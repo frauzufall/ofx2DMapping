@@ -1,0 +1,6 @@
+ofxGui
+ofxTriangle
+ofxSvg
+ofxSortableList
+ofxXmlSettings
+ofx2DMapping
