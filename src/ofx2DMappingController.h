@@ -39,13 +39,10 @@ class ofx2DMappingController {
         bool                        isLeft(ofPoint p1, ofPoint p2, ofPoint p_test);
         bool                        isOnLine(ofPoint p1, ofPoint p2, ofPoint p_test);
 
-        bool                        isCalibrating();
-        void                        setCalibrating(bool calibrate);
+        ofParameter<bool>           getCalibrating();
 
-        float                       getCalBorder();
-        int                         getCalGrey();
-        void                        setCalBorder(float border);
-        void                        setCalGrey(int grey);
+        ofParameter<float>          getCalBorder();
+        ofParameter<int>            getCalGrey();
 
         float							contentWidth();
         float							contentHeight();
@@ -77,21 +74,21 @@ class ofx2DMappingController {
 
         void saveOutputImage();
 
-        void addOption(string name, ofPolyline shape, ofFbo fbo);
-        void addOption(string name, ofPolyline shape, ofFbo_ptr fbo);
-        void addOption(string name, ofPolyline shape, ofTexture texture);
-        void addOption(string name, ofPolyline shape, ofTexture_ptr texture);
-        void addOption(string name, ofPolyline shape, ofImage image);
-        void addOption(string name, ofPolyline shape, ofImage_ptr image);
-        void addOption(string name, ofPolyline shape, ofColor color);
-        void addOption(string name, ofPoint point);
-        void addOption(string name, string text);
+        void                        saveMapping(string path, string path_svg, string path_png);
+        void                        saveMappingDefault();
+        void                        saveMappingAsPng(string path);
+        void                        saveMappingAsPng();
+        void                        saveMappingAsSvg();
+        void                        importSvg();
+
+        void addOption(MappingObject_ptr obj);
+        vector<MappingObject_ptr> getOptions();
 
     private:
 
         bool use_mapping;
 
-        string xml_mapping;
+        string xml_mapping, svg_mapping, png_mapping;
 
         float output_w, output_h;
         float content_w, content_h;
@@ -102,7 +99,7 @@ class ofx2DMappingController {
         GLfloat						matrix[16];
         ofPoint						plane[4];
 
-        bool                        is_cal;
+        ofParameter<bool>           is_cal;
         float                       cal_border;
         int                         cal_grey;
 

@@ -3,8 +3,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    mapping.setup(800, 600);
-    mapping.getControl()->getProjector(0)->addShape(CONTENT_SHAPE);
+    mapping.setup("mapping/mapping.xml", 800, 600);
+    mapping.getControl()->getProjector(0)->addShape("CONTENT_SHAPE");
 }
 
 //--------------------------------------------------------------

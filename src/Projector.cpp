@@ -127,7 +127,7 @@ MappingObject_ptr Projector::getFirstImageShape() {
     for(uint i = 0; i < shapeCount(); i++) {
         mq = shapes.at(i);
         if(mq) {
-            if(std::static_pointer_cast<MappingContentShape>(mq)) {
+            if(std::dynamic_pointer_cast<MappingContentShape>(mq)) {
                 mq_res = mq;
                 break;
             }
@@ -142,7 +142,7 @@ MappingObject_ptr Projector::getFirstImageShape() {
 //    res.clear();
 //    ofPtr<T> mo;
 //    for(uint i = 0; i < shapeCount(); i++) {
-//        mo = static_pointer_cast<T>(getShape(i));
+//        mo = dynamic_pointer_cast<T>(getShape(i));
 //        if(mo) {
 //            res.push_back(mo);
 //        }
@@ -220,7 +220,7 @@ void Projector::updateOutlines() {
 
         _paths->push_back(ofPtr<ofPath>(new ofPath()));
 
-        if(MappingShape_ptr shape = static_pointer_cast<MappingShape>(mq)) {
+        if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(mq)) {
             _outlines_raw->push_back(shape->polyline);
         }
         else {
@@ -255,7 +255,7 @@ void Projector::updateOutline(int shape_id) {
 
     MappingObject_ptr mq = getShape(shape_id);
 
-    if(MappingShape_ptr shape = static_pointer_cast<MappingShape>(mq)) {
+    if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(mq)) {
         _outlines_raw->at(shape_id) = shape->polyline.getVertices();
     }
 
@@ -316,7 +316,7 @@ void Projector::importSvg(string svg) {
             }
         }
 
-        MappingShape_ptr shape = static_pointer_cast<MappingShape>(getShape(j));
+        MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(getShape(j));
 
         shape->color = fill_col;
 
@@ -421,7 +421,7 @@ void Projector::saveMappingAsSvg(string path) {
                     id_sstr << "path" << i;
                     xml.addAttribute("path", "id", id_sstr.str(), i);
                     xml.addAttribute("path", "fill", Helper::getColorAsHex(mq->color), i);
-                    if(MappingShape_ptr shape = static_pointer_cast<MappingShape>(mq)) {
+                    if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(mq)) {
                         stringstream path_sstr;
                         path_sstr << "m";
                         ofPoint last_p;

@@ -4,6 +4,8 @@
 ofx2DMappingController::ofx2DMappingController() {
 
     xml_mapping = "mapping/mapping.xml";
+    svg_mapping = "mapping/mapping.svg";
+    png_mapping = "mapping/mapping.png";
 
     projectors.clear();
 
@@ -25,6 +27,8 @@ ofx2DMappingController::ofx2DMappingController() {
     cal_grey = 100;
 
     controlpoint = ofPoint(20,20);
+
+    available_shapes.clear();
 
     ofRegisterKeyEvents(this);
 
@@ -108,7 +112,7 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
                 MappingObject_ptr obj = getProjector(i)->addShape(type);
                 obj->loadXml(xml);
 
-                if(MappingContentShape_ptr shape = std::static_pointer_cast<MappingContentShape>(obj)) {
+                if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
                     ofAddListener(ofx2DMappingController::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
                 }
 
@@ -208,10 +212,6 @@ void ofx2DMappingController::mappedAreaToFbo(Projector *p) {
 
 }
 
-void ofx2DMappingController::setCalibrating(bool calibrate) {
-    is_cal = calibrate;
-}
-
 void ofx2DMappingController::drawCalibration(Projector* p) {
 
     ofEnableAlphaBlending();
@@ -238,23 +238,15 @@ void ofx2DMappingController::drawCalibration(Projector* p) {
 
 }
 
-bool ofx2DMappingController::isCalibrating() {
+ofParameter<bool> ofx2DMappingController::getCalibrating() {
     return is_cal;
 }
 
-void ofx2DMappingController::setCalBorder(float border) {
-    cal_border = border;
-}
-
-void ofx2DMappingController::setCalGrey(int grey) {
-    cal_grey = grey;
-}
-
-float ofx2DMappingController::getCalBorder() {
+ofParameter<float> ofx2DMappingController::getCalBorder() {
     return cal_border;
 }
 
-int ofx2DMappingController::getCalGrey() {
+ofParameter<int> ofx2DMappingController::getCalGrey() {
     return cal_grey;
 }
 
@@ -298,7 +290,7 @@ ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint nex
 
 //    for(uint i = 0; i < getProjector(0)->shapeCount(); i++) {
 
-//        MappingShape_ptr shape = std::static_pointer_cast<MappingShape>(getProjector(0)->getShape(i));
+//        MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(getProjector(0)->getShape(i));
 
 //        if(shape) {
 
@@ -472,6 +464,175 @@ void ofx2DMappingController::saveOutputImage() {
     img.save(str.str());
 }
 
+void ofx2DMappingController::saveMappingDefault() {
+    saveMapping(xml_mapping, svg_mapping, png_mapping);
+}
+
+void ofx2DMappingController::saveMapping(string path, string path_svg, string path_png) {
+
+    ofxXmlSettings xml;
+
+    xml.clear();
+
+    xml.addTag("mapping");
+
+    xml.pushTag("mapping", 0);
+
+        xml.addTag("content");
+        xml.pushTag("content", 0);
+            xml.addValue("width", (int)content_w);
+            xml.addValue("height", (int)content_h);
+        xml.popTag();
+        xml.addTag("output");
+        xml.pushTag("output", 0);
+            xml.addValue("width", (int)output_w);
+            xml.addValue("height", (int)output_h);
+        xml.popTag();
+        xml.addTag("control");
+        xml.pushTag("control", 0);
+            xml.addValue("width", (int)control_w);
+            xml.addValue("height", (int)control_h);
+        xml.popTag();
+        xml.addTag("video");
+        xml.pushTag("video", 0);
+            xml.addValue("max_width", (int)vid_max_w);
+            xml.addValue("max_height", (int)vid_max_h);
+        xml.popTag();
+
+        xml.addTag("projector");
+
+        xml.pushTag("projector", 0);
+
+            int i = 0;
+            for(uint j = 0; j < getProjector(0)->shapeCount(); j++) {
+
+                MappingObject_ptr mq = getProjector(0)->getShape(j);
+
+                if(mq) {
+
+                    xml.addTag("quad");
+
+                    xml.addAttribute("quad","type",mq->nature, i);
+                    xml.pushTag("quad", i);
+
+                        if(MappingImage_ptr image = std::dynamic_pointer_cast<MappingImage>(mq)) {
+                            xml.addValue("url", image->img_src);
+                        }
+
+                        if(MappingContentShape_ptr cshape = std::dynamic_pointer_cast<MappingContentShape>(mq)) {
+                            xml.addTag("src");
+                            xml.pushTag("src", 0);
+                                xml.addTag("lefttop");
+                                xml.pushTag("lefttop", 0);
+                                    xml.addValue("x", cshape->src[0].x);
+                                    xml.addValue("y", cshape->src[0].y);
+                                xml.popTag();
+                                xml.addTag("righttop");
+                                xml.pushTag("righttop", 0);
+                                    xml.addValue("x", cshape->src[1].x);
+                                    xml.addValue("y", cshape->src[1].y);
+                                xml.popTag();
+                                xml.addTag("rightbottom");
+                                xml.pushTag("rightbottom", 0);
+                                    xml.addValue("x", cshape->src[2].x);
+                                    xml.addValue("y", cshape->src[2].y);
+                                xml.popTag();
+                                xml.addTag("leftbottom");
+                                xml.pushTag("leftbottom", 0);
+                                    xml.addValue("x", cshape->src[3].x);
+                                    xml.addValue("y", cshape->src[3].y);
+                                xml.popTag();
+                            xml.popTag();
+                        }
+
+                        if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(mq)) {
+                            xml.addTag("dst");
+                            xml.pushTag("dst", 0);
+                                xml.addTag("lefttop");
+                                xml.pushTag("lefttop", 0);
+                                    xml.addValue("x", shape->dst[0].x);
+                                    xml.addValue("y", shape->dst[0].y);
+                                xml.popTag();
+                                xml.addTag("righttop");
+                                xml.pushTag("righttop", 0);
+                                    xml.addValue("x", shape->dst[1].x);
+                                    xml.addValue("y", shape->dst[1].y);
+                                xml.popTag();
+                                xml.addTag("rightbottom");
+                                xml.pushTag("rightbottom", 0);
+                                    xml.addValue("x", shape->dst[2].x);
+                                    xml.addValue("y", shape->dst[2].y);
+                                xml.popTag();
+                                xml.addTag("leftbottom");
+                                xml.pushTag("leftbottom", 0);
+                                    xml.addValue("x", shape->dst[3].x);
+                                    xml.addValue("y", shape->dst[3].y);
+                                xml.popTag();
+                            xml.popTag();
+
+                            xml.addTag("polyline");
+                            xml.pushTag("polyline",0);
+
+                                for(uint k = 0; k < shape->polyline.size(); k++) {
+                                    xml.addTag("point");
+                                    xml.pushTag("point",k);
+                                        xml.addValue("x", shape->polyline[k].x);
+                                        xml.addValue("y", shape->polyline[k].y);
+                                    xml.popTag();
+                                }
+
+                            xml.popTag();
+                        }
+
+                    xml.popTag();
+
+                    i++;
+
+                }
+            }
+
+        xml.popTag();
+
+    xml.popTag();
+
+    xml.saveFile(path);
+
+    saveMappingAsPng(path_png);
+
+    getProjector(0)->saveMappingAsSvg(path_svg);
+
+}
+
+void ofx2DMappingController::saveMappingAsPng() {
+    saveMappingAsPng(png_mapping);
+}
+
+void ofx2DMappingController::saveMappingAsPng(string path) {
+
+    ofFbo_ptr fbo = getArea();
+    ofImage img;
+    unsigned char* pixels = new unsigned char[(int)output_w*(int)output_h*4];
+    img.allocate(fbo->getWidth(), fbo->getHeight(), OF_IMAGE_COLOR_ALPHA);
+    img.setUseTexture(false);
+    fbo->begin();
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, fbo->getWidth(), fbo->getHeight(), GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+    img.setFromPixels(pixels, fbo->getWidth(), fbo->getHeight(), OF_IMAGE_COLOR_ALPHA);
+    fbo->end();
+
+    img.save(path);
+
+}
+
+void ofx2DMappingController::saveMappingAsSvg() {
+    getProjector(0)->saveMappingAsSvg(svg_mapping);
+}
+
+void ofx2DMappingController::importSvg() {
+    getProjector(0)->importSvg(svg_mapping);
+}
+
 void ofx2DMappingController::keyPressed(ofKeyEventArgs &args){
 
     switch(args.key) {
@@ -538,4 +699,12 @@ void ofx2DMappingController::setControlWidth(float val) {
 
 void ofx2DMappingController::setControlHeight(float val) {
     control_h = val;
+}
+
+void ofx2DMappingController::addOption(MappingObject_ptr obj) {
+    available_shapes.push_back(obj);
+}
+
+vector<MappingObject_ptr> ofx2DMappingController::getOptions() {
+    return available_shapes;
 }

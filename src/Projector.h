@@ -53,7 +53,7 @@ public:
         res.clear();
         ofPtr<T> mo;
         for(uint i = 0; i < shapeCount(); i++) {
-            mo = static_pointer_cast<T>(getShape(i));
+            mo = dynamic_pointer_cast<T>(getShape(i));
             if(mo) {
                 res.push_back(mo);
             }
