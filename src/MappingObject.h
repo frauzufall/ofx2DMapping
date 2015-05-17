@@ -22,6 +22,8 @@ public:
         newitem = true;
 
         nature = "OBJECT";
+
+        editable.set(nature, false);
     }
 
     virtual void loadXml(ofxXmlSettings_ptr xml) {
@@ -30,6 +32,12 @@ public:
             name = "noname";
         }
 
+    }
+
+    virtual void copy(ofPtr<MappingObject> obj)  {
+        this->color = obj->color;
+        this->name = obj->name;
+        this->nature = obj->nature;
     }
 
     virtual void draw(float w, float h) = 0;
@@ -174,6 +182,7 @@ public:
 
     bool        newpos;
     bool        newitem;
+    ofParameter<bool> editable;
 
     ~MappingObject(){}
 

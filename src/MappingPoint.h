@@ -9,7 +9,6 @@ class MappingPoint : public MappingObject {
     ofPoint     pos;
 
     MappingPoint() {
-        cout << "MAPPINGPOINT" << endl;
         this->nature = "POINT";
     }
 

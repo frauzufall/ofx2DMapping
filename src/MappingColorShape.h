@@ -7,12 +7,10 @@ class MappingColorShape : public MappingShape {
     public:
 
     MappingColorShape() {
-        cout << "MAPPINGCOLORSHAPE" << endl;
         this->nature = "COLOR_SHAPE";
     }
 
     void draw(float w, float h) {
-        cout << "MAPPINGCOLORSHAPE::draw()" << endl;
         ofFill();
         ofSetColor(this->color);
         ofBeginShape();

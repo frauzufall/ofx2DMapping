@@ -22,9 +22,9 @@ ofx2DMappingController::ofx2DMappingController() {
     plane[2] = ofPoint(1, 1, 0);
     plane[3] = ofPoint(0, 1, 0);
 
-    is_cal = false;
-    cal_border = 0.05;
-    cal_grey = 100;
+    is_cal.set("calibration", false);
+    cal_border.set("line width", 1, 1, 7);
+    cal_grey.set("lightness", 100, 0, 255);
 
     controlpoint = ofPoint(20,20);
 
@@ -34,20 +34,20 @@ ofx2DMappingController::ofx2DMappingController() {
 
 }
 
-void ofx2DMappingController::setup(string xml_path, float width, float height) {
+void ofx2DMappingController::setup(string xml_path) {
 
     xml_mapping = xml_path;
-
-    output_w = width;
-    output_h = height;
+    ofFile xml = ofFile(xml_path);
+    svg_mapping = xml.getEnclosingDirectory() + xml.getBaseName() + ".svg";
+    png_mapping = xml.getEnclosingDirectory() + xml.getBaseName() + ".png";
 
     setupMapping();
 
     mapped_content_fbo = ofFbo_ptr(new ofFbo());
-    mapped_content_fbo->allocate(output_w, output_h, GL_RGBA);
+    mapped_content_fbo->allocate(getProjector(0)->outputWidth(), getProjector(0)->outputHeight(), GL_RGBA);
 
     mapped_area_fbo = ofFbo_ptr(new ofFbo());
-    mapped_area_fbo->allocate(output_w, output_h, GL_RGBA);
+    mapped_area_fbo->allocate(getProjector(0)->outputWidth(), getProjector(0)->outputHeight(), GL_RGBA);
 
 }
 
@@ -74,12 +74,7 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
     content_h		= xml->getValue("height", 480.);
 
     xml->popTag();
-    xml->pushTag("output", 0);
 
-    output_w		= xml->getValue("width", 1024.);
-    output_h		= xml->getValue("height", 768.);
-
-    xml->popTag();
     xml->pushTag("control", 0);
 
     control_w		= xml->getValue("width", 1024.);
@@ -99,6 +94,13 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
         xml->pushTag("projector", i);
 
+        xml->pushTag("output", 0);
+
+        float output_w		= xml->getValue("width", 1024.);
+        float output_h		= xml->getValue("height", 768.);
+
+        xml->popTag();
+
         addProjector(output_w, output_h);
 
         int quad_count = xml->getNumTags("quad");
@@ -112,10 +114,7 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
                 MappingObject_ptr obj = getProjector(i)->addShape(type);
                 obj->loadXml(xml);
 
-                if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
-                    ofAddListener(ofx2DMappingController::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
-                }
-
+                addListeners(obj);
 
             xml->popTag();
 
@@ -191,7 +190,7 @@ void ofx2DMappingController::mappedContentToFbo(Projector *p) {
     for(uint i = 0; i < p->shapeCount(); i++) {
 
         MappingObject_ptr q = p->getShape(i);
-        q->draw(output_w, output_h);
+        q->draw(p->outputWidth(), p->outputHeight());
     }
 
     mapped_content_fbo->end();
@@ -205,7 +204,7 @@ void ofx2DMappingController::mappedAreaToFbo(Projector *p) {
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
-        p->getShape(i)->drawArea(output_w, output_h);
+        p->getShape(i)->drawArea(p->outputWidth(), p->outputHeight());
     }
 
     mapped_area_fbo->end();
@@ -238,15 +237,15 @@ void ofx2DMappingController::drawCalibration(Projector* p) {
 
 }
 
-ofParameter<bool> ofx2DMappingController::getCalibrating() {
+ofParameter<bool>& ofx2DMappingController::getCalibrating() {
     return is_cal;
 }
 
-ofParameter<float> ofx2DMappingController::getCalBorder() {
+ofParameter<float>& ofx2DMappingController::getCalBorder() {
     return cal_border;
 }
 
-ofParameter<int> ofx2DMappingController::getCalGrey() {
+ofParameter<int>& ofx2DMappingController::getCalGrey() {
     return cal_grey;
 }
 
@@ -268,7 +267,8 @@ Projector* ofx2DMappingController::getProjector(int id) {
 
 ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint next_p) {
 
-    ofPoint last_p_norm(last_p.x/output_w, last_p.y/output_h);
+    Projector *p = getProjector(0);
+    ofPoint last_p_norm(last_p.x/p->outputWidth(), last_p.y/p->outputHeight());
     ofPoint res_norm;
     ofPoint res = next_p;
     //TODO rewrite to fit new model
@@ -424,7 +424,7 @@ ofPoint ofx2DMappingController::intersectionPointPolyline(ofPoint last_p, ofPoin
             ofPoint intersection = getIntersection(last_p, next_p, poly[i], poly[j]);
             ofPoint last_inter_norm = (intersection-last_p).normalize();
             if(last_p.x<1)
-                intersections.push_back(intersection-last_inter_norm*1/output_w);
+                intersections.push_back(intersection-last_inter_norm*1/getProjector(0)->outputWidth());
             else
                 intersections.push_back(intersection-last_inter_norm);
         }
@@ -485,8 +485,8 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
         xml.popTag();
         xml.addTag("output");
         xml.pushTag("output", 0);
-            xml.addValue("width", (int)output_w);
-            xml.addValue("height", (int)output_h);
+            xml.addValue("width", (int)getProjector(0)->outputWidth());
+            xml.addValue("height", (int)getProjector(0)->outputHeight());
         xml.popTag();
         xml.addTag("control");
         xml.pushTag("control", 0);
@@ -611,7 +611,7 @@ void ofx2DMappingController::saveMappingAsPng(string path) {
 
     ofFbo_ptr fbo = getArea();
     ofImage img;
-    unsigned char* pixels = new unsigned char[(int)output_w*(int)output_h*4];
+    unsigned char* pixels = new unsigned char[(int)getProjector(0)->outputWidth()*(int)getProjector(0)->outputHeight()*4];
     img.allocate(fbo->getWidth(), fbo->getHeight(), OF_IMAGE_COLOR_ALPHA);
     img.setUseTexture(false);
     fbo->begin();
@@ -661,14 +661,6 @@ float ofx2DMappingController::contentHeight() {
     return content_h;
 }
 
-float ofx2DMappingController::outputWidth() {
-    return output_w;
-}
-
-float ofx2DMappingController::outputHeight() {
-    return output_h;
-}
-
 float ofx2DMappingController::controlWidth() {
     return control_w;
 }
@@ -685,14 +677,6 @@ float ofx2DMappingController::vidMaxHeight() {
     return vid_max_h;
 }
 
-void ofx2DMappingController::setOutputWidth(float val) {
-    output_w = val;
-}
-
-void ofx2DMappingController::setOutputHeight(float val) {
-    output_h = val;
-}
-
 void ofx2DMappingController::setControlWidth(float val) {
     control_w = val;
 }
@@ -707,4 +691,16 @@ void ofx2DMappingController::addOption(MappingObject_ptr obj) {
 
 vector<MappingObject_ptr> ofx2DMappingController::getOptions() {
     return available_shapes;
+}
+
+void ofx2DMappingController::addListeners(MappingObject_ptr obj) {
+    if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
+        ofAddListener(ofx2DMappingController::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
+    }
+}
+
+void ofx2DMappingController::removeListeners(MappingObject_ptr obj) {
+    if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
+        ofRemoveListener(ofx2DMappingController::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
+    }
 }

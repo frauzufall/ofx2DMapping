@@ -3,8 +3,8 @@
 ofx2DMapping::ofx2DMapping() {
 }
 
-void ofx2DMapping::setup(string mapping_path, float w, float h) {
-    ctrl.setup(mapping_path, w, h);
+void ofx2DMapping::setup(string mapping_path) {
+    ctrl.setup(mapping_path);
 }
 
 void ofx2DMapping::update() {

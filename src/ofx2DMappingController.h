@@ -16,7 +16,7 @@ class ofx2DMappingController {
         ofx2DMappingController();
         ~ofx2DMappingController() {}
 
-        void						setup(string xml_path, float width, float height);
+        void						setup(string xml_path);
         void						update();
         void                        updateFbo(int projector_id);
         void                        updateAreaFbo(int projector_id);
@@ -39,24 +39,20 @@ class ofx2DMappingController {
         bool                        isLeft(ofPoint p1, ofPoint p2, ofPoint p_test);
         bool                        isOnLine(ofPoint p1, ofPoint p2, ofPoint p_test);
 
-        ofParameter<bool>           getCalibrating();
+        ofParameter<bool>           &getCalibrating();
 
-        ofParameter<float>          getCalBorder();
-        ofParameter<int>            getCalGrey();
+        ofParameter<float>          &getCalBorder();
+        ofParameter<int>            &getCalGrey();
 
-        float							contentWidth();
-        float							contentHeight();
-        float							outputWidth();
-        float							outputHeight();
-        float							controlWidth();
-        float							controlHeight();
-        float							vidMaxWidth();
-        float							vidMaxHeight();
+        float						contentWidth();
+        float						contentHeight();
+        float						controlWidth();
+        float						controlHeight();
+        float						vidMaxWidth();
+        float						vidMaxHeight();
 
         void						setContentWidth(float val);
         void						setContentHeight(float val);
-        void						setOutputWidth(float val);
-        void						setOutputHeight(float val);
         void						setControlWidth(float val);
         void						setControlHeight(float val);
         void						setVidMaxWidth(float val);
@@ -84,13 +80,15 @@ class ofx2DMappingController {
         void addOption(MappingObject_ptr obj);
         vector<MappingObject_ptr> getOptions();
 
+        void addListeners(MappingObject_ptr obj);
+        void removeListeners(MappingObject_ptr obj);
+
     private:
 
         bool use_mapping;
 
         string xml_mapping, svg_mapping, png_mapping;
 
-        float output_w, output_h;
         float content_w, content_h;
         float control_w, control_h;
         float vid_max_w, vid_max_h;
@@ -100,8 +98,8 @@ class ofx2DMappingController {
         ofPoint						plane[4];
 
         ofParameter<bool>           is_cal;
-        float                       cal_border;
-        int                         cal_grey;
+        ofParameter<float>          cal_border;
+        ofParameter<int>            cal_grey;
 
         ofFbo_ptr                   src_fbo;
         ofEvent<ofFbo_ptr>          updatedFbo;

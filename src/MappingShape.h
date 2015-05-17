@@ -106,6 +106,8 @@ protected:
             xml->popTag();
         }
 
+        res.close();
+
         return res;
 
     }

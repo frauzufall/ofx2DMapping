@@ -80,6 +80,19 @@ MappingObject_ptr Projector::addShape(string type, bool swap) {
     return shapes.at(shapes.size()-1);
 }
 
+MappingObject_ptr Projector::copyShape(MappingObject_ptr original, bool swap) {
+    shapes.push_back(MappingObjectFactory<MappingObject>::instance().Create(original->nature));
+    shapes.at(shapes.size()-1)->copy(original);
+    if(swap) {
+        update();
+        for(int i = shapes.size()-1; i>0;i--) {
+            swapShapes(i, i-1);
+        }
+        return shapes.at(0);
+    }
+    return shapes.at(shapes.size()-1);
+}
+
 bool Projector::removeShape(int id) {
     if(id >= 0 && id < (int)shapes.size()) {
         shapes.at(id).reset();
@@ -449,4 +462,12 @@ void Projector::saveMappingAsSvg(string path) {
     xml.popTag();
 
     xml.saveFile(path);
+}
+
+ofParameter<float> Projector::outputWidth() {
+    return output_w;
+}
+
+ofParameter<float> Projector::outputHeight() {
+    return output_h;
 }

@@ -10,7 +10,6 @@ class MappingImage : public MappingContentShape {
     string      img_src;
 
     MappingImage() {
-        cout << "MAPPINGIMAGE" << endl;
         this->image.clear();
         this->img_src = "";
         this->nature = "IMAGE";

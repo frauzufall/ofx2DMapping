@@ -34,6 +34,7 @@ public:
 
     MappingObject_ptr addShape(MappingObject_ptr obj, bool swap = false);
     MappingObject_ptr addShape(string type, bool swap = false);
+    MappingObject_ptr copyShape(MappingObject_ptr obj, bool swap = false);
 
     bool removeShape(int id);
 
@@ -82,10 +83,13 @@ public:
     void                        importSvg(string file);
     void                        reloadLinesFromRaw();
 
+    ofParameter<float>			outputWidth();
+    ofParameter<float>			outputHeight();
+
 
 private:
 
-    float							output_w, output_h;
+    float                       output_w, output_h;
 
     ofxSVG_ptr                  _svg;
     ofPaths_ptr                 _paths;

@@ -9,7 +9,7 @@ public:
     ofx2DMapping();
     ~ofx2DMapping();
 
-    void setup(string mapping_path, float w=800, float h=600);
+    void setup(string mapping_path);
     void update();
 
     ofx2DMappingController* getControl();

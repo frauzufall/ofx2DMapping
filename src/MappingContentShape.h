@@ -26,7 +26,7 @@ class MappingContentShape : public MappingShape {
         this->src[3].x = this->src[0].x;
         this->src[3].y = this->src[2].y;
 
-//        this->matrix_src_dst.makeIdentityMatrix();
+        this->matrix_src_dst.makeIdentityMatrix();
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {
