@@ -14,7 +14,9 @@ class ofx2DMappingController {
     public:
 
         ofx2DMappingController();
-        ~ofx2DMappingController() {}
+        ~ofx2DMappingController() {
+            projectors.clear();
+        }
 
         void						setup(string xml_path);
         void						update();
@@ -58,7 +60,7 @@ class ofx2DMappingController {
         void						setVidMaxWidth(float val);
         void						setVidMaxHeight(float val);
 
-        ofFbo_ptr					getOutput();
+        ofFbo_ptr &getOutput();
         ofFbo_ptr					getArea();
 
         void                        setInputFbo(ofFbo_ptr fbo);
@@ -77,11 +79,18 @@ class ofx2DMappingController {
         void                        saveMappingAsSvg();
         void                        importSvg();
 
-        void addOption(MappingObject_ptr obj);
+        void addTemplate(MappingObject_ptr obj);
+        template <class T>
+        ofPtr<T> addTemplate(string name) {
+            ofPtr<T> obj  = ofPtr<T>(new T());
+            addTemplate(obj);
+            obj->name = name;
+            return obj;
+        }
+
         vector<MappingObject_ptr> getOptions();
 
-        void addListeners(MappingObject_ptr obj);
-        void removeListeners(MappingObject_ptr obj);
+        ofFbo_ptr&                  getSourceFbo();
 
     private:
 
@@ -102,7 +111,6 @@ class ofx2DMappingController {
         ofParameter<int>            cal_grey;
 
         ofFbo_ptr                   src_fbo;
-        ofEvent<ofFbo_ptr>          updatedFbo;
 
         ofFbo_ptr           		mapped_content_fbo;
         ofFbo_ptr                   mapped_area_fbo;

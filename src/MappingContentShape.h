@@ -29,6 +29,16 @@ class MappingContentShape : public MappingShape {
         this->matrix_src_dst.makeIdentityMatrix();
     }
 
+    void copy(ofPtr<MappingContentShape> obj)  {
+        MappingShape::copy(obj);
+        for(int i = 0; i < 4; i++) {
+            this->src[i] = obj->src[i];
+        }
+        this->src_width = obj->src_width;
+        this->src_height = obj->src_height;
+        this->matrix_src_dst = obj->matrix_src_dst;
+    }
+
     void loadXml(ofxXmlSettings_ptr xml) {
         MappingShape::loadXml(xml);
         xml->pushTag("src", 0);
@@ -106,6 +116,13 @@ class MappingContentShape : public MappingShape {
 
         ofPopMatrix();
 
+    }
+
+    ofTexture* getTexture() {
+        if(fbo)
+            return &fbo->getTexture();
+        else
+            return 0;
     }
 
 };

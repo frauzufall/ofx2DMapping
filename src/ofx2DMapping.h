@@ -11,6 +11,7 @@ public:
 
     void setup(string mapping_path);
     void update();
+    void draw(float x, float y, float w, float h);
 
     ofx2DMappingController* getControl();
     ofx2DMappingView* getView();

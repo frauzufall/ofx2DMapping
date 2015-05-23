@@ -22,10 +22,11 @@ Projector::Projector(float w, float h) {
     output_w = w;
     output_h = h;
 
-
     RegisterInFactory<MappingObject, MappingContentShape> register1(MappingContentShape().nature);
     RegisterInFactory<MappingObject, MappingColorShape> register2(MappingColorShape().nature);
     RegisterInFactory<MappingObject, MappingImage> register3(MappingImage().nature);
+
+    ofAddListener(Projector::updatedFbo, this, &Projector::setInputFbo);
 }
 
 Projector::~Projector() {
@@ -70,6 +71,7 @@ MappingObject_ptr Projector::addShape(MappingObject_ptr obj, bool swap) {
 
 MappingObject_ptr Projector::addShape(string type, bool swap) {
     shapes.push_back(MappingObjectFactory<MappingObject>::instance().Create(type));
+    shapes.at(shapes.size()-1)->name = type;
     if(swap) {
         update();
         for(int i = shapes.size()-1; i>0;i--) {
@@ -314,22 +316,20 @@ void Projector::importSvg(string svg) {
         ofPolyline l = _outlines_raw->at(j);
         ofRectangle bounding = l.getBoundingBox();
 
-        if(fill_col.getLightness() == 255) {
-            //add content shape
-            if(!quads_match) {
-                MappingContentShape_ptr cshape = MappingContentShape_ptr(new MappingContentShape());
-                addShape(cshape);
+        if(!quads_match) {
+            if(fill_col == ofColor::white) {
+                //add content shape
+                addShape("CONTENT_SHAPE");
             }
-        }
-        else {
-            //add color shape
-            if(!quads_match) {
-                MappingColorShape_ptr cshape = MappingColorShape_ptr(new MappingColorShape());
-                addShape(cshape);
+            else {
+                //add color shape
+                addShape("COLOR_SHAPE");
             }
         }
 
         MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(getShape(j));
+
+        addListeners(shape);
 
         shape->color = fill_col;
 
@@ -431,8 +431,9 @@ void Projector::saveMappingAsSvg(string path) {
 
                     xml.addTag("path");
                     stringstream id_sstr;
-                    id_sstr << "path" << i;
+                    id_sstr << "mappingobject_" << i << "_" << mq->name;
                     xml.addAttribute("path", "id", id_sstr.str(), i);
+//                    xml.addAttribute("path", "inkscape:label", mq->nature, i);
                     xml.addAttribute("path", "fill", Helper::getColorAsHex(mq->color), i);
                     if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(mq)) {
                         stringstream path_sstr;
@@ -464,6 +465,25 @@ void Projector::saveMappingAsSvg(string path) {
     xml.saveFile(path);
 }
 
+void Projector::setInputFbo(ofFbo_ptr &fbo) {
+    input_fbo = fbo;
+}
+
+void Projector::addListeners(MappingObject_ptr obj) {
+    if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
+        if(input_fbo) {
+            shape->updateFbo(input_fbo);
+        }
+        ofAddListener(Projector::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
+    }
+}
+
+void Projector::removeListeners(MappingObject_ptr obj) {
+    if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
+        ofRemoveListener(Projector::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
+    }
+}
+
 ofParameter<float> Projector::outputWidth() {
     return output_w;
 }
@@ -471,3 +491,4 @@ ofParameter<float> Projector::outputWidth() {
 ofParameter<float> Projector::outputHeight() {
     return output_h;
 }
+

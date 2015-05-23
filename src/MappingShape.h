@@ -9,7 +9,6 @@ public:
     ofPoint     dst[4];
     ofMatrix4x4 matrix_dst_norm;
     ofxTriangle triangle;
-    ofMesh      mesh;
     ofPolyline  polyline;
     ofPoint     plane[4];
 
@@ -39,6 +38,17 @@ public:
         this->plane[3] = ofPoint(0, 1, 0);
 
         this->matrix_dst_norm.makeIdentityMatrix();
+    }
+
+    void copy(ofPtr<MappingShape> obj)  {
+        MappingObject::copy(obj);
+        for(int i = 0; i < 4; i++) {
+            this->dst[i] = obj->dst[i];
+            this->plane[i] = obj->plane[i];
+        }
+        this->polyline = obj->polyline;
+        this->triangle = obj->triangle;
+        this->matrix_dst_norm = obj->matrix_dst_norm;
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {

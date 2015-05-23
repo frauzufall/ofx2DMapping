@@ -15,6 +15,12 @@ class MappingImage : public MappingContentShape {
         this->nature = "IMAGE";
     }
 
+    void copy(ofPtr<MappingImage> obj)  {
+        MappingContentShape::copy(obj);
+        this->image = obj->image;
+        this->img_src = obj->img_src;
+    }
+
     void loadXml(ofxXmlSettings_ptr xml) {
         MappingContentShape::loadXml(xml);
         string url = xml->getValue("url", "images/notfound.png");
@@ -24,8 +30,6 @@ class MappingImage : public MappingContentShape {
     }
 
     void draw(float w, float h) {
-
-        cout << "MAPPINGIMAGE::draw()" << endl;
 
         if(this->image.isAllocated()) {
             ofPushMatrix();
@@ -49,6 +53,13 @@ class MappingImage : public MappingContentShape {
             glPopMatrix();
         }
 
+    }
+
+    ofTexture* getTexture() {
+        if(image.isAllocated())
+            return &image.getTexture();
+        else
+            return 0;
     }
 
 };

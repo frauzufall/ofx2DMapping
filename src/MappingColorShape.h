@@ -10,6 +10,10 @@ class MappingColorShape : public MappingShape {
         this->nature = "COLOR_SHAPE";
     }
 
+    void copy(ofPtr<MappingColorShape> obj)  {
+        MappingShape::copy(obj);
+    }
+
     void draw(float w, float h) {
         ofFill();
         ofSetColor(this->color);

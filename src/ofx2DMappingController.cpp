@@ -112,9 +112,13 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
             xml->pushTag("quad", j);
 
                 MappingObject_ptr obj = getProjector(i)->addShape(type);
-                obj->loadXml(xml);
-
-                addListeners(obj);
+                if(obj) {
+                    obj->loadXml(xml);
+                    getProjector(0)->addListeners(obj);
+                }
+                else {
+                    ofLogError("ofx2DMappingController::reloadMapping()", "Could not load mapping object with type " + type + " from xml");
+                }
 
             xml->popTag();
 
@@ -135,6 +139,9 @@ void ofx2DMappingController::update() {
     for(uint i = 0; i < projectors.size(); i++) {
         projectors[i].update();
     }
+
+    updateFbo(0);
+    updateAreaFbo(0);
 
 }
 
@@ -444,7 +451,7 @@ ofPoint ofx2DMappingController::intersectionPointPolyline(ofPoint last_p, ofPoin
     return min_dif_p;
 }
 
-ofFbo_ptr ofx2DMappingController::getOutput() {
+ofFbo_ptr &ofx2DMappingController::getOutput() {
     return mapped_content_fbo;
 }
 
@@ -458,8 +465,8 @@ void ofx2DMappingController::saveOutputImage() {
     str << ofGetTimestampString() << ".png";
     cout << "MAPPINGCONTROLLER::saving image " << str.str() << endl;
     ofImage img;
-    img.allocate(mapped_content_fbo->getWidth(), mapped_content_fbo->getHeight(), OF_IMAGE_COLOR_ALPHA);
-    mapped_content_fbo->readToPixels(img.getPixels());
+    img.allocate(getOutput()->getWidth(), getOutput()->getHeight(), OF_IMAGE_COLOR_ALPHA);
+    getOutput()->readToPixels(img.getPixels());
     img.update();
     img.save(str.str());
 }
@@ -483,11 +490,6 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
             xml.addValue("width", (int)content_w);
             xml.addValue("height", (int)content_h);
         xml.popTag();
-        xml.addTag("output");
-        xml.pushTag("output", 0);
-            xml.addValue("width", (int)getProjector(0)->outputWidth());
-            xml.addValue("height", (int)getProjector(0)->outputHeight());
-        xml.popTag();
         xml.addTag("control");
         xml.pushTag("control", 0);
             xml.addValue("width", (int)control_w);
@@ -509,6 +511,12 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
                 MappingObject_ptr mq = getProjector(0)->getShape(j);
 
                 if(mq) {
+
+                    xml.addTag("output");
+                    xml.pushTag("output", 0);
+                        xml.addValue("width", (int)getProjector(0)->outputWidth());
+                        xml.addValue("height", (int)getProjector(0)->outputHeight());
+                    xml.popTag();
 
                     xml.addTag("quad");
 
@@ -650,7 +658,8 @@ void ofx2DMappingController::keyReleased(ofKeyEventArgs &args){
 
 void ofx2DMappingController::setInputFbo(ofFbo_ptr fbo) {
     src_fbo = fbo;
-    ofNotifyEvent(ofx2DMappingController::updatedFbo, fbo);
+    ofNotifyEvent(getProjector(0)->updatedFbo, fbo);
+    getProjector(0)->setInputFbo(fbo);
 }
 
 float ofx2DMappingController::contentWidth() {
@@ -685,7 +694,7 @@ void ofx2DMappingController::setControlHeight(float val) {
     control_h = val;
 }
 
-void ofx2DMappingController::addOption(MappingObject_ptr obj) {
+void ofx2DMappingController::addTemplate(MappingObject_ptr obj) {
     available_shapes.push_back(obj);
 }
 
@@ -693,14 +702,6 @@ vector<MappingObject_ptr> ofx2DMappingController::getOptions() {
     return available_shapes;
 }
 
-void ofx2DMappingController::addListeners(MappingObject_ptr obj) {
-    if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
-        ofAddListener(ofx2DMappingController::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
-    }
-}
-
-void ofx2DMappingController::removeListeners(MappingObject_ptr obj) {
-    if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
-        ofRemoveListener(ofx2DMappingController::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
-    }
+ofFbo_ptr &ofx2DMappingController::getSourceFbo() {
+    return src_fbo;
 }

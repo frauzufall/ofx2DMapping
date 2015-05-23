@@ -86,6 +86,13 @@ public:
     ofParameter<float>			outputWidth();
     ofParameter<float>			outputHeight();
 
+    void addListeners(MappingObject_ptr obj);
+    void removeListeners(MappingObject_ptr obj);
+
+    void                        setInputFbo(ofFbo_ptr &fbo);
+
+    ofEvent<ofFbo_ptr>          updatedFbo;
+
 
 private:
 
@@ -99,6 +106,8 @@ private:
     vector<MappingObject_ptr> shapes;
     ofPoint                 start_point;
     ofPoint                 plane[4];
+
+    ofFbo_ptr               input_fbo;
 
 };
 

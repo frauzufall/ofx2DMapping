@@ -1,47 +1,58 @@
 #pragma once
 #include "ofMain.h"
+#include "ofx2DMappingController.h"
 #include "ofxSortableList.h"
+#include "FormMapping.h"
 
-
-
-class ofx2DMappingView : public ofxPanel {
+class ofx2DMappingView {
 
 public:
     ofx2DMappingView();
+    void setup(float w, float h);
+    void update();
+    void draw();
+    void draw(ofPoint pos);
+    void setMappingBackground(ofFbo_ptr fbo);
+    void showSource(bool show);
+    void setEditMode(bool &direct_edit);
 
-//    void setup(string title = "");
+    void setControl(ofx2DMappingController* ctrl);
 
-//    bool mouseDragged(ofMouseEventArgs& args);
-//    bool mousePressed(ofMouseEventArgs& args);
-//    bool mouseReleased(ofMouseEventArgs& args);
-//    bool mouseMoved(ofMouseEventArgs& args);
-//    bool mouseScrolled(ofMouseEventArgs& args);
+    void importSvg();
 
-//    //is called after an element is dropped outside of the list.
-//    ofEvent <RemovedElementData> elementRemoved;
-
-//    //is called after an element is dropped and changed position.
-//    ofEvent <MovingElementData> elementMoved;
-
-//    //is called for every single index an element is moved. when an element is moved from 2 to 4, it is called two times (2->3, 3->4)
-//    ofEvent <MovingElementData> elementMovedStepByStep;
-
-//    ofxPanel& getList();
-//    ofxPanel& getControls();
-
-//    void drawMapping();
+    FormMapping* getMappingList();
 
 private:
 
-//    bool use_complex_images;
+    ofx2DMappingController* ctrl;
 
-//    vector< vector < draggableVertex > >  shape_dst,shape_src;
-//    draggableVertex start_point;
+    void setSubpanelPositions();
+    void updateQuadList();
 
-//    ofRectangle mapping_rect_dst, mapping_rect_src;
-//    vector<ofPtr<ofParameter<bool>>> shape_params;
+    bool show_source, direct_edit;
 
-//    ofxSortableList shape_list;
-//    ofxPanel controls;
+    ofRectangle control_rect;
+
+    ofxSortableList shape_list;
+
+    ofPoint pos_main_options, pos_calibration_options, pos_add_buttons, pos_shape_list;
+
+    ofxPanel add_buttons_panel;
+    FormMapping mapping_dst;
+    ofxPanel mapping_src;
+    ofxPanel main_options, calibration_options;
+
+    void removeForm(RemovedElementData& data);
+    void reorderForm(MovingElementData& data);
+
+    MappingObject_ptr addForm(string type, string name, bool at_bottom);
+
+    ofxButton save_btn, import_btn;
+    ofxToggle edit_mode_btn;
+    vector<ofParameter<bool>> add_button_params;
+
+    float zoom;
+    ofPoint zoom_pos;
+
 
 };
