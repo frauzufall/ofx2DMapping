@@ -46,6 +46,33 @@ class MappingContentShape : public MappingShape {
         xml->popTag();
     }
 
+    virtual void saveXml(ofxXmlSettings_ptr xml) {
+        MappingShape::saveXml(xml);
+        xml->addTag("src");
+        xml->pushTag("src", 0);
+            xml->addTag("lefttop");
+            xml->pushTag("lefttop", 0);
+                xml->addValue("x", src[0].x);
+                xml->addValue("y", src[0].y);
+            xml->popTag();
+            xml->addTag("righttop");
+            xml->pushTag("righttop", 0);
+                xml->addValue("x", src[1].x);
+                xml->addValue("y", src[1].y);
+            xml->popTag();
+            xml->addTag("rightbottom");
+            xml->pushTag("rightbottom", 0);
+                xml->addValue("x", src[2].x);
+                xml->addValue("y", src[2].y);
+            xml->popTag();
+            xml->addTag("leftbottom");
+            xml->pushTag("leftbottom", 0);
+                xml->addValue("x", src[3].x);
+                xml->addValue("y", src[3].y);
+            xml->popTag();
+        xml->popTag();
+    }
+
     void update(float w, float h) {
         MappingShape::update(w, h);
         this->findHomography(this->dst, this->src, (GLfloat*) this->matrix_src_dst.getPtr(), true, w, h);
@@ -74,22 +101,22 @@ class MappingContentShape : public MappingShape {
                     glBegin(GL_TRIANGLES);
                     for (int i = 0; i < this->triangle.nTriangles; i++){
 
-                        float cx = (((this->triangle.triangles[i].a.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* w;
-                        float cy = (((this->triangle.triangles[i].a.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * h;
+                        float cx = (((this->triangle.triangles[i].a.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* fbo->getWidth();
+                        float cy = (((this->triangle.triangles[i].a.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * fbo->getHeight();
                         float ox = (this->triangle.triangles[i].a.x - this->dst[0].x) / (float)(this->dst[1].x-this->dst[0].x) * w;
                         float oy = (this->triangle.triangles[i].a.y - this->dst[0].y) / (float)(this->dst[2].y-this->dst[0].y) * h;
                         glTexCoord2f(cx, cy);
                         glVertex2f(ox, oy);
 
-                        cx = (((this->triangle.triangles[i].b.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* w;
-                        cy = (((this->triangle.triangles[i].b.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * h;
+                        cx = (((this->triangle.triangles[i].b.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* fbo->getWidth();
+                        cy = (((this->triangle.triangles[i].b.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * fbo->getHeight();
                         ox = (this->triangle.triangles[i].b.x - this->dst[0].x)/(float)(this->dst[1].x-this->dst[0].x)*w;
                         oy = (this->triangle.triangles[i].b.y - this->dst[0].y)/(float)(this->dst[2].y-this->dst[0].y)*h;
                         glTexCoord2f(cx, cy);
                         glVertex2f(ox, oy);
 
-                        cx = (((this->triangle.triangles[i].c.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* w;
-                        cy = (((this->triangle.triangles[i].c.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * h;
+                        cx = (((this->triangle.triangles[i].c.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* fbo->getWidth();
+                        cy = (((this->triangle.triangles[i].c.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * fbo->getHeight();
                         ox = (this->triangle.triangles[i].c.x - this->dst[0].x)/(float)(this->dst[1].x-this->dst[0].x)*w;
                         oy = (this->triangle.triangles[i].c.y - this->dst[0].y)/(float)(this->dst[2].y-this->dst[0].y)*h;
                         glTexCoord2f(cx, cy);
@@ -102,10 +129,10 @@ class MappingContentShape : public MappingShape {
 
                     glBegin(GL_QUADS);
 
-                    glTexCoord2f(this->src[0].x*w, this->src[0].y*h);		glVertex3f(0, 0, 0);
-                    glTexCoord2f(this->src[1].x*w, this->src[1].y*h);		glVertex3f(w, 0, 0);
-                    glTexCoord2f(this->src[2].x*w, this->src[2].y*h);		glVertex3f(w, h, 0);
-                    glTexCoord2f(this->src[3].x*w, this->src[3].y*h);		glVertex3f(0, h, 0);
+                    glTexCoord2f(this->src[0].x*fbo->getWidth(), this->src[0].y*fbo->getHeight());		glVertex3f(0, 0, 0);
+                    glTexCoord2f(this->src[1].x*fbo->getWidth(), this->src[1].y*fbo->getHeight());		glVertex3f(w, 0, 0);
+                    glTexCoord2f(this->src[2].x*fbo->getWidth(), this->src[2].y*fbo->getHeight());		glVertex3f(w, h, 0);
+                    glTexCoord2f(this->src[3].x*fbo->getWidth(), this->src[3].y*fbo->getHeight());		glVertex3f(0, h, 0);
 
                    glEnd();
                 }

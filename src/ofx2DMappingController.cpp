@@ -54,11 +54,12 @@ void ofx2DMappingController::setup(string xml_path) {
 void ofx2DMappingController::setupMapping(){
     ofxXmlSettings_ptr xml = ofxXmlSettings_ptr(new ofxXmlSettings());
     xml->clear();
-    if( xml->loadFile(xml_mapping) ){
-        reloadMapping(xml);
-    }else{
+    if(!xml->loadFile(xml_mapping) ) {
+        ofFile newFile(xml_mapping);
+        newFile.create();
         cout << "unable to load xml file " << xml_mapping << endl;
     }
+    reloadMapping(xml);
 
 }
 
@@ -94,42 +95,46 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
         xml->pushTag("projector", i);
 
-        xml->pushTag("output", 0);
+            xml->pushTag("output", 0);
 
-        float output_w		= xml->getValue("width", 1024.);
-        float output_h		= xml->getValue("height", 768.);
-
-        xml->popTag();
-
-        addProjector(output_w, output_h);
-
-        int quad_count = xml->getNumTags("quad");
-
-        for (int j = 0; j < quad_count; j++){
-
-            string type = xml->getAttribute("quad","type","OBJECT",j);
-
-            xml->pushTag("quad", j);
-
-                MappingObject_ptr obj = getProjector(i)->addShape(type);
-                if(obj) {
-                    obj->loadXml(xml);
-                    getProjector(0)->addListeners(obj);
-                }
-                else {
-                    ofLogError("ofx2DMappingController::reloadMapping()", "Could not load mapping object with type " + type + " from xml");
-                }
+                float output_w		= xml->getValue("width", 1600.);
+                float output_h		= xml->getValue("height", 900.);
 
             xml->popTag();
 
-        }
+            addProjector(output_w, output_h);
 
-        getProjector(i)->updateOutlines();
+            int quad_count = xml->getNumTags("quad");
+
+            for (int j = 0; j < quad_count; j++) {
+
+                string type = xml->getAttribute("quad","type","OBJECT",j);
+
+                xml->pushTag("quad", j);
+
+                    MappingObject_ptr obj = getProjector(i)->addShape(type);
+                    if(obj) {
+                        obj->loadXml(xml);
+                        getProjector(0)->addListeners(obj);
+                    }
+                    else {
+                        ofLogError("ofx2DMappingController::reloadMapping()", "Could not load mapping object with type " + type + " from xml");
+                    }
+
+                xml->popTag();
+
+            }
+
+            getProjector(i)->updateOutlines();
 
         xml->popTag();
 
         cout << "OFX2DMAPPINGCONTROLLER:: projector " << i << " with " << getProjector(i)->shapeCount() << " mapping objects loaded." << endl;
 
+    }
+
+    if(projector_count == 0) {
+        addProjector(1600, 900);
     }
 
 }
@@ -199,6 +204,8 @@ void ofx2DMappingController::mappedContentToFbo(Projector *p) {
         MappingObject_ptr q = p->getShape(i);
         q->draw(p->outputWidth(), p->outputHeight());
     }
+
+    if(getCalibrating()) drawCalibration(p);
 
     mapped_content_fbo->end();
 
@@ -477,33 +484,33 @@ void ofx2DMappingController::saveMappingDefault() {
 
 void ofx2DMappingController::saveMapping(string path, string path_svg, string path_png) {
 
-    ofxXmlSettings xml;
+    ofxXmlSettings_ptr xml = ofxXmlSettings_ptr(new ofxXmlSettings());
 
-    xml.clear();
+    xml->clear();
 
-    xml.addTag("mapping");
+    xml->addTag("mapping");
 
-    xml.pushTag("mapping", 0);
+    xml->pushTag("mapping", 0);
 
-        xml.addTag("content");
-        xml.pushTag("content", 0);
-            xml.addValue("width", (int)content_w);
-            xml.addValue("height", (int)content_h);
-        xml.popTag();
-        xml.addTag("control");
-        xml.pushTag("control", 0);
-            xml.addValue("width", (int)control_w);
-            xml.addValue("height", (int)control_h);
-        xml.popTag();
-        xml.addTag("video");
-        xml.pushTag("video", 0);
-            xml.addValue("max_width", (int)vid_max_w);
-            xml.addValue("max_height", (int)vid_max_h);
-        xml.popTag();
+        xml->addTag("content");
+        xml->pushTag("content", 0);
+            xml->addValue("width", (int)content_w);
+            xml->addValue("height", (int)content_h);
+        xml->popTag();
+        xml->addTag("control");
+        xml->pushTag("control", 0);
+            xml->addValue("width", (int)control_w);
+            xml->addValue("height", (int)control_h);
+        xml->popTag();
+        xml->addTag("video");
+        xml->pushTag("video", 0);
+            xml->addValue("max_width", (int)vid_max_w);
+            xml->addValue("max_height", (int)vid_max_h);
+        xml->popTag();
 
-        xml.addTag("projector");
+        xml->addTag("projector");
 
-        xml.pushTag("projector", 0);
+        xml->pushTag("projector", 0);
 
             int i = 0;
             for(uint j = 0; j < getProjector(0)->shapeCount(); j++) {
@@ -512,98 +519,31 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
 
                 if(mq) {
 
-                    xml.addTag("output");
-                    xml.pushTag("output", 0);
-                        xml.addValue("width", (int)getProjector(0)->outputWidth());
-                        xml.addValue("height", (int)getProjector(0)->outputHeight());
-                    xml.popTag();
+                    xml->addTag("output");
+                    xml->pushTag("output", 0);
+                        xml->addValue("width", (int)getProjector(0)->outputWidth());
+                        xml->addValue("height", (int)getProjector(0)->outputHeight());
+                    xml->popTag();
 
-                    xml.addTag("quad");
+                    xml->addTag("quad");
 
-                    xml.addAttribute("quad","type",mq->nature, i);
-                    xml.pushTag("quad", i);
+                    xml->addAttribute("quad","type",mq->nature, i);
+                    xml->pushTag("quad", i);
 
-                        if(MappingImage_ptr image = std::dynamic_pointer_cast<MappingImage>(mq)) {
-                            xml.addValue("url", image->img_src);
-                        }
+                        mq->saveXml(xml);
 
-                        if(MappingContentShape_ptr cshape = std::dynamic_pointer_cast<MappingContentShape>(mq)) {
-                            xml.addTag("src");
-                            xml.pushTag("src", 0);
-                                xml.addTag("lefttop");
-                                xml.pushTag("lefttop", 0);
-                                    xml.addValue("x", cshape->src[0].x);
-                                    xml.addValue("y", cshape->src[0].y);
-                                xml.popTag();
-                                xml.addTag("righttop");
-                                xml.pushTag("righttop", 0);
-                                    xml.addValue("x", cshape->src[1].x);
-                                    xml.addValue("y", cshape->src[1].y);
-                                xml.popTag();
-                                xml.addTag("rightbottom");
-                                xml.pushTag("rightbottom", 0);
-                                    xml.addValue("x", cshape->src[2].x);
-                                    xml.addValue("y", cshape->src[2].y);
-                                xml.popTag();
-                                xml.addTag("leftbottom");
-                                xml.pushTag("leftbottom", 0);
-                                    xml.addValue("x", cshape->src[3].x);
-                                    xml.addValue("y", cshape->src[3].y);
-                                xml.popTag();
-                            xml.popTag();
-                        }
-
-                        if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(mq)) {
-                            xml.addTag("dst");
-                            xml.pushTag("dst", 0);
-                                xml.addTag("lefttop");
-                                xml.pushTag("lefttop", 0);
-                                    xml.addValue("x", shape->dst[0].x);
-                                    xml.addValue("y", shape->dst[0].y);
-                                xml.popTag();
-                                xml.addTag("righttop");
-                                xml.pushTag("righttop", 0);
-                                    xml.addValue("x", shape->dst[1].x);
-                                    xml.addValue("y", shape->dst[1].y);
-                                xml.popTag();
-                                xml.addTag("rightbottom");
-                                xml.pushTag("rightbottom", 0);
-                                    xml.addValue("x", shape->dst[2].x);
-                                    xml.addValue("y", shape->dst[2].y);
-                                xml.popTag();
-                                xml.addTag("leftbottom");
-                                xml.pushTag("leftbottom", 0);
-                                    xml.addValue("x", shape->dst[3].x);
-                                    xml.addValue("y", shape->dst[3].y);
-                                xml.popTag();
-                            xml.popTag();
-
-                            xml.addTag("polyline");
-                            xml.pushTag("polyline",0);
-
-                                for(uint k = 0; k < shape->polyline.size(); k++) {
-                                    xml.addTag("point");
-                                    xml.pushTag("point",k);
-                                        xml.addValue("x", shape->polyline[k].x);
-                                        xml.addValue("y", shape->polyline[k].y);
-                                    xml.popTag();
-                                }
-
-                            xml.popTag();
-                        }
-
-                    xml.popTag();
+                    xml->popTag();
 
                     i++;
 
                 }
             }
 
-        xml.popTag();
+        xml->popTag();
 
-    xml.popTag();
+    xml->popTag();
 
-    xml.saveFile(path);
+    xml->saveFile(path);
 
     saveMappingAsPng(path_png);
 

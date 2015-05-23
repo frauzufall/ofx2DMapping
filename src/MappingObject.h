@@ -4,6 +4,7 @@
 #include "MappingObjectFactory.h"
 #include "ofxTriangle.h"
 #include "ofxXmlSettings.h"
+#include "Helper.h"
 
 //enum ObjectType { OBJECT = 0, SHAPE = 1, CONTENT_SHAPE = 2, COLOR_SHAPE = 3, IMAGE = 4, POINT = 5, TEXT = 6};
 typedef ofPtr<ofFbo> ofFbo_ptr;
@@ -29,9 +30,21 @@ public:
     virtual void loadXml(ofxXmlSettings_ptr xml) {
         name = xml->getValue("name", "", 0);
         if(name == "") {
-            name = "noname";
+            name = nature;
         }
 
+        color.r = xml->getAttribute("color", "r", 255, 0);
+        color.g = xml->getAttribute("color", "g", 255, 0);
+        color.b = xml->getAttribute("color", "b", 255, 0);
+
+    }
+
+    virtual void saveXml(ofxXmlSettings_ptr xml) {
+        xml->addValue("name", name);
+        xml->addTag("color");
+        xml->addAttribute("color", "r", color.r, 0);
+        xml->addAttribute("color", "g", color.g, 0);
+        xml->addAttribute("color", "b", color.b, 0);
     }
 
     virtual void copy(ofPtr<MappingObject> obj)  {

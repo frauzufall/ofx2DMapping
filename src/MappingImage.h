@@ -29,6 +29,11 @@ class MappingImage : public MappingContentShape {
         img_src = url;
     }
 
+    virtual void saveXml(ofxXmlSettings_ptr xml) {
+        MappingContentShape::saveXml(xml);
+        xml->addValue("url", img_src);
+    }
+
     void draw(float w, float h) {
 
         if(this->image.isAllocated()) {

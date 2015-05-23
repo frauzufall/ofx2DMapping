@@ -61,6 +61,46 @@ public:
         xml->popTag();
     }
 
+    virtual void saveXml(ofxXmlSettings_ptr xml) {
+        MappingObject::saveXml(xml);
+        xml->addTag("dst");
+        xml->pushTag("dst", 0);
+            xml->addTag("lefttop");
+            xml->pushTag("lefttop", 0);
+                xml->addValue("x", dst[0].x);
+                xml->addValue("y", dst[0].y);
+            xml->popTag();
+            xml->addTag("righttop");
+            xml->pushTag("righttop", 0);
+                xml->addValue("x", dst[1].x);
+                xml->addValue("y", dst[1].y);
+            xml->popTag();
+            xml->addTag("rightbottom");
+            xml->pushTag("rightbottom", 0);
+                xml->addValue("x", dst[2].x);
+                xml->addValue("y", dst[2].y);
+            xml->popTag();
+            xml->addTag("leftbottom");
+            xml->pushTag("leftbottom", 0);
+                xml->addValue("x", dst[3].x);
+                xml->addValue("y", dst[3].y);
+            xml->popTag();
+        xml->popTag();
+
+        xml->addTag("polyline");
+        xml->pushTag("polyline",0);
+
+            for(uint k = 0; k < polyline.size(); k++) {
+                xml->addTag("point");
+                xml->pushTag("point",k);
+                    xml->addValue("x", polyline[k].x);
+                    xml->addValue("y", polyline[k].y);
+                xml->popTag();
+            }
+
+        xml->popTag();
+    }
+
     void draw(float w, float h){}
 
     void drawArea(float w, float h) {
