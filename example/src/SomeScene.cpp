@@ -14,19 +14,18 @@ void SomeScene::setup(float w, float h) {
 
 void SomeScene::update() {
 
-    float time_f = ofGetElapsedTimef();
     int time_i = ofGetElapsedTimeMillis();
 
     fbo->begin();
 
-    ofSetColor(ofColor::fromHsb((int)(time_i*0.02)%255, 255, 255));
+    ofSetColor(ofColor::fromHsb((int)(time_i*0.05)%255, 255, 255));
     ofSetLineWidth(10);
 
     ofDrawLine(
-                fbo->getWidth()/2,
-                fbo->getHeight()/2,
-                fbo->getWidth()/2+sin(time_f)*(fbo->getWidth()),
-                fbo->getHeight()/2+cos(time_f)*(fbo->getWidth())
+                0,
+                fbo->getHeight()/32*(time_i%32),
+                fbo->getWidth(),
+                fbo->getHeight()/32*(time_i%32)
     );
 
     fbo->end();

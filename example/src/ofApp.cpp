@@ -10,7 +10,7 @@ void ofApp::setup(){
     //create template mapping objects that can then be added via button
 
     //option to add shapes that show the content of a given fbo
-    mapping.getControl()->addTemplate<MappingContentShape>("window");
+    mapping.getControl()->addTemplate<MappingContentShape>("content");
     //option to add black shapes
     ofPtr<MappingColorShape> black_shape = mapping.getControl()->addTemplate<MappingColorShape>("black");
     black_shape->color = ofColor(0);

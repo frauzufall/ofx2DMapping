@@ -288,6 +288,10 @@ void Projector::updateOutline(int shape_id) {
 
     _outlines->at(shape_id).addVertices(_outlines_raw->at(shape_id).getResampledBySpacing(1).getVertices());
 
+    _outlines_raw->at(shape_id).close();
+    _outlines->at(shape_id).close();
+    _paths->at(shape_id)->close();
+
 }
 
 ofPolylines_ptr Projector::outlinesRaw() {

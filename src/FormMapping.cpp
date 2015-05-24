@@ -55,7 +55,7 @@ void FormMapping::setMappingRects() {
     //        mapping_rect_src.width = mapping_rect_src.height*content_ratio_inv;
     //    }
 
-        this->setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+2*margin);
+        this->setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
     }
 }
 
@@ -157,18 +157,24 @@ void FormMapping::rebuild() {
 
 void FormMapping::draw(bool show_source) {
 
+    ofSetColor(42);
+    ofFill();
+    ofDrawRectangle(this->getPosition().x, this->getPosition().y, this->getWidth(), this->getHeight()-2);
+
     ofxPanel::draw();
 
-    ofSetColor(200);
-    ofNoFill();
-    ofSetLineWidth(0.5);
-    ofDrawRectangle(mapping_rect_dst);
-    ofSetColor(255,60);
-    mapping_bg->draw(
-                mapping_rect_dst.x,
-                mapping_rect_dst.y,
-                mapping_rect_dst.width,
-                mapping_rect_dst.height);
+    if(!direct_edit) {
+        ofSetColor(200);
+        ofNoFill();
+        ofSetLineWidth(0.5);
+        ofDrawRectangle(mapping_rect_dst);
+        ofSetColor(255,60);
+        mapping_bg->draw(
+                    mapping_rect_dst.x,
+                    mapping_rect_dst.y,
+                    mapping_rect_dst.width,
+                    mapping_rect_dst.height);
+    }
 
     if(show_source) {
         ofDrawRectangle(mapping_rect_src);
@@ -208,13 +214,21 @@ void FormMapping::draw(bool show_source) {
             }
             else {
                 ofNoFill();
-                ofSetColor(shapes[i].color,255);
+                if(direct_edit) {
+                    ofSetColor(255);
+                }
+                else {
+                    ofSetColor(shapes[i].color,255);
+                }
+
             }
-            ofBeginShape();
-            for(uint j = 0; j < shapes[i].polyline.size(); j++) {
-                ofVertex(shapes[i].polyline[j].x, shapes[i].polyline[j].y);
+            if(!(j == 0 && direct_edit)) {
+                ofBeginShape();
+                for(uint j = 0; j < shapes[i].polyline.size(); j++) {
+                    ofVertex(shapes[i].polyline[j].x, shapes[i].polyline[j].y);
+                }
+                ofEndShape(true);
             }
-            ofEndShape(true);
         }
 
         //draw src

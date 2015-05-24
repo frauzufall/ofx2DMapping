@@ -20,10 +20,10 @@ void ofx2DMappingView::setup(float w, float h) {
     direct_edit = false;
 
     //MAPPING RECT PANEL
-    mapping_dst.setup("MAPPING FORMS", ctrl->getProjector(0), &shape_list, w, h);
-    mapping_dst.rebuild();
-    mapping_dst.setMappingBackground(ctrl->getOutput());
-    ofAddListener(ctrl->getProjector(0)->updatedFbo, &mapping_dst, &FormMapping::setMappingBackground);
+    mapping_forms.setup("MAPPING FORMS", ctrl->getProjector(0), &shape_list, w, h);
+    mapping_forms.rebuild();
+    mapping_forms.setMappingBackground(ctrl->getOutput());
+    ofAddListener(ctrl->getProjector(0)->updatedFbo, &mapping_forms, &FormMapping::setMappingBackground);
 
     //MAIN OPTIONS PANEL
 
@@ -62,10 +62,21 @@ void ofx2DMappingView::setup(float w, float h) {
 
     //QUAD LIST
 
-    shape_list.setup("mapping forms");
+    shape_list.setup("MAPPING FORM LIST");
     ofAddListener(shape_list.elementRemoved, this, &ofx2DMappingView::removeForm);
     ofAddListener(shape_list.elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
     shape_list.setHeaderBackgroundColor(ofColor::black);
+
+    //SELECT OPTIONS
+
+    select_options.setup("FORM SELECTION");
+    select_all_btn.addListener(this, &ofx2DMappingView::selectAll);
+    select_all_btn.setup("select all");
+    select_options.add(&select_all_btn);
+
+    deselect_all_btn.addListener(this, &ofx2DMappingView::deselectAll);
+    deselect_all_btn.setup("deselect all");
+    select_options.add(&deselect_all_btn);
 
     setSubpanelPositions();
 
@@ -76,14 +87,14 @@ void ofx2DMappingView::setup(float w, float h) {
 
 void ofx2DMappingView::update() {
 
-    mapping_dst.update();
+    mapping_forms.update();
 
     for(uint i = 0; i < add_button_params.size(); i++) {
         if(add_button_params.at(i)) {
             MappingObject_ptr obj = ctrl->getOptions().at(i);
             MappingObject_ptr copy = ctrl->getProjector(0)->copyShape(obj);
             ctrl->getProjector(0)->addListeners(copy);
-            mapping_dst.updateForms();
+            mapping_forms.updateForms();
             updateQuadList();
             add_button_params.at(i) = false;
         }
@@ -99,16 +110,17 @@ void ofx2DMappingView::draw(ofPoint pos) {
 
     if(pos != control_rect.position) {
         control_rect.position = pos;
-        mapping_dst.setPosition(control_rect.x, mapping_dst.getPosition().y);
-        mapping_dst.rebuild();
+        mapping_forms.setPosition(control_rect.x, mapping_forms.getPosition().y);
+        mapping_forms.rebuild();
         setSubpanelPositions();
     }
 
     ofPushStyle();
 
-    mapping_dst.draw(show_source);
+    mapping_forms.draw(show_source);
 
     shape_list.draw();
+    select_options.draw();
     main_options.draw();
     calibration_options.draw();
     add_buttons_panel.draw();
@@ -138,14 +150,14 @@ void ofx2DMappingView::updateQuadList() {
 
 void ofx2DMappingView::importSvg() {
     ctrl->importSvg();
-    mapping_dst.updateForms();
+    mapping_forms.updateForms();
     shape_list.clear();
     updateQuadList();
 }
 
 MappingObject_ptr ofx2DMappingView::addForm(string type, string name, bool at_bottom) {
     MappingObject_ptr mq = ctrl->getProjector(0)->addShape(type, at_bottom);
-    mapping_dst.updateForms();
+    mapping_forms.updateForms();
     mq->editable.set(name,true);
     shape_list.add(mq->editable,at_bottom);
     if(at_bottom) {
@@ -167,7 +179,7 @@ void ofx2DMappingView::removeForm(RemovedElementData &data) {
 //            addForm("CONTENT_SHAPE", "painting", true);
 //        }
         p->updateOutlines();
-        mapping_dst.updateForms();
+        mapping_forms.updateForms();
     }
 
 }
@@ -181,21 +193,35 @@ void ofx2DMappingView::reorderForm(MovingElementData &data) {
 
     bool swapped = p->swapShapes(index1,index2);
     if(swapped) {
-        mapping_dst.updateForms();
+        mapping_forms.updateForms();
     }
 
 }
 
 void ofx2DMappingView::setSubpanelPositions() {
-    main_options.setPosition(control_rect.x+10, control_rect.y+10);
-    calibration_options.setPosition(main_options.getPosition().x + main_options.getWidth() + 10, main_options.getPosition().y);
-    mapping_dst.setPosition(main_options.getPosition().x, main_options.getPosition().y+main_options.getHeight()+10);
-    add_buttons_panel.setPosition(mapping_dst.getPosition().x + mapping_dst.getWidth()+10, mapping_dst.getPosition().y);
-    shape_list.setPosition(add_buttons_panel.getPosition().x, add_buttons_panel.getPosition().y + add_buttons_panel.getHeight()+10);
+    float margin = 10;
+    main_options.setPosition(
+                control_rect.x+margin,
+                control_rect.y+margin);
+    calibration_options.setPosition(
+                main_options.getPosition().x + main_options.getWidth() + margin,
+                main_options.getPosition().y);
+    mapping_forms.setPosition(
+                main_options.getPosition().x,
+                main_options.getPosition().y+main_options.getHeight()+margin);
+    add_buttons_panel.setPosition(
+                mapping_forms.getPosition().x + mapping_forms.getWidth()+margin,
+                mapping_forms.getPosition().y);
+    shape_list.setPosition(
+                add_buttons_panel.getPosition().x,
+                add_buttons_panel.getPosition().y + add_buttons_panel.getHeight()+margin);
+    select_options.setPosition(
+                calibration_options.getPosition().x + calibration_options.getWidth() + margin,
+                calibration_options.getPosition().y);
 }
 
 void ofx2DMappingView::setMappingBackground(ofFbo_ptr fbo) {
-    mapping_dst.setMappingBackground(fbo);
+    mapping_forms.setMappingBackground(fbo);
 }
 
 void ofx2DMappingView::showSource(bool show) {
@@ -204,10 +230,22 @@ void ofx2DMappingView::showSource(bool show) {
 
 void ofx2DMappingView::setEditMode(bool &direct_edit) {
     this->direct_edit = direct_edit;
-    mapping_dst.setEditMode(direct_edit);
+    mapping_forms.setEditMode(direct_edit);
     setSubpanelPositions();
 }
 
 FormMapping* ofx2DMappingView::getMappingList() {
-    return &mapping_dst;
+    return &mapping_forms;
+}
+
+void ofx2DMappingView::selectAll() {
+    for(uint i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
+        ctrl->getProjector(0)->getShape(i)->editable = true;
+    }
+}
+
+void ofx2DMappingView::deselectAll() {
+    for(uint i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
+        ctrl->getProjector(0)->getShape(i)->editable = false;
+    }
 }

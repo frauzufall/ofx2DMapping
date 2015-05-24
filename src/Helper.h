@@ -66,6 +66,9 @@ public:
                     else
                         polyline.arcNegative(commands[i].to,commands[i].radiusX,commands[i].radiusY,commands[i].angleBegin,commands[i].angleEnd, arcResolution);
                     break;
+                case ofPath::Command::close:
+                    polyline.close();
+                    break;
                 default: break;
             }
         }

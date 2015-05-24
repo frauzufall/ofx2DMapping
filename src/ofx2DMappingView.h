@@ -28,6 +28,8 @@ private:
 
     void setSubpanelPositions();
     void updateQuadList();
+    void selectAll();
+    void deselectAll();
 
     bool show_source, direct_edit;
 
@@ -38,16 +40,15 @@ private:
     ofPoint pos_main_options, pos_calibration_options, pos_add_buttons, pos_shape_list;
 
     ofxPanel add_buttons_panel;
-    FormMapping mapping_dst;
-    ofxPanel mapping_src;
-    ofxPanel main_options, calibration_options;
+    FormMapping mapping_forms;
+    ofxPanel main_options, calibration_options, select_options;
 
     void removeForm(RemovedElementData& data);
     void reorderForm(MovingElementData& data);
 
     MappingObject_ptr addForm(string type, string name, bool at_bottom);
 
-    ofxButton save_btn, import_btn;
+    ofxButton save_btn, import_btn, select_all_btn, deselect_all_btn;
     ofxToggle edit_mode_btn;
     vector<ofParameter<bool>> add_button_params;
 

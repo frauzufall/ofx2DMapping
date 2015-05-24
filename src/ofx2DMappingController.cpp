@@ -235,10 +235,14 @@ void ofx2DMappingController::drawCalibration(Projector* p) {
 
         if(q) {
 
-            ofSetColor(q->color);
-            ofFill();
+//            ofSetColor(q->color);
+//            ofFill();
 
-            p->outlinesRaw()->at(i).draw();
+//            ofBeginShape();
+//            for(int j= 0; j < p->outlinesRaw()->at(i).getVertices().size(); j++) {
+//                ofVertex(p->outlinesRaw()->at(i).getVertices().at(j).x, p->outlinesRaw()->at(i).getVertices().at(j).y);
+//            }
+//            ofEndShape();
 
             ofSetColor(cal_grey);
             ofNoFill();
@@ -513,17 +517,18 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
         xml->pushTag("projector", 0);
 
             int i = 0;
+
+            xml->addTag("output");
+            xml->pushTag("output", 0);
+                xml->addValue("width", (int)getProjector(0)->outputWidth());
+                xml->addValue("height", (int)getProjector(0)->outputHeight());
+            xml->popTag();
+
             for(uint j = 0; j < getProjector(0)->shapeCount(); j++) {
 
                 MappingObject_ptr mq = getProjector(0)->getShape(j);
 
                 if(mq) {
-
-                    xml->addTag("output");
-                    xml->pushTag("output", 0);
-                        xml->addValue("width", (int)getProjector(0)->outputWidth());
-                        xml->addValue("height", (int)getProjector(0)->outputHeight());
-                    xml->popTag();
 
                     xml->addTag("quad");
 
