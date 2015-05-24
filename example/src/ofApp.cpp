@@ -4,8 +4,16 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    show_controls = true;
+
     //init mapping and load mapping settings from xml
     mapping.setup("mapping/mapping.xml");
+
+    //setup some scene that creates an fbo that is to be mapped
+    scene.setup(mapping.getControl()->contentWidth(), mapping.getControl()->contentHeight());
+
+    //set input fbo
+    mapping.getControl()->setInputFbo(scene.getFbo());
 
     //create template mapping objects that can then be added via button
 
@@ -15,16 +23,8 @@ void ofApp::setup(){
     ofPtr<MappingColorShape> black_shape = mapping.getControl()->addTemplate<MappingColorShape>("black");
     black_shape->color = ofColor(0);
 
-    //setup some scene that creates an fbo that is to be mapped
-    scene.setup(mapping.getControl()->contentWidth(), mapping.getControl()->contentHeight());
-
-    //set input fbo
-    mapping.getControl()->setInputFbo(scene.getFbo());
-
     //set size of control panel
-    mapping.getView()->setup(ofGetWindowWidth()/2, ofGetWindowHeight());
-    //say whether the input (fbo or images) content should be able to get clipped
-    mapping.getView()->showSource(true);
+    mapping.getControlView()->setup(ofGetWindowWidth()/2, ofGetWindowHeight());
 
 }
 
@@ -36,8 +36,7 @@ void ofApp::exit() {
 void ofApp::update() {
 
     //update the addon
-    mapping.getControl()->update();
-    mapping.getView()->update();
+    mapping.update();
 
     //update your content
     scene.update();
@@ -48,11 +47,11 @@ void ofApp::draw(){
 
     ofSetColor(255);
 
-    //draw the mapped output image
-    mapping.draw(ofGetWidth()/2,0,ofGetWidth()/2, ofGetHeight());
+    //draw the mapped output image and the controls
+    mapping.draw(
+                ofGetWidth()/2, 0,
+                ofGetWidth()/2, ofGetHeight());
 
-    //draw the control panel
-    mapping.getView()->draw();
 }
 
 //--------------------------------------------------------------
@@ -61,6 +60,13 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
+    switch(key) {
+    case 'c': {
+        show_controls = !show_controls;
+        mapping.showControls(show_controls);
+    }
+    default: break;
+    }
 	
 }
 

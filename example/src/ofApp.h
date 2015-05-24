@@ -32,5 +32,7 @@ private:
 
     SomeScene scene;
 
+    bool show_controls;
+
 };
 
