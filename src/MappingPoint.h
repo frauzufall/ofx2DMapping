@@ -12,13 +12,27 @@ class MappingPoint : public MappingObject {
         this->nature = "POINT";
     }
 
-    void copy(ofPtr<MappingPoint> obj)  {
-        MappingObject::copy(obj);
-        this->pos = obj->pos;
+    MappingPoint(const MappingPoint& obj) : MappingObject(obj) {
+        this->pos = obj.pos;
+    }
+
+    ofPtr<MappingObject> clone() const {
+        return ofPtr<MappingObject>(new MappingPoint(*this));
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {
         MappingObject::loadXml(xml);
         pos = this->getPoint(xml);
     }
+
+    void saveXml(ofxXmlSettings_ptr xml) {
+        MappingObject::saveXml(xml);
+    }
+
+    void update(float w, float h){}
+
+    void draw(float w, float h){}
+
+    void drawArea(float w, float h){}
+
 };

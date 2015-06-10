@@ -63,8 +63,6 @@ class ofx2DMappingController {
         ofFbo_ptr &getOutput();
         ofFbo_ptr					getArea();
 
-        void                        setInputFbo(ofFbo_ptr fbo);
-
         ofPoint                     controlpoint;
 
         void keyPressed  (ofKeyEventArgs &args);
@@ -90,9 +88,9 @@ class ofx2DMappingController {
 
         vector<MappingObject_ptr> getOptions();
 
-        ofFbo_ptr&                  getSourceFbo();
-
     private:
+
+        MappingObject_ptr createShape(Projector* projector, string type, string name);
 
         bool use_mapping;
 
@@ -109,8 +107,6 @@ class ofx2DMappingController {
         ofParameter<bool>           is_cal;
         ofParameter<float>          cal_border;
         ofParameter<int>            cal_grey;
-
-        ofFbo_ptr                   src_fbo;
 
         ofFbo_ptr           		mapped_content_fbo;
         ofFbo_ptr                   mapped_area_fbo;

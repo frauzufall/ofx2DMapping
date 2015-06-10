@@ -40,15 +40,18 @@ public:
         this->matrix_dst_norm.makeIdentityMatrix();
     }
 
-    void copy(ofPtr<MappingShape> obj)  {
-        MappingObject::copy(obj);
+    MappingShape(const MappingShape& obj) : MappingObject(obj) {
         for(int i = 0; i < 4; i++) {
-            this->dst[i] = obj->dst[i];
-            this->plane[i] = obj->plane[i];
+            this->dst[i] = obj.dst[i];
+            this->plane[i] = obj.plane[i];
         }
-        this->polyline = obj->polyline;
-        this->triangle = obj->triangle;
-        this->matrix_dst_norm = obj->matrix_dst_norm;
+        this->polyline = obj.polyline;
+        this->triangle = obj.triangle;
+        this->matrix_dst_norm = obj.matrix_dst_norm;
+    }
+
+    ofPtr<MappingObject> clone() const {
+        return ofPtr<MappingObject>(new MappingShape(*this));
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {
@@ -61,7 +64,7 @@ public:
         xml->popTag();
     }
 
-    virtual void saveXml(ofxXmlSettings_ptr xml) {
+    void saveXml(ofxXmlSettings_ptr xml) {
         MappingObject::saveXml(xml);
         xml->addTag("dst");
         xml->pushTag("dst", 0);

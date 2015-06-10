@@ -29,14 +29,18 @@ class MappingContentShape : public MappingShape {
         this->matrix_src_dst.makeIdentityMatrix();
     }
 
-    void copy(ofPtr<MappingContentShape> obj)  {
-        MappingShape::copy(obj);
+    MappingContentShape(const MappingContentShape& obj) : MappingShape(obj) {
         for(int i = 0; i < 4; i++) {
-            this->src[i] = obj->src[i];
+            this->src[i] = obj.src[i];
         }
-        this->src_width = obj->src_width;
-        this->src_height = obj->src_height;
-        this->matrix_src_dst = obj->matrix_src_dst;
+        this->src_width = obj.src_width;
+        this->src_height = obj.src_height;
+        this->matrix_src_dst = obj.matrix_src_dst;
+        this->fbo = obj.fbo;
+    }
+
+    ofPtr<MappingObject> clone() const {
+        return ofPtr<MappingObject>(new MappingContentShape(*this));
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {
@@ -46,7 +50,7 @@ class MappingContentShape : public MappingShape {
         xml->popTag();
     }
 
-    virtual void saveXml(ofxXmlSettings_ptr xml) {
+    void saveXml(ofxXmlSettings_ptr xml) {
         MappingShape::saveXml(xml);
         xml->addTag("src");
         xml->pushTag("src", 0);
@@ -78,7 +82,7 @@ class MappingContentShape : public MappingShape {
         this->findHomography(this->dst, this->src, (GLfloat*) this->matrix_src_dst.getPtr(), true, w, h);
     }
 
-    void updateFbo(ofFbo_ptr &fbo) {
+    void setFbo(ofFbo_ptr &fbo) {
         this->fbo = fbo;
         src_width = fbo->getWidth();
         src_height = fbo->getHeight();

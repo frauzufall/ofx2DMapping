@@ -8,8 +8,9 @@ public:
     SomeScene();
     void setup(float w, float h);
     void update();
-    ofPtr<ofFbo> getFbo();
+    ofPtr<ofFbo> &getFbo();
 
 private:
     ofPtr<ofFbo> fbo;
+    ofTrueTypeFont myfont;
 };

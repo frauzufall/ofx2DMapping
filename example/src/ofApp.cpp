@@ -6,22 +6,21 @@ void ofApp::setup(){
 
     show_controls = true;
 
-    //init mapping and load mapping settings from xml
-    mapping.setup("mapping/mapping.xml");
-
     //setup some scene that creates an fbo that is to be mapped
-    scene.setup(mapping.getControl()->contentWidth(), mapping.getControl()->contentHeight());
+    scene.setup(1600, 900);
 
-    //set input fbo
-    mapping.getControl()->setInputFbo(scene.getFbo());
-
-    //create template mapping objects that can then be added via button
+    //create template mapping objects that can be added afterwards via button
 
     //option to add shapes that show the content of a given fbo
-    mapping.getControl()->addTemplate<MappingContentShape>("content");
+    ofPtr<MappingContentShape> content = mapping.getControl()->addTemplate<MappingContentShape>("content");
+    content->setFbo(scene.getFbo());
+
     //option to add black shapes
     ofPtr<MappingColorShape> black_shape = mapping.getControl()->addTemplate<MappingColorShape>("black");
-    black_shape->color = ofColor(0);
+    black_shape->setColor(ofColor(0));
+
+    //init mapping and load mapping settings from xml
+    mapping.setup("mapping/mapping.xml");
 
     //set size of control panel
     mapping.getControlView()->setup(ofGetWindowWidth()/2, ofGetWindowHeight());
@@ -64,6 +63,9 @@ void ofApp::keyReleased(int key){
     case 'c': {
         show_controls = !show_controls;
         mapping.showControls(show_controls);
+    }
+    case 'f': {
+        ofToggleFullscreen();
     }
     default: break;
     }

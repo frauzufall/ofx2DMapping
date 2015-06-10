@@ -27,12 +27,21 @@ public:
         editable.set(nature, false);
     }
 
-    virtual void loadXml(ofxXmlSettings_ptr xml) {
-        name = xml->getValue("name", "", 0);
-        if(name == "") {
-            name = nature;
-        }
+    MappingObject(const MappingObject& obj) {
+        this->color = obj.color;
+        this->name = obj.name;
+        this->nature = obj.nature;
+        this->newitem = true;
+        this->editable.set(obj.name, true);
+    }
 
+    virtual ofPtr<MappingObject> clone() const = 0;
+
+    void setColor(ofColor color) {
+        this->color = color;
+    }
+
+    virtual void loadXml(ofxXmlSettings_ptr xml) {
         color.r = xml->getAttribute("color", "r", 255, 0);
         color.g = xml->getAttribute("color", "g", 255, 0);
         color.b = xml->getAttribute("color", "b", 255, 0);
@@ -40,17 +49,10 @@ public:
     }
 
     virtual void saveXml(ofxXmlSettings_ptr xml) {
-        xml->addValue("name", name);
         xml->addTag("color");
         xml->addAttribute("color", "r", color.r, 0);
         xml->addAttribute("color", "g", color.g, 0);
         xml->addAttribute("color", "b", color.b, 0);
-    }
-
-    virtual void copy(ofPtr<MappingObject> obj)  {
-        this->color = obj->color;
-        this->name = obj->name;
-        this->nature = obj->nature;
     }
 
     virtual void draw(float w, float h) = 0;

@@ -5,11 +5,14 @@ SomeScene::SomeScene()
 }
 
 void SomeScene::setup(float w, float h) {
+
     fbo = ofPtr<ofFbo>(new ofFbo());
     fbo->allocate(w,h,GL_RGBA);
     fbo->begin();
     ofClear(0,0,0,0);
     fbo->end();
+
+    myfont.loadFont("arial.ttf", 112);
 }
 
 void SomeScene::update() {
@@ -18,20 +21,23 @@ void SomeScene::update() {
 
     fbo->begin();
 
-    ofSetColor(ofColor::fromHsb((int)(time_i*0.05)%255, 255, 255));
-    ofSetLineWidth(10);
+    ofColor c  = ofColor::fromHsb((int)(time_i*0.005)%255, 200, 255);
 
-    ofDrawLine(
-                0,
-                fbo->getHeight()/32*(time_i%32),
-                fbo->getWidth(),
-                fbo->getHeight()/32*(time_i%32)
-    );
+    ofSetColor(c);
+    ofFill();
+
+    ofDrawRectangle(0,0,fbo->getWidth(), fbo->getHeight());
+
+    ofEnableBlendMode(OF_BLENDMODE_ADD);
+
+    ofSetColor(c.getInverted());
+
+    myfont.drawString("OPENFRAMEWORKS", 10, fbo->getHeight()*0.5);
 
     fbo->end();
 
 }
 
-ofPtr<ofFbo> SomeScene::getFbo() {
+ofPtr<ofFbo> & SomeScene::getFbo() {
     return fbo;
 }

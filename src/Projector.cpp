@@ -26,7 +26,6 @@ Projector::Projector(float w, float h) {
     RegisterInFactory<MappingObject, MappingColorShape> register2(MappingColorShape().nature);
     RegisterInFactory<MappingObject, MappingImage> register3(MappingImage().nature);
 
-    ofAddListener(Projector::updatedFbo, this, &Projector::setInputFbo);
 }
 
 Projector::~Projector() {
@@ -69,9 +68,9 @@ MappingObject_ptr Projector::addShape(MappingObject_ptr obj, bool swap) {
     return shapes.at(shapes.size()-1);
 }
 
-MappingObject_ptr Projector::addShape(string type, bool swap) {
+MappingObject_ptr Projector::addShape(string type, string name, bool swap) {
     shapes.push_back(MappingObjectFactory<MappingObject>::instance().Create(type));
-    shapes.at(shapes.size()-1)->name = type;
+    shapes.at(shapes.size()-1)->name = name;
     if(swap) {
         update();
         for(int i = shapes.size()-1; i>0;i--) {
@@ -83,8 +82,7 @@ MappingObject_ptr Projector::addShape(string type, bool swap) {
 }
 
 MappingObject_ptr Projector::copyShape(MappingObject_ptr original, bool swap) {
-    shapes.push_back(MappingObjectFactory<MappingObject>::instance().Create(original->nature));
-    shapes.at(shapes.size()-1)->copy(original);
+    shapes.push_back(original->clone());
     if(swap) {
         update();
         for(int i = shapes.size()-1; i>0;i--) {
@@ -323,17 +321,17 @@ void Projector::importSvg(string svg) {
         if(!quads_match) {
             if(fill_col == ofColor::white) {
                 //add content shape
-                addShape("CONTENT_SHAPE");
+                addShape("CONTENT_SHAPE", "CONTENT_SHAPE");
             }
             else {
                 //add color shape
-                addShape("COLOR_SHAPE");
+                addShape("COLOR_SHAPE", "COLOR_SHAPE");
             }
         }
 
         MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(getShape(j));
 
-        addListeners(shape);
+//        addListeners(shape);
 
         shape->color = fill_col;
 
@@ -467,25 +465,6 @@ void Projector::saveMappingAsSvg(string path) {
     xml.popTag();
 
     xml.saveFile(path);
-}
-
-void Projector::setInputFbo(ofFbo_ptr &fbo) {
-    input_fbo = fbo;
-}
-
-void Projector::addListeners(MappingObject_ptr obj) {
-    if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
-        if(input_fbo) {
-            shape->updateFbo(input_fbo);
-        }
-        ofAddListener(Projector::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
-    }
-}
-
-void Projector::removeListeners(MappingObject_ptr obj) {
-    if(MappingContentShape_ptr shape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
-        ofRemoveListener(Projector::updatedFbo, shape.get(), &MappingContentShape::updateFbo);
-    }
 }
 
 ofParameter<float> Projector::outputWidth() {

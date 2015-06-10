@@ -5,6 +5,8 @@ ofx2DMappingView::ofx2DMappingView() {
     control_rect.position = ofPoint(0,0);
     zoom = 1;
     zoom_pos = ofPoint(0.5,0.5);
+    show_source = true;
+    direct_edit = false;
 
 }
 
@@ -17,13 +19,10 @@ void ofx2DMappingView::setup(float w, float h) {
     control_rect.width= w;
     control_rect.height= h;
 
-    direct_edit = false;
-
     //MAPPING RECT PANEL
     mapping_forms.setup("MAPPING FORMS", ctrl->getProjector(0), &shape_list, w, h);
     mapping_forms.rebuild();
     mapping_forms.setMappingBackground(ctrl->getOutput());
-    ofAddListener(ctrl->getProjector(0)->updatedFbo, &mapping_forms, &FormMapping::setMappingBackground);
 
     //MAIN OPTIONS PANEL
 
@@ -91,9 +90,7 @@ void ofx2DMappingView::update() {
 
     for(uint i = 0; i < add_button_params.size(); i++) {
         if(add_button_params.at(i)) {
-            MappingObject_ptr obj = ctrl->getOptions().at(i);
-            MappingObject_ptr copy = ctrl->getProjector(0)->copyShape(obj);
-            ctrl->getProjector(0)->addListeners(copy);
+            ctrl->getProjector(0)->copyShape(ctrl->getOptions().at(i));
             mapping_forms.updateForms();
             updateQuadList();
             add_button_params.at(i) = false;
@@ -139,9 +136,9 @@ void ofx2DMappingView::updateQuadList() {
 
         MappingObject_ptr mq = p->getShape(i);
         if(mq) {
-            string objname = mq->name;
+//            string objname = mq->name;
             //insert toggles at beginning of list
-            mq->editable.set(objname, true);
+            mq->editable.setName(mq->name);
             shape_list.add(mq->editable,false);
             shape_list.getListItems().at(0)->setBorderColor(mq->color);
         }
@@ -155,29 +152,11 @@ void ofx2DMappingView::importSvg() {
     updateQuadList();
 }
 
-MappingObject_ptr ofx2DMappingView::addForm(string type, string name, bool at_bottom) {
-    MappingObject_ptr mq = ctrl->getProjector(0)->addShape(type, at_bottom);
-    mapping_forms.updateForms();
-    mq->editable.set(name,true);
-    shape_list.add(mq->editable,at_bottom);
-    if(at_bottom) {
-        shape_list.getListItems().at(shape_list.getListItems().size()-1)->setBorderColor(mq->color);
-    }
-    else {
-        shape_list.getListItems().at(0)->setBorderColor(mq->color);
-    }
-    return mq;
-}
-
 void ofx2DMappingView::removeForm(RemovedElementData &data) {
 
     Projector *p = ctrl->getProjector(0);
     int index = p->shapeCount()-1-data.index;
-    ctrl->getProjector(0)->removeListeners(p->getShape(index));
     if(p->removeShape(index)) {
-//        if(p->getFirstImageShape() == 0) {
-//            addForm("CONTENT_SHAPE", "painting", true);
-//        }
         p->updateOutlines();
         mapping_forms.updateForms();
     }

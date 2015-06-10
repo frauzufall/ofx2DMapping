@@ -15,10 +15,13 @@ class MappingImage : public MappingContentShape {
         this->nature = "IMAGE";
     }
 
-    void copy(ofPtr<MappingImage> obj)  {
-        MappingContentShape::copy(obj);
-        this->image = obj->image;
-        this->img_src = obj->img_src;
+    MappingImage(const MappingImage& obj) : MappingContentShape(obj) {
+        this->image = obj.image;
+        this->img_src = obj.img_src;
+    }
+
+    ofPtr<MappingObject> clone() {
+        return ofPtr<MappingObject>(new MappingImage(*this));
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {

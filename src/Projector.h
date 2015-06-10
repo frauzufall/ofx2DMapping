@@ -33,7 +33,7 @@ public:
     ofPoint relative(ofPoint orig);
 
     MappingObject_ptr addShape(MappingObject_ptr obj, bool swap = false);
-    MappingObject_ptr addShape(string type, bool swap = false);
+    MappingObject_ptr addShape(string type, string name, bool swap = false);
     MappingObject_ptr copyShape(MappingObject_ptr obj, bool swap = false);
 
     bool removeShape(int id);
@@ -85,14 +85,6 @@ public:
 
     ofParameter<float>			outputWidth();
     ofParameter<float>			outputHeight();
-
-    void addListeners(MappingObject_ptr obj);
-    void removeListeners(MappingObject_ptr obj);
-
-    void                        setInputFbo(ofFbo_ptr &fbo);
-
-    ofEvent<ofFbo_ptr>          updatedFbo;
-
 
 private:
 

@@ -46,8 +46,6 @@ private:
     void removeForm(RemovedElementData& data);
     void reorderForm(MovingElementData& data);
 
-    MappingObject_ptr addForm(string type, string name, bool at_bottom);
-
     ofxButton save_btn, import_btn, select_all_btn, deselect_all_btn;
     ofxToggle edit_mode_btn;
     vector<ofParameter<bool>> add_button_params;

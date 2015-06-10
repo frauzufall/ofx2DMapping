@@ -10,8 +10,11 @@ class MappingColorShape : public MappingShape {
         this->nature = "COLOR_SHAPE";
     }
 
-    void copy(ofPtr<MappingColorShape> obj)  {
-        MappingShape::copy(obj);
+    MappingColorShape(const MappingColorShape& obj) : MappingShape(obj) {
+    }
+
+    ofPtr<MappingObject> clone() const {
+        return ofPtr<MappingObject>(new MappingColorShape(*this));
     }
 
     void draw(float w, float h) {

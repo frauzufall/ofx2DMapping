@@ -110,12 +110,13 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
                 string type = xml->getAttribute("quad","type","OBJECT",j);
 
+                string name = xml->getAttribute("quad","name","content",j);
+
                 xml->pushTag("quad", j);
 
-                    MappingObject_ptr obj = getProjector(i)->addShape(type);
+                    MappingObject_ptr obj = createShape(getProjector(i), type, name);
                     if(obj) {
                         obj->loadXml(xml);
-                        getProjector(0)->addListeners(obj);
                     }
                     else {
                         ofLogError("ofx2DMappingController::reloadMapping()", "Could not load mapping object with type " + type + " from xml");
@@ -136,6 +137,25 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
     if(projector_count == 0) {
         addProjector(1600, 900);
     }
+
+}
+
+MappingObject_ptr ofx2DMappingController::createShape(Projector* projector, string type, string name) {
+
+    MappingObject_ptr res;
+
+    uint i = 0;
+    for(; i < available_shapes.size(); i++) {
+        if(available_shapes.at(i)->name == name) {
+            res = projector->copyShape(available_shapes.at(i));
+            break;
+        }
+    }
+    if(i == available_shapes.size()) {
+        res = projector->addShape(type, name);
+    }
+
+    return res;
 
 }
 
@@ -533,6 +553,7 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
                     xml->addTag("quad");
 
                     xml->addAttribute("quad","type",mq->nature, i);
+                    xml->addAttribute("quad","name",mq->name, i);
                     xml->pushTag("quad", i);
 
                         mq->saveXml(xml);
@@ -601,12 +622,6 @@ void ofx2DMappingController::keyReleased(ofKeyEventArgs &args){
 
 }
 
-void ofx2DMappingController::setInputFbo(ofFbo_ptr fbo) {
-    src_fbo = fbo;
-    ofNotifyEvent(getProjector(0)->updatedFbo, fbo);
-    getProjector(0)->setInputFbo(fbo);
-}
-
 float ofx2DMappingController::contentWidth() {
     return content_w;
 }
@@ -645,8 +660,4 @@ void ofx2DMappingController::addTemplate(MappingObject_ptr obj) {
 
 vector<MappingObject_ptr> ofx2DMappingController::getOptions() {
     return available_shapes;
-}
-
-ofFbo_ptr &ofx2DMappingController::getSourceFbo() {
-    return src_fbo;
 }
