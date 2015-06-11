@@ -24,7 +24,7 @@ void ofApp::setup(){
     ofPtr<MappingColorShape> black_shape = mapping.getControl()->addTemplate<MappingColorShape>("black");
     black_shape->setColor(ofColor(0));
 
-    //option to add black shapes
+    //option to add an image
     ofPtr<MappingImage> logo = mapping.getControl()->addTemplate<MappingImage>("image");
     logo->loadImage("images/ente.jpg");
     logo->setColor(ofColor(0,200,255));
