@@ -127,7 +127,7 @@ MappingObject_ptr Projector::getShape(int id) {
         return shapes[id];
     }
     else {
-        cout << "ERROR: projector: trying to get quad " << id << " but quads size is " << shapes.size() << endl;
+        cout << "ERROR: projector: trying to get object " << id << " but objects size is " << shapes.size() << endl;
         return MappingObject_ptr();
     }
 
@@ -309,9 +309,9 @@ void Projector::importSvg(string svg) {
 
     int outlinescount = _outlines_raw->size();
 
-    bool quads_match = ((int)shapeCount()) == outlinescount;
+    bool objects_match = ((int)shapeCount()) == outlinescount;
 
-    if(!quads_match) {
+    if(!objects_match) {
         removeAllShapes();
     }
 
@@ -321,7 +321,7 @@ void Projector::importSvg(string svg) {
         ofPolyline l = _outlines_raw->at(j);
         ofRectangle bounding = l.getBoundingBox();
 
-        if(!quads_match) {
+        if(!objects_match) {
             if(fill_col == ofColor::white) {
                 //add content shape
                 addShape("CONTENT_SHAPE", "CONTENT_SHAPE");

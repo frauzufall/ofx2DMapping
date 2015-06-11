@@ -104,15 +104,15 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
             addProjector(output_w, output_h);
 
-            int quad_count = xml->getNumTags("quad");
+            int object_count = xml->getNumTags("object");
 
-            for (int j = 0; j < quad_count; j++) {
+            for (int j = 0; j < object_count; j++) {
 
-                string type = xml->getAttribute("quad","type","OBJECT",j);
+                string type = xml->getAttribute("object","type","OBJECT",j);
 
-                string name = xml->getAttribute("quad","name","content",j);
+                string name = xml->getAttribute("object","name","content",j);
 
-                xml->pushTag("quad", j);
+                xml->pushTag("object", j);
 
                     MappingObject_ptr obj = createShape(getProjector(i), type, name);
                     if(obj) {
@@ -550,11 +550,11 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
 
                 if(mq) {
 
-                    xml->addTag("quad");
+                    xml->addTag("object");
 
-                    xml->addAttribute("quad","type",mq->nature, i);
-                    xml->addAttribute("quad","name",mq->name, i);
-                    xml->pushTag("quad", i);
+                    xml->addAttribute("object","type",mq->nature, i);
+                    xml->addAttribute("object","name",mq->name, i);
+                    xml->pushTag("object", i);
 
                         mq->saveXml(xml);
 
