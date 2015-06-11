@@ -51,6 +51,7 @@ public:
 private:
 
     void setMappingRects();
+    void updateSourceBackground();
 
     bool direct_edit;
 

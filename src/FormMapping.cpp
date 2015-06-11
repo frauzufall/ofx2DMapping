@@ -132,13 +132,34 @@ void FormMapping::updateForms() {
 
     vector<MappingContentShape_ptr> objs = parent_projector->getShapesByClass<MappingContentShape>();
     if(objs.size() > 0) {
-        source_bg = objs.at(objs.size()-1)->getTexture();
+        for(uint i = objs.size()-1; i >= 0; i--) {
+            if(objs.at(i)->editable) {
+                source_bg = objs.at(i)->getTexture();
+                break;
+            }
+        }
     }
+
+    updateSourceBackground();
 
 }
 
-void FormMapping::update() {
+void FormMapping::updateSourceBackground() {
+    //find first content shape from top to use as background for source mapping
 
+    source_bg = 0;
+    vector<MappingContentShape_ptr> objs = parent_projector->getShapesByClass<MappingContentShape>();
+    if(objs.size() > 0) {
+        for(uint i = objs.size()-1; i >= 0; i--) {
+            if(objs.at(i)->editable) {
+                source_bg = objs.at(i)->getTexture();
+                break;
+            }
+        }
+    }
+}
+
+void FormMapping::update() {
 
     if(control_rect.position != this->getPosition()) {
         control_rect.position = this->getPosition();
@@ -147,6 +168,8 @@ void FormMapping::update() {
 
         rebuild();
     }
+
+    updateSourceBackground();
 
 }
 
