@@ -11,7 +11,7 @@ class MappingContentShape : public MappingShape {
     float       src_height;
     ofMatrix4x4 matrix_src_dst;
 
-    ofFbo_ptr fbo;
+    ofTexture* texture;
 
     MappingContentShape() {
 
@@ -36,7 +36,7 @@ class MappingContentShape : public MappingShape {
         this->src_width = obj.src_width;
         this->src_height = obj.src_height;
         this->matrix_src_dst = obj.matrix_src_dst;
-        this->fbo = obj.fbo;
+        this->texture = obj.texture;
     }
 
     ofPtr<MappingObject> clone() const {
@@ -82,10 +82,12 @@ class MappingContentShape : public MappingShape {
         this->findHomography(this->dst, this->src, (GLfloat*) this->matrix_src_dst.getPtr(), true, w, h);
     }
 
-    void setFbo(ofFbo_ptr &fbo) {
-        this->fbo = fbo;
-        src_width = fbo->getWidth();
-        src_height = fbo->getHeight();
+    void setTexture(ofTexture* texture) {
+        this->texture = texture;
+        if(texture) {
+            src_width = texture->getWidth();
+            src_height = texture->getHeight();
+        }
     }
 
     void draw(float w, float h) {
@@ -94,33 +96,33 @@ class MappingContentShape : public MappingShape {
 
             glMultMatrixf(this->matrix_dst_norm.getPtr());
 
-            if(this->fbo) {
+            if(this->texture) {
 
                 ofSetColor(255);
 
-                this->fbo->getTexture().bind();
+                texture->bind();
 
                 if(this->polyline.size()!= 4) {
 
                     glBegin(GL_TRIANGLES);
                     for (int i = 0; i < this->triangle.nTriangles; i++){
 
-                        float cx = (((this->triangle.triangles[i].a.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* fbo->getWidth();
-                        float cy = (((this->triangle.triangles[i].a.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * fbo->getHeight();
+                        float cx = (((this->triangle.triangles[i].a.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
+                        float cy = (((this->triangle.triangles[i].a.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
                         float ox = (this->triangle.triangles[i].a.x - this->dst[0].x) / (float)(this->dst[1].x-this->dst[0].x) * w;
                         float oy = (this->triangle.triangles[i].a.y - this->dst[0].y) / (float)(this->dst[2].y-this->dst[0].y) * h;
                         glTexCoord2f(cx, cy);
                         glVertex2f(ox, oy);
 
-                        cx = (((this->triangle.triangles[i].b.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* fbo->getWidth();
-                        cy = (((this->triangle.triangles[i].b.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * fbo->getHeight();
+                        cx = (((this->triangle.triangles[i].b.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
+                        cy = (((this->triangle.triangles[i].b.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
                         ox = (this->triangle.triangles[i].b.x - this->dst[0].x)/(float)(this->dst[1].x-this->dst[0].x)*w;
                         oy = (this->triangle.triangles[i].b.y - this->dst[0].y)/(float)(this->dst[2].y-this->dst[0].y)*h;
                         glTexCoord2f(cx, cy);
                         glVertex2f(ox, oy);
 
-                        cx = (((this->triangle.triangles[i].c.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* fbo->getWidth();
-                        cy = (((this->triangle.triangles[i].c.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * fbo->getHeight();
+                        cx = (((this->triangle.triangles[i].c.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
+                        cy = (((this->triangle.triangles[i].c.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
                         ox = (this->triangle.triangles[i].c.x - this->dst[0].x)/(float)(this->dst[1].x-this->dst[0].x)*w;
                         oy = (this->triangle.triangles[i].c.y - this->dst[0].y)/(float)(this->dst[2].y-this->dst[0].y)*h;
                         glTexCoord2f(cx, cy);
@@ -133,15 +135,15 @@ class MappingContentShape : public MappingShape {
 
                     glBegin(GL_QUADS);
 
-                    glTexCoord2f(this->src[0].x*fbo->getWidth(), this->src[0].y*fbo->getHeight());		glVertex3f(0, 0, 0);
-                    glTexCoord2f(this->src[1].x*fbo->getWidth(), this->src[1].y*fbo->getHeight());		glVertex3f(w, 0, 0);
-                    glTexCoord2f(this->src[2].x*fbo->getWidth(), this->src[2].y*fbo->getHeight());		glVertex3f(w, h, 0);
-                    glTexCoord2f(this->src[3].x*fbo->getWidth(), this->src[3].y*fbo->getHeight());		glVertex3f(0, h, 0);
+                    glTexCoord2f(this->src[0].x*src_width, this->src[0].y*src_height);		glVertex3f(0, 0, 0);
+                    glTexCoord2f(this->src[1].x*src_width, this->src[1].y*src_height);		glVertex3f(w, 0, 0);
+                    glTexCoord2f(this->src[2].x*src_width, this->src[2].y*src_height);		glVertex3f(w, h, 0);
+                    glTexCoord2f(this->src[3].x*src_width, this->src[3].y*src_height);		glVertex3f(0, h, 0);
 
                    glEnd();
                 }
 
-                this->fbo->getTexture().unbind();
+                texture->unbind();
 
             }
 
@@ -150,10 +152,7 @@ class MappingContentShape : public MappingShape {
     }
 
     ofTexture* getTexture() {
-        if(fbo)
-            return &fbo->getTexture();
-        else
-            return 0;
+        return texture;
     }
 
 };

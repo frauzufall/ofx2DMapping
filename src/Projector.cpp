@@ -22,7 +22,7 @@ Projector::Projector(float w, float h) {
     output_w = w;
     output_h = h;
 
-    RegisterInFactory<MappingObject, MappingContentShape> register1(MappingContentShape().nature);
+    RegisterInFactory<MappingObject, MappingFbo> register1(MappingFbo().nature);
     RegisterInFactory<MappingObject, MappingColorShape> register2(MappingColorShape().nature);
     RegisterInFactory<MappingObject, MappingImage> register3(MappingImage().nature);
 

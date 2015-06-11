@@ -6,7 +6,6 @@
 #include "ofxXmlSettings.h"
 #include "Helper.h"
 
-//enum ObjectType { OBJECT = 0, SHAPE = 1, CONTENT_SHAPE = 2, COLOR_SHAPE = 3, IMAGE = 4, POINT = 5, TEXT = 6};
 typedef ofPtr<ofFbo> ofFbo_ptr;
 typedef ofPtr<ofxXmlSettings> ofxXmlSettings_ptr;
 

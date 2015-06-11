@@ -2,6 +2,7 @@
 
 #include "MappingObject.h"
 #include "MappingContentShape.h"
+#include "MappingFbo.h"
 #include "MappingColorShape.h"
 #include "MappingShape.h"
 #include "MappingImage.h"
@@ -16,6 +17,7 @@ typedef ofPtr<MappingShape> MappingShape_ptr;
 typedef ofPtr<MappingContentShape> MappingContentShape_ptr;
 typedef ofPtr<MappingColorShape> MappingColorShape_ptr;
 typedef ofPtr<MappingImage> MappingImage_ptr;
+typedef ofPtr<MappingFbo> MappingFbo_ptr;
 typedef ofPtr<MappingPoint> MappingPoint_ptr;
 
 class Projector {
