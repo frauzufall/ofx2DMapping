@@ -2,10 +2,10 @@
 
 #include "ofMain.h"
 
-class SomeScene
+class Scene1
 {
 public:
-    SomeScene();
+    Scene1();
     void setup(float w, float h);
     void update();
     ofPtr<ofFbo> &getFbo();

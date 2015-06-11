@@ -6,18 +6,28 @@ void ofApp::setup(){
 
     show_controls = true;
 
-    //setup some scene that creates an fbo that is to be mapped
-    scene.setup(1600, 900);
+    //setup some content that should get mapped
+    scene1.setup(1600, 900);
+    scene2.setup(1600, 900);
 
     //create template mapping objects that can be added afterwards via button
 
     //option to add shapes that show the content of a given fbo
-    ofPtr<MappingContentShape> content = mapping.getControl()->addTemplate<MappingContentShape>("content");
-    content->setFbo(scene.getFbo());
+
+    ofPtr<MappingFbo> content1 = mapping.getControl()->addTemplate<MappingFbo>("scene1");
+    content1->setFbo(scene1.getFbo());
+
+    ofPtr<MappingFbo> content2 = mapping.getControl()->addTemplate<MappingFbo>("scene2");
+    content2->setFbo(scene2.getFbo());
 
     //option to add black shapes
     ofPtr<MappingColorShape> black_shape = mapping.getControl()->addTemplate<MappingColorShape>("black");
     black_shape->setColor(ofColor(0));
+
+    //option to add black shapes
+    ofPtr<MappingImage> logo = mapping.getControl()->addTemplate<MappingImage>("logo");
+    logo->loadImage("images/ente.jpg");
+    logo->setColor(ofColor(0,200,255));
 
     //init mapping and load mapping settings from xml
     mapping.setup("mapping/mapping.xml");
@@ -38,7 +48,8 @@ void ofApp::update() {
     mapping.update();
 
     //update your content
-    scene.update();
+    scene1.update();
+    scene2.update();
 }
 
 //--------------------------------------------------------------
