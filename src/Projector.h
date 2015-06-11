@@ -37,7 +37,6 @@ public:
     MappingObject_ptr copyShape(MappingObject_ptr obj, bool swap = false);
 
     bool removeShape(int id);
-
     void removeAllShapes();
 
     bool swapShapes(int index1, int index2);

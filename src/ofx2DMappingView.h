@@ -27,26 +27,27 @@ private:
     ofx2DMappingController* ctrl;
 
     void setSubpanelPositions();
-    void updateQuadList();
-    void selectAll();
-    void deselectAll();
+    void updateObjectList();
+    void selectAllObjects();
+    void deselectAllObjects();
+    void removeAllObjects();
 
     bool show_source, direct_edit;
 
     ofRectangle control_rect;
 
-    ofxSortableList shape_list;
+    ofxSortableList object_list;
 
     ofPoint pos_main_options, pos_calibration_options, pos_add_buttons, pos_shape_list;
 
     ofxPanel add_buttons_panel;
     FormMapping mapping_forms;
-    ofxPanel main_options, calibration_options, select_options;
+    ofxPanel main_options, calibration_options, list_options;
 
     void removeForm(RemovedElementData& data);
     void reorderForm(MovingElementData& data);
 
-    ofxButton save_btn, import_btn, select_all_btn, deselect_all_btn;
+    ofxButton save_btn, import_btn, select_all_btn, deselect_all_btn, delete_all_btn;
     ofxToggle edit_mode_btn;
     vector<ofParameter<bool>> add_button_params;
 

@@ -103,6 +103,9 @@ bool Projector::removeShape(int id) {
 }
 
 void Projector::removeAllShapes() {
+    for(uint i = 0; i < shapes.size(); i++) {
+        shapes.at(i).reset();
+    }
     shapes.clear();
 }
 
