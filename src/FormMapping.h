@@ -81,4 +81,7 @@ private:
     ofPoint zoom_point, zoom_point_scaled, zoom_point_offset;
     ofPoint translation_dst;
 
+    bool dragging_dst;
+    ofPoint last_mouse;
+
 };

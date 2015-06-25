@@ -5,6 +5,7 @@ FormMapping::FormMapping(): ofxPanel() {
     shapes.clear();
     zoom_factor = 0;
     zoom_speed = 0.01;
+    dragging_dst = false;
 
 }
 
@@ -490,12 +491,19 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
 
     }
 
+    if(dragging_dst) {
+        zoom_point_offset += mouse - last_mouse;
+        last_mouse = mouse;
+    }
+
     return ofxPanel::mouseDragged(args);
 }
 
 bool FormMapping::mousePressed(ofMouseEventArgs& args) {
 
     ofPoint mouse(args.x,args.y);
+
+    bool on_element = false;
 
     for (uint i = 0; i < shapes.size(); i++){
         bool editable = parent_projector->getShape(i)->editable;
@@ -507,6 +515,7 @@ bool FormMapping::mousePressed(ofMouseEventArgs& args) {
             if (dist < shapes[i].polyline[j].radius){
                 if(editable) {
                     shapes[i].polyline[j].bBeingDragged = true;
+                    on_element = true;
                 }
             } else {
                 shapes[i].polyline[j].bBeingDragged = false;
@@ -526,6 +535,11 @@ bool FormMapping::mousePressed(ofMouseEventArgs& args) {
         }
     }
 
+    if(!on_element && mapping_rect_dst.inside(mouse)) {
+        dragging_dst = true;
+        last_mouse = mouse;
+    }
+
     return ofxPanel::mousePressed(args);
 }
 
@@ -541,6 +555,8 @@ bool FormMapping::mouseReleased(ofMouseEventArgs &args) {
             shapes[i].src[j].bBeingDragged = false;
         }
     }
+
+    dragging_dst = false;
 
     return ofxPanel::mouseReleased(args);
 }
