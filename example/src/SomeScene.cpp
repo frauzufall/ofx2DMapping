@@ -1,10 +1,10 @@
-#include "Scene1.h"
+#include "SomeScene.h"
 
-Scene1::Scene1()
+SomeScene::SomeScene()
 {
 }
 
-void Scene1::setup(float w, float h) {
+void SomeScene::setup(float w, float h) {
 
     fbo = ofPtr<ofFbo>(new ofFbo());
     fbo->allocate(w,h,GL_RGBA);
@@ -15,7 +15,7 @@ void Scene1::setup(float w, float h) {
     myfont.loadFont("arial.ttf", 112);
 }
 
-void Scene1::update() {
+void SomeScene::update() {
 
     int time_i = ofGetElapsedTimeMillis();
 
@@ -38,6 +38,6 @@ void Scene1::update() {
 
 }
 
-ofPtr<ofFbo> & Scene1::getFbo() {
+ofPtr<ofFbo> & SomeScene::getFbo() {
     return fbo;
 }

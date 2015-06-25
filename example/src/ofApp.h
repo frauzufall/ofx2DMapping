@@ -4,8 +4,7 @@
 #include "ofxGui.h"
 #include "ofx2DMapping.h"
 
-#include "Scene1.h"
-#include "Scene2.h"
+#include "SomeScene.h"
 
 class ofApp : public ofBaseApp{
 	
@@ -31,8 +30,7 @@ private:
     ofx2DMapping mapping;
     MappingContentShape_ptr cshape;
 
-    Scene1 scene1;
-    Scene2 scene2;
+    SomeScene scene;
 
     bool show_controls;
 

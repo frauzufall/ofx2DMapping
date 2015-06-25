@@ -7,18 +7,14 @@ void ofApp::setup(){
     show_controls = true;
 
     //setup some content that should get mapped
-    scene1.setup(1600, 900);
-    scene2.setup(1600, 900);
+    scene.setup(1600, 900);
 
     //create template mapping objects that can be added afterwards via button
 
     //option to add shapes that show the content of a given fbo
 
-    ofPtr<MappingFbo> content1 = mapping.getControl()->addTemplate<MappingFbo>("scene1");
-    content1->setFbo(scene1.getFbo());
-
-    ofPtr<MappingFbo> content2 = mapping.getControl()->addTemplate<MappingFbo>("scene2");
-    content2->setFbo(scene2.getFbo());
+    ofPtr<MappingFbo> content1 = mapping.getControl()->addTemplate<MappingFbo>("scene");
+    content1->setFbo(scene.getFbo());
 
     //option to add black shapes
     ofPtr<MappingColorShape> black_shape = mapping.getControl()->addTemplate<MappingColorShape>("black");
@@ -48,8 +44,7 @@ void ofApp::update() {
     mapping.update();
 
     //update your content
-    scene1.update();
-    scene2.update();
+    scene.update();
 }
 
 //--------------------------------------------------------------
