@@ -69,16 +69,22 @@ MappingObject_ptr Projector::addShape(MappingObject_ptr obj, bool swap) {
 }
 
 MappingObject_ptr Projector::addShape(string type, string name, bool swap) {
-    shapes.push_back(MappingObjectFactory<MappingObject>::instance().Create(type));
-    shapes.at(shapes.size()-1)->name = name;
-    if(swap) {
-        update();
-        for(int i = shapes.size()-1; i>0;i--) {
-            swapShapes(i, i-1);
+    MappingObject_ptr obj = MappingObjectFactory<MappingObject>::instance().Create(type);
+    if(obj) {
+        shapes.push_back(obj);
+        shapes.at(shapes.size()-1)->name = name;
+        if(swap) {
+            update();
+            for(int i = shapes.size()-1; i>0;i--) {
+                swapShapes(i, i-1);
+            }
         }
-        return shapes.at(0);
     }
-    return shapes.at(shapes.size()-1);
+    else {
+        ofLogError("Projector: addShape()", "MappingObjectFactory could not create object of type " + type + ".");
+    }
+    return obj;
+
 }
 
 MappingObject_ptr Projector::copyShape(MappingObject_ptr original, bool swap) {
