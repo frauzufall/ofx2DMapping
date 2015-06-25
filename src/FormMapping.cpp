@@ -3,6 +3,8 @@
 FormMapping::FormMapping(): ofxPanel() {
 
     shapes.clear();
+    zoom_factor = 0;
+    zoom_speed = 0.01;
 
 }
 
@@ -56,6 +58,9 @@ void FormMapping::setMappingRects() {
     //    }
 
         this->setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
+
+        mapping_front.clear();
+        mapping_front.allocate(mapping_rect_dst.width, mapping_rect_dst.height, GL_RGBA);
     }
 }
 
@@ -130,16 +135,6 @@ void FormMapping::updateForms() {
 
     //find first content shape from top to use as background for source mapping
 
-    vector<MappingContentShape_ptr> objs = parent_projector->getShapesByClass<MappingContentShape>();
-    if(objs.size() > 0) {
-        for(uint i = objs.size()-1; i >= 0; i--) {
-            if(objs.at(i)->editable) {
-                source_bg = objs.at(i)->getTexture();
-                break;
-            }
-        }
-    }
-
     updateSourceBackground();
 
 }
@@ -150,7 +145,7 @@ void FormMapping::updateSourceBackground() {
     source_bg = 0;
     vector<MappingContentShape_ptr> objs = parent_projector->getShapesByClass<MappingContentShape>();
     if(objs.size() > 0) {
-        for(uint i = objs.size()-1; i >= 0; i--) {
+        for(int i = objs.size()-1; i >= 0; i--) {
             if(objs.at(i)->editable) {
                 source_bg = objs.at(i)->getTexture();
                 break;
@@ -191,12 +186,6 @@ void FormMapping::draw(bool show_source) {
         ofNoFill();
         ofSetLineWidth(0.5);
         ofDrawRectangle(mapping_rect_dst);
-        ofSetColor(255,60);
-        mapping_bg->draw(
-                    mapping_rect_dst.x,
-                    mapping_rect_dst.y,
-                    mapping_rect_dst.width,
-                    mapping_rect_dst.height);
     }
 
     if(show_source) {
@@ -214,6 +203,35 @@ void FormMapping::draw(bool show_source) {
     ofEnableAlphaBlending();
 
     ofSetLineWidth(1);
+
+    //draw dst
+
+    if(!direct_edit) {
+        mapping_front.begin();
+        ofClear(0,0,0,0);
+
+        ofPushMatrix();
+        ofTranslate(-mapping_rect_dst.getPosition());
+
+        //ZOOM TRANSLATION
+
+        translation_dst = zoom_point-zoom_point_scaled+zoom_point_offset;
+        if(translation_dst.x > 0) translation_dst.x = 0;
+        if(translation_dst.y > 0) translation_dst.y = 0;
+        if(translation_dst.x < -addZoom(mapping_rect_dst.getWidth())+mapping_rect_dst.getWidth())
+            translation_dst.x = -addZoom(mapping_rect_dst.getWidth())+mapping_rect_dst.getWidth();
+        if(translation_dst.y < -addZoom(mapping_rect_dst.getHeight())+mapping_rect_dst.getHeight())
+            translation_dst.y = -addZoom(mapping_rect_dst.getHeight())+mapping_rect_dst.getHeight();
+        ofTranslate(translation_dst);
+
+        ofSetColor(255,160);
+        mapping_bg->draw(
+                    mapping_rect_dst.x,
+                    mapping_rect_dst.y,
+                    addZoom(mapping_rect_dst.width),
+                    addZoom(mapping_rect_dst.height));
+
+    }
 
     for (uint i = 0; i < shapes.size(); i++) {
 
@@ -248,13 +266,34 @@ void FormMapping::draw(bool show_source) {
             if(!(j == 0 && direct_edit)) {
                 ofBeginShape();
                 for(uint j = 0; j < shapes[i].polyline.size(); j++) {
-                    ofVertex(shapes[i].polyline[j].x, shapes[i].polyline[j].y);
+                    ofVertex(addZoom(shapes[i].polyline[j].x-mapping_rect_dst.x)+mapping_rect_dst.x,
+                             addZoom(shapes[i].polyline[j].y-mapping_rect_dst.y)+mapping_rect_dst.y);
                 }
                 ofEndShape(true);
             }
         }
 
-        //draw src
+        //draw dragging points
+        ofSetColor(255,255,255,200);
+        if(parent_projector->getShape(i)->editable) {
+            for(uint j = 0; j < shapes[i].polyline.size(); j++) {
+                if (shapes[i].polyline[j].bOver) ofFill();
+                else ofNoFill();
+                ofDrawCircle(addZoom(shapes[i].polyline[j]-mapping_rect_dst.getPosition())+mapping_rect_dst.getPosition(),6);
+            }
+        }
+
+    }
+
+    if(!direct_edit) {
+        ofPopMatrix();
+        mapping_front.end();
+        mapping_front.draw(mapping_rect_dst.getPosition(), mapping_rect_dst.width, mapping_rect_dst.height);
+    }
+
+    //draw src
+
+    for (uint i = 0; i < shapes.size(); i++) {
 
         ofNoFill();
         ofSetColor(shapes[i].color,255);
@@ -268,17 +307,13 @@ void FormMapping::draw(bool show_source) {
         //draw dragging points
         ofSetColor(255,255,255,200);
         if(parent_projector->getShape(i)->editable) {
-            for(uint j = 0; j < shapes[i].polyline.size(); j++) {
-                if (shapes[i].polyline[j].bOver) ofFill();
-                else ofNoFill();
-                ofDrawCircle(shapes[i].polyline[j].x, shapes[i].polyline[j].y,6);
+            for(uint j = 0; j < shapes[i].src.size(); j++) {
 
-                if(j < shapes[i].src.size()) {
-                    if (shapes[i].src[j].bOver) ofFill();
-                    else ofNoFill();
-                    if(j%2==0)
-                        ofDrawCircle(shapes[i].src[j].x, shapes[i].src[j].y,6);
-                }
+                if (shapes[i].src[j].bOver) ofFill();
+                else ofNoFill();
+                if(j%2==0)
+                    ofDrawCircle(shapes[i].src[j].x, shapes[i].src[j].y,6);
+
             }
         }
 
@@ -291,8 +326,9 @@ bool FormMapping::mouseMoved(ofMouseEventArgs& args) {
     ofPoint mouse(args.x,args.y);
     for (uint i = 0; i < shapes.size(); i++){
         for (uint j = 0; j < shapes[i].polyline.size(); j++){
-            float diffx = mouse.x - shapes[i].polyline[j].x;
-            float diffy = mouse.y - shapes[i].polyline[j].y;
+            ofPoint zoomed_p = addZoomRelativeOfDstRect(shapes[i].polyline[j]);
+            float diffx = mouse.x - zoomed_p.x;
+            float diffy = mouse.y - zoomed_p.y;
             float dist = sqrt(diffx*diffx + diffy*diffy);
             if (dist < shapes[i].polyline[j].radius){
                 shapes[i].polyline[j].bOver = true;
@@ -329,23 +365,28 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
             for (uint j = 0; j < shapes[i].polyline.size(); j++) {
 
                 if (shapes[i].polyline[j].bBeingDragged == true){
+
+                    ofPoint zoomed_mouse = removeZoomRelativeOfDstRect(mouse);
+                    ofPoint zoomed_mapping_rect_dst_lefttop = removeZoomRelativeOfDstRect(mapping_rect_dst.getPosition());
+                    ofPoint zoomed_mapping_rect_dst_rightbottom = removeZoomRelativeOfDstRect(mapping_rect_dst.getPosition()+ofPoint(mapping_rect_dst.getWidth(), mapping_rect_dst.getHeight()));
+
                     if(mouse.x < mapping_rect_dst.x+mapping_rect_dst.width) {
                         if(mouse.x > mapping_rect_dst.x)
-                            shapes[i].polyline[j].x = mouse.x;
+                            shapes[i].polyline[j].x = zoomed_mouse.x;
                         else
-                            shapes[i].polyline[j].x = mapping_rect_dst.x;
+                            shapes[i].polyline[j].x = zoomed_mapping_rect_dst_lefttop.x;
                     }
                     else {
-                        shapes[i].polyline[j].x = mapping_rect_dst.x+mapping_rect_dst.width;
+                        shapes[i].polyline[j].x = zoomed_mapping_rect_dst_rightbottom.x;
                     }
                     if(mouse.y < mapping_rect_dst.y+mapping_rect_dst.height) {
                         if(mouse.y > mapping_rect_dst.y)
-                            shapes[i].polyline[j].y = mouse.y;
+                            shapes[i].polyline[j].y = zoomed_mouse.y;
                         else
-                            shapes[i].polyline[j].y = mapping_rect_dst.y;
+                            shapes[i].polyline[j].y = zoomed_mapping_rect_dst_lefttop.y;
                     }
                     else {
-                        shapes[i].polyline[j].y = mapping_rect_dst.y+mapping_rect_dst.height;
+                        shapes[i].polyline[j].y = zoomed_mapping_rect_dst_rightbottom.y;
                     }
 
                     if(shapes[i].polyline.size() == 4) {
@@ -459,8 +500,9 @@ bool FormMapping::mousePressed(ofMouseEventArgs& args) {
     for (uint i = 0; i < shapes.size(); i++){
         bool editable = parent_projector->getShape(i)->editable;
         for (uint j = 0; j < shapes[i].polyline.size(); j++){
-            float diffx = mouse.x - shapes[i].polyline[j].x;
-            float diffy = mouse.y - shapes[i].polyline[j].y;
+            ofPoint zoomed_p = addZoomRelativeOfDstRect(shapes[i].polyline[j]);
+            float diffx = mouse.x - zoomed_p.x;
+            float diffy = mouse.y - zoomed_p.y;
             float dist = sqrt(diffx*diffx + diffy*diffy);
             if (dist < shapes[i].polyline[j].radius){
                 if(editable) {
@@ -503,6 +545,15 @@ bool FormMapping::mouseReleased(ofMouseEventArgs &args) {
     return ofxPanel::mouseReleased(args);
 }
 
+bool FormMapping::mouseScrolled(ofMouseEventArgs &args) {
+
+    if(!direct_edit && mapping_rect_dst.inside(ofGetMouseX(), ofGetMouseY())) {
+        setZoomFactor(args.y);
+    }
+
+    return ofxPanel::mouseScrolled(args);
+}
+
 void FormMapping::setMappingBackground(ofFbo_ptr &fbo) {
     mapping_bg = fbo;
 }
@@ -511,6 +562,7 @@ void FormMapping::setEditMode(bool direct_edit) {
     this->direct_edit = direct_edit;
     if(direct_edit) {
         control_rect_backup = control_rect;
+        setZoomFactor(0);
     }
     else {
         control_rect = control_rect_backup;
@@ -524,4 +576,53 @@ void FormMapping::setOutputForm(float x, float y, float w, float h) {
 
 void FormMapping::setOutputForm(ofRectangle rect) {
     mapping_rect_output = rect;
+}
+
+void FormMapping::setZoomFactor(int factor) {
+
+    int old_zoom_factor = zoom_factor;
+
+    zoom_factor += factor;
+    if(zoom_factor < 0)
+        zoom_factor = 0;
+
+    ofPoint zoom_point_old = zoom_point;
+
+    ofPoint tmp_zoom_point;
+    tmp_zoom_point.x = ofGetMouseX() - mapping_rect_dst.x - zoom_point_offset.x;
+    tmp_zoom_point.y = ofGetMouseY() - mapping_rect_dst.y - zoom_point_offset.y;
+
+    ofVec2f diff = tmp_zoom_point - zoom_point_old;
+
+    if(old_zoom_factor == 0) {
+        diff = ofPoint(0,0);
+        zoom_point_offset = ofPoint(0,0);
+        zoom_point_old = tmp_zoom_point;
+    }
+
+    zoom_point = zoom_point_old + removeZoom(diff);
+    zoom_point_offset += tmp_zoom_point - zoom_point;
+    zoom_point_scaled = addZoom(zoom_point);
+
+}
+
+ofPoint FormMapping::addZoom(ofPoint p) {
+    return p*(1+zoom_factor*zoom_speed);
+}
+
+ofPoint FormMapping::addZoomRelativeOfDstRect(ofPoint p) {
+    return addZoom(p-mapping_rect_dst.getPosition())+mapping_rect_dst.getPosition()+translation_dst;
+}
+
+ofPoint FormMapping::removeZoomRelativeOfDstRect(ofPoint p) {
+    return removeZoom(p-mapping_rect_dst.getPosition()-translation_dst)+mapping_rect_dst.getPosition();
+}
+
+float FormMapping::addZoom(float p) {
+    return p*(1+zoom_factor*zoom_speed);
+}
+
+
+ofPoint FormMapping::removeZoom(ofPoint p) {
+    return p/(1+zoom_factor*zoom_speed);
 }
