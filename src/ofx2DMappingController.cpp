@@ -57,7 +57,7 @@ void ofx2DMappingController::setupMapping(){
     if(!xml->loadFile(xml_mapping) ) {
         ofFile newFile(xml_mapping);
         newFile.create();
-        cout << "unable to load xml file " << xml_mapping << endl;
+        ofLogError("ofx2DMappingController: setupMapping()", "unable to load xml file " + xml_mapping);
     }
     reloadMapping(xml);
 
@@ -130,7 +130,7 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
         xml->popTag();
 
-        cout << "OFX2DMAPPINGCONTROLLER:: projector " << i << " with " << getProjector(i)->shapeCount() << " mapping objects loaded." << endl;
+        ofLogNotice("ofx2DMappingController: reloadMapping()", "projector " + ofToString(i) + " with " + ofToString(getProjector(i)->shapeCount()) + " mapping objects loaded.");
 
     }
 
@@ -185,7 +185,7 @@ void ofx2DMappingController::updateFbo(int projector_id) {
 
     }
     else {
-        cout << "ERROR: ofx2DMappingController: trying to draw projector " << projector_id << " but projectors size is " << projectors.size() << endl;
+        ofLogError("ofx2DMappingController: updateFbo()", "trying to draw projector " + ofToString(projector_id) + " but projectors size is " + ofToString(projectors.size()));
     }
 }
 
@@ -204,7 +204,7 @@ void ofx2DMappingController::updateAreaFbo(int projector_id) {
 
     }
     else {
-        cout << "ERROR: ofx2DMappingController: trying to draw projector " << projector_id << " but projectors size is " << projectors.size() << endl;
+        ofLogError("ofx2DMappingController: updateAreaFbo()", "trying to draw projector " + ofToString(projector_id) + " but projectors size is " + ofToString(projectors.size()));
     }
 }
 
@@ -298,7 +298,7 @@ Projector* ofx2DMappingController::getProjector(int id) {
         return &(projectors[id]);
     }
     else {
-        cout << "ERROR: ofx2DMappingController: trying to get projector " << id << " but projectors size is " << projectors.size() << endl;
+        ofLogError("ofx2DMappingController: getProjector()", "trying to get projector " + ofToString(id) + " but projectors size is " + ofToString(projectors.size()));
         return 0;
     }
 }
@@ -494,7 +494,7 @@ void ofx2DMappingController::saveOutputImage() {
     stringstream str;
     str << "screenshots/";
     str << ofGetTimestampString() << ".png";
-    cout << "MAPPINGCONTROLLER::saving image " << str.str() << endl;
+    ofLogNotice("ofx2DMappingController: saveOutputImage()", "saving image " + str.str());
     ofImage img;
     img.allocate(getOutput()->getWidth(), getOutput()->getHeight(), OF_IMAGE_COLOR_ALPHA);
     getOutput()->readToPixels(img.getPixels());

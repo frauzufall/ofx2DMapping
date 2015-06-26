@@ -128,7 +128,7 @@ public:
 
         xml.popTag();
 
-        cout << "saving svg to " << path << endl;
+        ofLogNotice("Helper: saveLineAsSvg()", "saving svg to " + path);
 
         xml.saveFile(path);
     }

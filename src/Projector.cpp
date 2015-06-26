@@ -133,7 +133,7 @@ MappingObject_ptr Projector::getMappingObject(int id) {
         return shapes[id];
     }
     else {
-        cout << "ERROR: projector: trying to get object " << id << " but objects size is " << shapes.size() << endl;
+        ofLogError("Projector: getMappingObject()","trying to get object " + ofToString(id) + " but objects size is " + ofToString(shapes.size()));
         return MappingObject_ptr();
     }
 
@@ -252,8 +252,6 @@ void Projector::updateOutlines() {
         for(uint j = 0; j < _outlines_raw->at(i).size(); j++) {
             _outlines_raw->at(i)[j].x *= output_w;
             _outlines_raw->at(i)[j].y *= output_h;
-
-            //cout << _outlines_raw->at(i)[j] << endl;
 
             if(j == 0)
                 ((ofPtr<ofPath>)_paths->at(i))->moveTo(_outlines_raw->at(i)[j]);
