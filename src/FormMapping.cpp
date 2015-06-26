@@ -361,46 +361,47 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
 
         MappingObject_ptr obj = parent_projector->getShape(i);
 
-        if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(obj)) {
+        for (uint j = 0; j < shapes[i].polyline.size(); j++) {
 
-            for (uint j = 0; j < shapes[i].polyline.size(); j++) {
+            if (shapes[i].polyline[j].bBeingDragged == true){
 
-                if (shapes[i].polyline[j].bBeingDragged == true){
+                ofPoint zoomed_mouse = removeZoomRelativeOfDstRect(mouse);
+                ofPoint zoomed_mapping_rect_dst_lefttop = removeZoomRelativeOfDstRect(mapping_rect_dst.getPosition());
+                ofPoint zoomed_mapping_rect_dst_rightbottom = removeZoomRelativeOfDstRect(mapping_rect_dst.getPosition()+ofPoint(mapping_rect_dst.getWidth(), mapping_rect_dst.getHeight()));
 
-                    ofPoint zoomed_mouse = removeZoomRelativeOfDstRect(mouse);
-                    ofPoint zoomed_mapping_rect_dst_lefttop = removeZoomRelativeOfDstRect(mapping_rect_dst.getPosition());
-                    ofPoint zoomed_mapping_rect_dst_rightbottom = removeZoomRelativeOfDstRect(mapping_rect_dst.getPosition()+ofPoint(mapping_rect_dst.getWidth(), mapping_rect_dst.getHeight()));
+                if(mouse.x < mapping_rect_dst.x+mapping_rect_dst.width) {
+                    if(mouse.x > mapping_rect_dst.x)
+                        shapes[i].polyline[j].x = zoomed_mouse.x;
+                    else
+                        shapes[i].polyline[j].x = zoomed_mapping_rect_dst_lefttop.x;
+                }
+                else {
+                    shapes[i].polyline[j].x = zoomed_mapping_rect_dst_rightbottom.x;
+                }
+                if(mouse.y < mapping_rect_dst.y+mapping_rect_dst.height) {
+                    if(mouse.y > mapping_rect_dst.y)
+                        shapes[i].polyline[j].y = zoomed_mouse.y;
+                    else
+                        shapes[i].polyline[j].y = zoomed_mapping_rect_dst_lefttop.y;
+                }
+                else {
+                    shapes[i].polyline[j].y = zoomed_mapping_rect_dst_rightbottom.y;
+                }
 
-                    if(mouse.x < mapping_rect_dst.x+mapping_rect_dst.width) {
-                        if(mouse.x > mapping_rect_dst.x)
-                            shapes[i].polyline[j].x = zoomed_mouse.x;
-                        else
-                            shapes[i].polyline[j].x = zoomed_mapping_rect_dst_lefttop.x;
-                    }
-                    else {
-                        shapes[i].polyline[j].x = zoomed_mapping_rect_dst_rightbottom.x;
-                    }
-                    if(mouse.y < mapping_rect_dst.y+mapping_rect_dst.height) {
-                        if(mouse.y > mapping_rect_dst.y)
-                            shapes[i].polyline[j].y = zoomed_mouse.y;
-                        else
-                            shapes[i].polyline[j].y = zoomed_mapping_rect_dst_lefttop.y;
-                    }
-                    else {
-                        shapes[i].polyline[j].y = zoomed_mapping_rect_dst_rightbottom.y;
-                    }
+                if(shapes[i].polyline.size() == 4) {
 
-                    if(shapes[i].polyline.size() == 4) {
-
+                    if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(obj)) {
                         shape->dst[j].x = (shapes[i].polyline[j].x-mapping_rect_dst.x)/mapping_rect_dst.width;
                         shape->dst[j].y = (shapes[i].polyline[j].y-mapping_rect_dst.y)/mapping_rect_dst.height;
 
                         shape->polyline[j].x = shape->dst[j].x;
                         shape->polyline[j].y = shape->dst[j].y;
-
                     }
-                    else {
 
+                }
+                else {
+
+                    if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(obj)) {
                         shape->polyline[j].x = (shapes[i].polyline[j].x-mapping_rect_dst.x)/mapping_rect_dst.width;
                         shape->polyline[j].y = (shapes[i].polyline[j].y-mapping_rect_dst.y)/mapping_rect_dst.height;
 
@@ -414,77 +415,82 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
                         shape->dst[2].y = bounding.y+bounding.height;
                         shape->dst[3].x = bounding.x;
                         shape->dst[3].y = bounding.y+bounding.height;
+                    }
+                    if(MappingPoint_ptr point = std::dynamic_pointer_cast<MappingPoint>(obj)) {
+                        //j should be 0
+                        point->pos.x = (shapes[i].polyline[j].x-mapping_rect_dst.x)/mapping_rect_dst.width;
+                        point->pos.y = (shapes[i].polyline[j].y-mapping_rect_dst.y)/mapping_rect_dst.height;
 
                     }
 
-                    shape->newpos = true;
-                    parent_list->getListItems().at(shapes.size()-1-i)->setBackgroundColor(ofColor(0,200,210));
+                }
+
+                obj->newpos = true;
+                parent_list->getListItems().at(shapes.size()-1-i)->setBackgroundColor(ofColor(0,200,210));
 //                    Visuals::get().reloadLinesFromRaw();
-                }
             }
+        }
 
-            if(MappingContentShape_ptr cshape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
+        if(MappingContentShape_ptr cshape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
 
-                for (uint j = 0; j < shapes[i].src.size(); j++){
-                    if (shapes[i].src[j].bBeingDragged == true){
-                        if(mouse.x < mapping_rect_src.x+mapping_rect_src.width) {
-                            if(mouse.x > mapping_rect_src.x)
-                                shapes[i].src[j].x = mouse.x;
-                            else
-                                shapes[i].src[j].x = mapping_rect_src.x;
-                        }
-                        else {
-                            shapes[i].src[j].x = mapping_rect_src.x+mapping_rect_src.width;
-                        }
-                        if(mouse.y < mapping_rect_src.y+mapping_rect_src.height) {
-                            if(mouse.y > mapping_rect_src.y)
-                                shapes[i].src[j].y = mouse.y;
-                            else
-                                shapes[i].src[j].y = mapping_rect_src.y;
-                        }
-                        else {
-                            shapes[i].src[j].y = mapping_rect_src.y+mapping_rect_src.height;
-                        }
-                        cshape->src[j].x = (shapes[i].src[j].x-mapping_rect_src.x)/mapping_rect_src.width;
-                        cshape->src[j].y = (shapes[i].src[j].y-mapping_rect_src.y)/mapping_rect_src.height;
-
-                        switch(j) {
-                        case 0: {
-                            cshape->src[1].y = cshape->src[j].y;
-                            cshape->src[3].x = cshape->src[j].x;
-                            shapes[i].src[1].y = shapes[i].src[j].y;
-                            shapes[i].src[3].x = shapes[i].src[j].x;
-                            break;
-                        }
-                        case 1: {
-                            cshape->src[0].y = cshape->src[j].y;
-                            cshape->src[2].x = cshape->src[j].x;
-                            shapes[i].src[0].y = shapes[i].src[j].y;
-                            shapes[i].src[2].x = shapes[i].src[j].x;
-                            break;
-                        }
-                        case 2: {
-                            cshape->src[1].x = cshape->src[j].x;
-                            cshape->src[3].y = cshape->src[j].y;
-                            shapes[i].src[1].x = shapes[i].src[j].x;
-                            shapes[i].src[3].y = shapes[i].src[j].y;
-                            break;
-                        }
-                        case 3: {
-                            cshape->src[0].x = cshape->src[j].x;
-                            cshape->src[2].y = cshape->src[j].y;
-                            shapes[i].src[0].x = shapes[i].src[j].x;
-                            shapes[i].src[2].y = shapes[i].src[j].y;
-                            break;
-                        }
-                        default:
-                            break;
-                        }
-
-                        cshape->newpos = true;
+            for (uint j = 0; j < shapes[i].src.size(); j++){
+                if (shapes[i].src[j].bBeingDragged == true){
+                    if(mouse.x < mapping_rect_src.x+mapping_rect_src.width) {
+                        if(mouse.x > mapping_rect_src.x)
+                            shapes[i].src[j].x = mouse.x;
+                        else
+                            shapes[i].src[j].x = mapping_rect_src.x;
                     }
-                }
+                    else {
+                        shapes[i].src[j].x = mapping_rect_src.x+mapping_rect_src.width;
+                    }
+                    if(mouse.y < mapping_rect_src.y+mapping_rect_src.height) {
+                        if(mouse.y > mapping_rect_src.y)
+                            shapes[i].src[j].y = mouse.y;
+                        else
+                            shapes[i].src[j].y = mapping_rect_src.y;
+                    }
+                    else {
+                        shapes[i].src[j].y = mapping_rect_src.y+mapping_rect_src.height;
+                    }
+                    cshape->src[j].x = (shapes[i].src[j].x-mapping_rect_src.x)/mapping_rect_src.width;
+                    cshape->src[j].y = (shapes[i].src[j].y-mapping_rect_src.y)/mapping_rect_src.height;
 
+                    switch(j) {
+                    case 0: {
+                        cshape->src[1].y = cshape->src[j].y;
+                        cshape->src[3].x = cshape->src[j].x;
+                        shapes[i].src[1].y = shapes[i].src[j].y;
+                        shapes[i].src[3].x = shapes[i].src[j].x;
+                        break;
+                    }
+                    case 1: {
+                        cshape->src[0].y = cshape->src[j].y;
+                        cshape->src[2].x = cshape->src[j].x;
+                        shapes[i].src[0].y = shapes[i].src[j].y;
+                        shapes[i].src[2].x = shapes[i].src[j].x;
+                        break;
+                    }
+                    case 2: {
+                        cshape->src[1].x = cshape->src[j].x;
+                        cshape->src[3].y = cshape->src[j].y;
+                        shapes[i].src[1].x = shapes[i].src[j].x;
+                        shapes[i].src[3].y = shapes[i].src[j].y;
+                        break;
+                    }
+                    case 3: {
+                        cshape->src[0].x = cshape->src[j].x;
+                        cshape->src[2].y = cshape->src[j].y;
+                        shapes[i].src[0].x = shapes[i].src[j].x;
+                        shapes[i].src[2].y = shapes[i].src[j].y;
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+
+                    cshape->newpos = true;
+                }
             }
 
         }

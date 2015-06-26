@@ -1,5 +1,6 @@
 #include "ofApp.h"
 #include "MappingObjectFactory.h"
+#include "Star.h"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -24,6 +25,10 @@ void ofApp::setup(){
     ofPtr<MappingImage> logo = mapping.getControl()->addTemplate<MappingImage>("image");
     logo->loadImage("images/ente.jpg");
     logo->setColor(ofColor(0,200,255));
+
+    //option to add custom class
+    ofPtr<Star> star = mapping.getControl()->addTemplate<Star>("star");
+    star->pos = ofPoint(0.2, 0.2);
 
     //init mapping and load mapping settings from xml
     mapping.setup("mapping/mapping.xml");
@@ -69,9 +74,11 @@ void ofApp::keyReleased(int key){
     case 'c': {
         show_controls = !show_controls;
         mapping.showControls(show_controls);
+        break;
     }
     case 'f': {
         ofToggleFullscreen();
+        break;
     }
     default: break;
     }

@@ -27,6 +27,8 @@ class MappingPoint : public MappingObject {
 
     void saveXml(ofxXmlSettings_ptr xml) {
         MappingObject::saveXml(xml);
+        xml->addValue("x", pos.x);
+        xml->addValue("y", pos.y);
     }
 
     void update(float w, float h){}
