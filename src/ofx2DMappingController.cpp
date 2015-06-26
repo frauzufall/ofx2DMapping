@@ -221,7 +221,7 @@ void ofx2DMappingController::mappedContentToFbo(Projector *p) {
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
-        MappingObject_ptr q = p->getShape(i);
+        MappingObject_ptr q = p->getMappingObject(i);
         q->draw(p->outputWidth(), p->outputHeight());
     }
 
@@ -238,7 +238,7 @@ void ofx2DMappingController::mappedAreaToFbo(Projector *p) {
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
-        p->getShape(i)->drawArea(p->outputWidth(), p->outputHeight());
+        p->getMappingObject(i)->drawArea(p->outputWidth(), p->outputHeight());
     }
 
     mapped_area_fbo->end();
@@ -251,7 +251,7 @@ void ofx2DMappingController::drawCalibration(Projector* p) {
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
-       MappingObject_ptr q = p->getShape(i);
+       MappingObject_ptr q = p->getMappingObject(i);
 
         if(q) {
 
@@ -546,7 +546,7 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
 
             for(uint j = 0; j < getProjector(0)->shapeCount(); j++) {
 
-                MappingObject_ptr mq = getProjector(0)->getShape(j);
+                MappingObject_ptr mq = getProjector(0)->getMappingObject(j);
 
                 if(mq) {
 
@@ -573,7 +573,7 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
 
     saveMappingAsPng(path_png);
 
-    getProjector(0)->saveMappingAsSvg(path_svg);
+    getProjector(0)->exportSvg(path_svg);
 
 }
 
@@ -600,7 +600,7 @@ void ofx2DMappingController::saveMappingAsPng(string path) {
 }
 
 void ofx2DMappingController::saveMappingAsSvg() {
-    getProjector(0)->saveMappingAsSvg(svg_mapping);
+    getProjector(0)->exportSvg(svg_mapping);
 }
 
 void ofx2DMappingController::importSvg() {

@@ -43,7 +43,7 @@ public:
 
     bool swapShapes(int index1, int index2);
 
-    MappingObject_ptr getShape(int id);
+    MappingObject_ptr getMappingObject(int id);
 
     uint shapeCount();
 
@@ -55,7 +55,7 @@ public:
         res.clear();
         ofPtr<T> mo;
         for(uint i = 0; i < shapeCount(); i++) {
-            mo = dynamic_pointer_cast<T>(getShape(i));
+            mo = dynamic_pointer_cast<T>(getMappingObject(i));
             if(mo) {
                 res.push_back(mo);
             }
@@ -73,14 +73,14 @@ public:
 
     void setStartPoint(ofPoint p);
 
-    void                        saveMappingAsSvg(string path);
+    void                        exportSvg(string path);
 
     ofxSVG_ptr                  svg();
     ofPolylines_ptr             outlines();
     ofPolylines_ptr             outlinesRaw();
     ofPaths_ptr                 paths();
 
-    void                        reloadSvg(string file);
+    bool reloadSvg(string file);
     void                        importSvg(string file);
     void                        reloadLinesFromRaw();
 

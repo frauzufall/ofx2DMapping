@@ -139,7 +139,7 @@ void ofx2DMappingView::updateObjectList() {
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
-        MappingObject_ptr mq = p->getShape(i);
+        MappingObject_ptr mq = p->getMappingObject(i);
         if(mq) {
 //            string objname = mq->name;
             //insert toggles at beginning of list
@@ -224,13 +224,13 @@ FormMapping* ofx2DMappingView::getMappingList() {
 
 void ofx2DMappingView::selectAllObjects() {
     for(uint i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
-        ctrl->getProjector(0)->getShape(i)->editable = true;
+        ctrl->getProjector(0)->getMappingObject(i)->editable = true;
     }
 }
 
 void ofx2DMappingView::deselectAllObjects() {
     for(uint i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
-        ctrl->getProjector(0)->getShape(i)->editable = false;
+        ctrl->getProjector(0)->getMappingObject(i)->editable = false;
     }
 }
 

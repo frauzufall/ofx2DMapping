@@ -35,7 +35,7 @@ Projector::~Projector() {
 void Projector::update() {
     MappingObject_ptr mq;
     for(uint i = 0; i < shapeCount(); i++) {
-        mq = getShape(i);
+        mq = getMappingObject(i);
         if(mq) {
             if(mq->newpos || mq->newitem) {
                 if(!mq->newitem) {
@@ -128,7 +128,7 @@ bool Projector::swapShapes(int index1, int index2) {
     return false;
 }
 
-MappingObject_ptr Projector::getShape(int id) {
+MappingObject_ptr Projector::getMappingObject(int id) {
     if(id < (int)shapes.size()) {
         return shapes[id];
     }
@@ -238,7 +238,7 @@ void Projector::updateOutlines() {
 
     for(uint i = 0; i < shapeCount(); i++) {
 
-        MappingObject_ptr mq = getShape(i);
+        MappingObject_ptr mq = getMappingObject(i);
 
         _paths->push_back(ofPtr<ofPath>(new ofPath()));
 
@@ -275,7 +275,7 @@ void Projector::updateOutline(int shape_id) {
     _outlines_raw->at(shape_id).clear();
     _paths->at(shape_id)->clear();
 
-    MappingObject_ptr mq = getShape(shape_id);
+    MappingObject_ptr mq = getMappingObject(shape_id);
 
     if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(mq)) {
         _outlines_raw->at(shape_id) = shape->polyline.getVertices();
@@ -311,92 +311,87 @@ ofPaths_ptr Projector::paths() {
 
 void Projector::importSvg(string svg) {
 
-    reloadSvg(svg);
+    if(reloadSvg(svg)) {
+        int outlinescount = _outlines_raw->size();
 
-    int outlinescount = _outlines_raw->size();
+        for (int j = 0; j < outlinescount; j++) {
 
-    bool objects_match = ((int)shapeCount()) == outlinescount;
+            ofColor fill_col = ((ofPtr<ofPath>)_paths->at(j))->getFillColor();
+            ofPolyline l = _outlines_raw->at(j);
+            ofRectangle bounding = l.getBoundingBox();
 
-    if(!objects_match) {
-        removeAllShapes();
-    }
+            getMappingObject(j)->color = fill_col;
 
-    for (int j = 0; j < outlinescount; j++) {
+            if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(getMappingObject(j))) {
+                if(l.size() == 4) {
+                    shape->dst[0].x = l[0].x/output_w;
+                    shape->dst[0].y = l[0].y/output_h;
+                    shape->dst[1].x = l[1].x/output_w;
+                    shape->dst[1].y = l[1].y/output_h;
+                    shape->dst[2].x = l[2].x/output_w;
+                    shape->dst[2].y = l[2].y/output_h;
+                    shape->dst[3].x = l[3].x/output_w;
+                    shape->dst[3].y = l[3].y/output_h;
+                }
+                else {
+                    shape->dst[0].x = bounding.x/output_w;
+                    shape->dst[0].y = bounding.y/output_h;
+                    shape->dst[1].x = (bounding.x+bounding.width)/output_w;
+                    shape->dst[1].y = bounding.y/output_h;
+                    shape->dst[2].x = (bounding.x+bounding.width)/output_w;
+                    shape->dst[2].y = (bounding.y+bounding.height)/output_h;
+                    shape->dst[3].x = bounding.x/output_w;
+                    shape->dst[3].y = (bounding.y+bounding.height)/output_h;
+                }
 
-        ofColor fill_col = ((ofPtr<ofPath>)_paths->at(j))->getFillColor();
-        ofPolyline l = _outlines_raw->at(j);
-        ofRectangle bounding = l.getBoundingBox();
+                shape->polyline.clear();
 
-        if(!objects_match) {
-            if(fill_col == ofColor::white) {
-                //add content shape
-                addShape("CONTENT_SHAPE", "CONTENT_SHAPE");
+                for(uint k = 0; k < l.size(); k++) {
+                    shape->polyline.addVertex(l[k].x/output_w, l[k].y/output_h);
+                }
+
+                shape->polyline.close();
+                shape->newpos = true;
             }
-            else {
-                //add color shape
-                addShape("COLOR_SHAPE", "COLOR_SHAPE");
+
+            if(MappingPoint_ptr point = dynamic_pointer_cast<MappingPoint>(getMappingObject(j))) {
+                point->pos.x = l[0].x/output_w;
+                point->pos.y = l[0].y/output_h;
+                point->newpos = true;
             }
+
         }
-
-        MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(getShape(j));
-
-//        addListeners(shape);
-
-        shape->color = fill_col;
-
-        if(l.size() == 4) {
-            shape->dst[0].x = l[0].x/output_w;
-            shape->dst[0].y = l[0].y/output_h;
-            shape->dst[1].x = l[1].x/output_w;
-            shape->dst[1].y = l[1].y/output_h;
-            shape->dst[2].x = l[2].x/output_w;
-            shape->dst[2].y = l[2].y/output_h;
-            shape->dst[3].x = l[3].x/output_w;
-            shape->dst[3].y = l[3].y/output_h;
-        }
-        else {
-            shape->dst[0].x = bounding.x/output_w;
-            shape->dst[0].y = bounding.y/output_h;
-            shape->dst[1].x = (bounding.x+bounding.width)/output_w;
-            shape->dst[1].y = bounding.y/output_h;
-            shape->dst[2].x = (bounding.x+bounding.width)/output_w;
-            shape->dst[2].y = (bounding.y+bounding.height)/output_h;
-            shape->dst[3].x = bounding.x/output_w;
-            shape->dst[3].y = (bounding.y+bounding.height)/output_h;
-        }
-
-        shape->polyline.clear();
-
-        for(uint k = 0; k < l.size(); k++) {
-            shape->polyline.addVertex(l[k].x/output_w, l[k].y/output_h);
-        }
-
-        shape->polyline.close();
-        shape->newpos = true;
-
     }
 
 }
 
-void Projector::reloadSvg(string file) {
+bool Projector::reloadSvg(string file) {
 
-    _svg = ofxSVG_ptr(new ofxSVG());
-    _svg->load(file);
+    ofxSVG_ptr svg = ofxSVG_ptr(new ofxSVG());
+    svg->load(file);
 
-    _outlines_raw->clear();
-    _outlines->clear();
-    _paths->clear();
+    if(svg->getNumPath() == (int)shapeCount()) {
+        _svg = svg;
+        _outlines_raw->clear();
+        _outlines->clear();
+        _paths->clear();
 
-    int paths_num = 0;
+        int paths_num = 0;
 
-    for(int j = 0; j<_svg->getNumPath(); j++) {
-        _paths->push_back(ofPtr<ofPath>(new ofPath(_svg->getPathAt(j))));
-        _outlines_raw->push_back(Helper::ofPathToOfPolyline(_svg->getPathAt(j), true));
-        _outlines->push_back(_outlines_raw->at(paths_num).getResampledBySpacing(1));
-        paths_num++;
+        for(int j = 0; j<_svg->getNumPath(); j++) {
+            _paths->push_back(ofPtr<ofPath>(new ofPath(_svg->getPathAt(j))));
+            _outlines_raw->push_back(Helper::ofPathToOfPolyline(_svg->getPathAt(j), true));
+            _outlines->push_back(_outlines_raw->at(paths_num).getResampledBySpacing(1));
+            paths_num++;
+        }
+
+        ofLogNotice("Projector: reloadSvg()", "loaded SVG with " + ofToString(paths_num) + " paths");
+        return true;
     }
-
-    cout << "PROJECTOR:: loaded SVG with " << paths_num << " paths" << endl;
+    else {
+        ofLogError("Projector: reloadSvg()", "could not import svg because the number of objects in the svg is not the same as in the program. do not remove or add objects to the saved svg. import is only used for position manipulation.");
+        return false;
+    }
 
 }
 
@@ -410,7 +405,7 @@ void Projector::reloadLinesFromRaw() {
 
 }
 
-void Projector::saveMappingAsSvg(string path) {
+void Projector::exportSvg(string path) {
     ofxXmlSettings xml;
 
     xml.clear();
@@ -436,7 +431,7 @@ void Projector::saveMappingAsSvg(string path) {
             int i = 0;
             for(uint j = 0; j < shapeCount(); j++) {
 
-                MappingObject_ptr mq = getShape(j);
+                MappingObject_ptr mq = getMappingObject(j);
 
                 if(mq) {
 
@@ -458,6 +453,17 @@ void Projector::saveMappingAsSvg(string path) {
                                 path_sstr << "," << cur_p.x-last_p.x << "," << cur_p.y-last_p.y;
                             last_p = cur_p;
                         }
+                        path_sstr << "z";
+
+                        xml.addAttribute("path", "d", path_sstr.str(), i);
+                        xml.addAttribute("path", "stroke", "#000000", i);
+                    }
+
+                    if(MappingPoint_ptr shape = dynamic_pointer_cast<MappingPoint>(mq)) {
+                        stringstream path_sstr;
+                        path_sstr << "m";
+                        ofPoint cur_p = ofPoint(shape->pos.x*output_w, shape->pos.y*output_h);
+                        path_sstr << cur_p.x << "," << cur_p.y << "," << cur_p.x << "," << cur_p.y;
                         path_sstr << "z";
 
                         xml.addAttribute("path", "d", path_sstr.str(), i);

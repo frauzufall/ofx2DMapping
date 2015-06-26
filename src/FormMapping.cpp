@@ -71,7 +71,7 @@ void FormMapping::updateForms() {
 
     for (uint i = 0; i < parent_projector->shapeCount(); i++) {
 
-        MappingObject_ptr obj = parent_projector->getShape(i);
+        MappingObject_ptr obj = parent_projector->getMappingObject(i);
 
         if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(obj)) {
 
@@ -276,7 +276,7 @@ void FormMapping::draw(bool show_source) {
 
         //draw dragging points
         ofSetColor(255,255,255,200);
-        if(parent_projector->getShape(i)->editable) {
+        if(parent_projector->getMappingObject(i)->editable) {
             for(uint j = 0; j < shapes[i].polyline.size(); j++) {
                 if (shapes[i].polyline[j].bOver) ofFill();
                 else ofNoFill();
@@ -307,7 +307,7 @@ void FormMapping::draw(bool show_source) {
 
         //draw dragging points
         ofSetColor(255,255,255,200);
-        if(parent_projector->getShape(i)->editable) {
+        if(parent_projector->getMappingObject(i)->editable) {
             for(uint j = 0; j < shapes[i].src.size(); j++) {
 
                 if (shapes[i].src[j].bOver) ofFill();
@@ -359,7 +359,7 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
 
     for (uint i = 0; i < shapes.size(); i++) {
 
-        MappingObject_ptr obj = parent_projector->getShape(i);
+        MappingObject_ptr obj = parent_projector->getMappingObject(i);
 
         for (uint j = 0; j < shapes[i].polyline.size(); j++) {
 
@@ -512,7 +512,7 @@ bool FormMapping::mousePressed(ofMouseEventArgs& args) {
     bool on_element = false;
 
     for (uint i = 0; i < shapes.size(); i++){
-        bool editable = parent_projector->getShape(i)->editable;
+        bool editable = parent_projector->getMappingObject(i)->editable;
         for (uint j = 0; j < shapes[i].polyline.size(); j++){
             ofPoint zoomed_p = addZoomRelativeOfDstRect(shapes[i].polyline[j]);
             float diffx = mouse.x - zoomed_p.x;
