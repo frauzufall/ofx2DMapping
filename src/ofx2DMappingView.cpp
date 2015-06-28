@@ -200,7 +200,7 @@ void ofx2DMappingView::setSubpanelPositions() {
                 add_buttons_panel.getPosition().x,
                 add_buttons_panel.getPosition().y + add_buttons_panel.getHeight()+margin);
     list_options.setPosition(
-                add_buttons_panel.getPosition().x,
+                max(add_buttons_panel.getPosition().x, calibration_options.getPosition().x+calibration_options.getWidth()+margin),
                 add_buttons_panel.getPosition().y - list_options.getHeight() - margin);
 }
 
