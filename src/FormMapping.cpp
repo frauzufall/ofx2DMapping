@@ -159,8 +159,8 @@ void FormMapping::update() {
 
     if(control_rect.position != this->getPosition()) {
         control_rect.position = this->getPosition();
-        control_rect.setWidth(this->getWidth());
-        control_rect.setHeight(this->getHeight());
+//        control_rect.setWidth(this->getWidth());
+//        control_rect.setHeight(this->getHeight());
 
         rebuild();
     }
