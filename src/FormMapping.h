@@ -84,4 +84,6 @@ private:
     bool dragging_dst;
     ofPoint last_mouse;
 
+    int mapping_margin;
+
 };

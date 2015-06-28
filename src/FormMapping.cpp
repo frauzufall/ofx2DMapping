@@ -4,8 +4,9 @@ FormMapping::FormMapping(): ofxPanel() {
 
     shapes.clear();
     zoom_factor = 0;
-    zoom_speed = 0.01;
+    zoom_speed = 0.1;
     dragging_dst = false;
+    mapping_margin = 10;
 
 }
 
@@ -61,7 +62,7 @@ void FormMapping::setMappingRects() {
         this->setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
 
         mapping_front.clear();
-        mapping_front.allocate(mapping_rect_dst.width, mapping_rect_dst.height, GL_RGBA);
+        mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
     }
 }
 
@@ -134,8 +135,6 @@ void FormMapping::updateForms() {
 
     }
 
-    //find first content shape from top to use as background for source mapping
-
     updateSourceBackground();
 
 }
@@ -182,15 +181,8 @@ void FormMapping::draw(bool show_source) {
 
     ofxPanel::draw();
 
-    if(!direct_edit) {
-        ofSetColor(200);
-        ofNoFill();
-        ofSetLineWidth(0.5);
-        ofDrawRectangle(mapping_rect_dst);
-    }
-
     if(show_source) {
-        ofDrawRectangle(mapping_rect_src);
+        //ofDrawRectangle(mapping_rect_src);
         if(source_bg) {
             ofSetColor(255,60);
             source_bg->draw(
@@ -199,17 +191,23 @@ void FormMapping::draw(bool show_source) {
                         mapping_rect_src.width,
                         mapping_rect_src.height);
         }
+        else {
+            ofSetColor(0,0,0,100);
+            ofFill();
+            ofDrawRectangle(mapping_rect_src);
+        }
     }
 
     ofEnableAlphaBlending();
 
-    ofSetLineWidth(1);
+    ofSetLineWidth(2);
 
     //draw dst
 
     if(!direct_edit) {
         mapping_front.begin();
         ofClear(0,0,0,0);
+        ofTranslate(mapping_margin, mapping_margin);
 
         ofPushMatrix();
         ofTranslate(-mapping_rect_dst.getPosition());
@@ -289,7 +287,7 @@ void FormMapping::draw(bool show_source) {
     if(!direct_edit) {
         ofPopMatrix();
         mapping_front.end();
-        mapping_front.draw(mapping_rect_dst.getPosition(), mapping_rect_dst.width, mapping_rect_dst.height);
+        mapping_front.draw(mapping_rect_dst.getPosition()-ofPoint(mapping_margin, mapping_margin), mapping_front.getWidth(), mapping_front.getHeight());
     }
 
     //draw src
