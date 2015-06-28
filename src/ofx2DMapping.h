@@ -22,6 +22,8 @@ public:
     void setOutputShape(float x, float y, float width, float height);
     void setControlShape(float x, float y, float width, float height);
 
+    //void setDirectEditMode(bool direct);
+
     template <class T>
     ofPtr<T> addTemplate(string name) {
         return ctrl.addTemplate<T>(name);

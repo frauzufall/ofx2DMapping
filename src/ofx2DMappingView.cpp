@@ -218,6 +218,7 @@ void ofx2DMappingView::setEditMode(bool &direct_edit) {
     this->direct_edit = direct_edit;
     mapping_forms.setEditMode(direct_edit);
     setSubpanelPositions();
+    //TODO trigger button
 }
 
 FormMapping* ofx2DMappingView::getFormMapping() {

@@ -28,9 +28,14 @@ void FormMapping::setMappingRects() {
         mapping_rect_dst = mapping_rect_output;
         mapping_rect_src.x = control_rect.x+margin;
         mapping_rect_src.y = control_rect.y+margin+header;
-        mapping_rect_src.width = control_rect.width/2;
-        float content_ratio = parent_projector->outputHeight()/parent_projector->outputWidth();
-        mapping_rect_src.height = mapping_rect_src.width*content_ratio;
+        mapping_rect_src.height = control_rect.height-margin-header;
+        float output_ratio = parent_projector->outputWidth()/parent_projector->outputHeight();
+        float output_ratio_inv = parent_projector->outputHeight()/parent_projector->outputWidth();
+        mapping_rect_src.width = mapping_rect_src.height*output_ratio;
+        if(mapping_rect_src.width > control_rect.width-2*margin) {
+            mapping_rect_src.width = control_rect.width-2*margin;
+            mapping_rect_src.height = mapping_rect_src.width*output_ratio_inv;
+        }
 
         ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
     }

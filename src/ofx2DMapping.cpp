@@ -52,5 +52,9 @@ void ofx2DMapping::showControls(bool show) {
     show_controls = show;
 }
 
+//void ofx2DMapping::setDirectEditMode(bool direct) {
+//    view.setEditMode(direct);
+//}
+
 ofx2DMapping::~ofx2DMapping() {
 }
