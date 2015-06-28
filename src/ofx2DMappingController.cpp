@@ -57,7 +57,7 @@ void ofx2DMappingController::setupMapping(){
     if(!xml->loadFile(xml_mapping) ) {
         ofFile newFile(xml_mapping);
         newFile.create();
-        ofLogError("ofx2DMappingController: setupMapping()", "unable to load xml file " + xml_mapping);
+        ofLogNotice("ofx2DMappingController: setupMapping()", "unable to load xml file " + xml_mapping + ", creating empty stage.");
     }
     reloadMapping(xml);
 
@@ -65,76 +65,78 @@ void ofx2DMappingController::setupMapping(){
 
 void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
-    use_mapping = xml->getAttribute("mapping", "active", (int)true);
+    if(xml->tagExists("mapping")) {
+        use_mapping = xml->getAttribute("mapping", "active", (int)true);
 
-    xml->pushTag("mapping", 0);
+        xml->pushTag("mapping", 0);
 
-    xml->pushTag("content", 0);
+        xml->pushTag("content", 0);
 
-    content_w		= xml->getValue("width", 640.);
-    content_h		= xml->getValue("height", 480.);
-
-    xml->popTag();
-
-    xml->pushTag("control", 0);
-
-    control_w		= xml->getValue("width", 1024.);
-    control_h		= xml->getValue("height", 768.);
-
-    xml->popTag();
-    xml->pushTag("video", 0);
-
-    vid_max_w		= xml->getValue("max_width", 640.);
-    vid_max_h		= xml->getValue("max_height", 480.);
-
-    xml->popTag();
-
-    int projector_count = xml->getNumTags("projector");
-
-    for(int i = 0; i < projector_count; i++) {
-
-        xml->pushTag("projector", i);
-
-            xml->pushTag("output", 0);
-
-                float output_w		= xml->getValue("width", 1600.);
-                float output_h		= xml->getValue("height", 900.);
-
-            xml->popTag();
-
-            addProjector(output_w, output_h);
-
-            int object_count = xml->getNumTags("object");
-
-            for (int j = 0; j < object_count; j++) {
-
-                string type = xml->getAttribute("object","type","OBJECT",j);
-
-                string name = xml->getAttribute("object","name","content",j);
-
-                xml->pushTag("object", j);
-
-                    MappingObject_ptr obj = createShape(getProjector(i), type, name);
-                    if(obj) {
-                        obj->loadXml(xml);
-                    }
-                    else {
-                        ofLogError("ofx2DMappingController::reloadMapping()", "Could not load mapping object with type " + type + " from xml");
-                    }
-
-                xml->popTag();
-
-            }
-
-            getProjector(i)->updateOutlines();
+        content_w		= xml->getValue("width", 640.);
+        content_h		= xml->getValue("height", 480.);
 
         xml->popTag();
 
-        ofLogNotice("ofx2DMappingController: reloadMapping()", "projector " + ofToString(i) + " with " + ofToString(getProjector(i)->shapeCount()) + " mapping objects loaded.");
+        xml->pushTag("control", 0);
 
+        control_w		= xml->getValue("width", 1024.);
+        control_h		= xml->getValue("height", 768.);
+
+        xml->popTag();
+        xml->pushTag("video", 0);
+
+        vid_max_w		= xml->getValue("max_width", 640.);
+        vid_max_h		= xml->getValue("max_height", 480.);
+
+        xml->popTag();
+
+        int projector_count = xml->getNumTags("projector");
+
+        for(int i = 0; i < projector_count; i++) {
+
+            xml->pushTag("projector", i);
+
+                xml->pushTag("output", 0);
+
+                    float output_w		= xml->getValue("width", 1600.);
+                    float output_h		= xml->getValue("height", 900.);
+
+                xml->popTag();
+
+                addProjector(output_w, output_h);
+
+                int object_count = xml->getNumTags("object");
+
+                for (int j = 0; j < object_count; j++) {
+
+                    string type = xml->getAttribute("object","type","OBJECT",j);
+
+                    string name = xml->getAttribute("object","name","content",j);
+
+                    xml->pushTag("object", j);
+
+                        MappingObject_ptr obj = createShape(getProjector(i), type, name);
+                        if(obj) {
+                            obj->loadXml(xml);
+                        }
+                        else {
+                            ofLogError("ofx2DMappingController::reloadMapping()", "Could not load mapping object with type " + type + " from xml");
+                        }
+
+                    xml->popTag();
+
+                }
+
+                getProjector(i)->updateOutlines();
+
+            xml->popTag();
+
+            ofLogNotice("ofx2DMappingController: reloadMapping()", "projector " + ofToString(i) + " with " + ofToString(getProjector(i)->shapeCount()) + " mapping objects loaded.");
+
+        }
     }
 
-    if(projector_count == 0) {
+    if(projectors.size() == 0) {
         addProjector(1600, 900);
     }
 
