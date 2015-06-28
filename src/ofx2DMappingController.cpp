@@ -663,3 +663,11 @@ void ofx2DMappingController::addTemplate(MappingObject_ptr obj) {
 vector<MappingObject_ptr> ofx2DMappingController::getOptions() {
     return available_shapes;
 }
+
+void ofx2DMappingController::setOutputRectangle(ofRectangle r) {
+    output_rectangle = r;
+}
+
+ofRectangle ofx2DMappingController::getOutputRectangle() {
+    return output_rectangle;
+}

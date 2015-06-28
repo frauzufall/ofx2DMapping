@@ -12,7 +12,7 @@ FormMapping::FormMapping(): ofxPanel() {
 
 void FormMapping::setup(string title, Projector *parent_projector, ofxSortableList *parent_list, float w, float h) {
     ofxPanel::setup(title);
-    setSize(w, h);
+    ofxPanel::setSize(w, h);
     control_rect = this->getShape();
     control_rect_backup = control_rect;
     this->parent_projector = parent_projector;
@@ -32,7 +32,7 @@ void FormMapping::setMappingRects() {
         float content_ratio = parent_projector->outputHeight()/parent_projector->outputWidth();
         mapping_rect_src.height = mapping_rect_src.width*content_ratio;
 
-        this->setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
+        ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
     }
     else {
         mapping_rect_dst.x = control_rect.x+margin;
@@ -59,7 +59,7 @@ void FormMapping::setMappingRects() {
     //        mapping_rect_src.width = mapping_rect_src.height*content_ratio_inv;
     //    }
 
-        this->setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
+        ofxPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
 
         mapping_front.clear();
         mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
@@ -591,7 +591,13 @@ void FormMapping::setEditMode(bool direct_edit) {
 }
 
 void FormMapping::setOutputForm(float x, float y, float w, float h) {
-    mapping_rect_output = ofRectangle(x,y,w,h);
+    if(x != mapping_rect_output.x || y != mapping_rect_output.y || w != mapping_rect_output.width || h != mapping_rect_output.height) {
+        mapping_rect_output = ofRectangle(x,y,w,h);
+        rebuild();
+    }
+    else {
+        mapping_rect_output = ofRectangle(x,y,w,h);
+    }
 }
 
 void FormMapping::setOutputForm(ofRectangle rect) {
@@ -645,4 +651,10 @@ float FormMapping::addZoom(float p) {
 
 ofPoint FormMapping::removeZoom(ofPoint p) {
     return p/(1+zoom_factor*zoom_speed);
+}
+
+void FormMapping::setSize(float w, float h) {
+    ofxPanel::setSize(w,h);
+    control_rect = this->getShape();
+    rebuild();
 }

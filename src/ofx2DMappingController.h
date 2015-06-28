@@ -88,6 +88,9 @@ class ofx2DMappingController {
 
         vector<MappingObject_ptr> getOptions();
 
+        ofRectangle                 getOutputRectangle();
+        void                        setOutputRectangle(ofRectangle r);
+
     private:
 
         MappingObject_ptr createShape(Projector* projector, string type, string name);
@@ -115,6 +118,8 @@ class ofx2DMappingController {
         void                        mappedAreaToFbo(Projector *p);
 
         vector<MappingObject_ptr>   available_shapes;
+
+        ofRectangle                 output_rectangle;
 
 };
 

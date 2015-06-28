@@ -14,8 +14,10 @@ void ofx2DMappingView::setControl(ofx2DMappingController *ctrl) {
     this->ctrl = ctrl;
 }
 
-void ofx2DMappingView::setup(float w, float h) {
+void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
+    control_rect.x = x;
+    control_rect.y = y;
     control_rect.width= w;
     control_rect.height= h;
 
@@ -105,7 +107,7 @@ void ofx2DMappingView::update() {
 }
 
 void ofx2DMappingView::draw() {
-    draw(ofPoint(0,0));
+    draw(control_rect.getPosition());
 }
 
 void ofx2DMappingView::draw(ofPoint pos) {
@@ -218,7 +220,7 @@ void ofx2DMappingView::setEditMode(bool &direct_edit) {
     setSubpanelPositions();
 }
 
-FormMapping* ofx2DMappingView::getMappingList() {
+FormMapping* ofx2DMappingView::getFormMapping() {
     return &mapping_forms;
 }
 
@@ -239,4 +241,15 @@ void ofx2DMappingView::removeAllObjects() {
     ctrl->getProjector(0)->updateOutlines();
     mapping_forms.updateForms();
     updateObjectList();
+}
+
+ofRectangle ofx2DMappingView::getShape() {
+    return control_rect;
+}
+
+void ofx2DMappingView::setShape(ofRectangle shape) {
+    control_rect = shape;
+    int margin = 10;
+    mapping_forms.setSize(control_rect.getWidth()-object_list.getWidth()-margin*3, control_rect.getHeight()-main_options.getHeight()-margin*3);
+    setSubpanelPositions();
 }

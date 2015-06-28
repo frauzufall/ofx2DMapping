@@ -47,6 +47,8 @@ public:
 
     void setEditMode(bool direct_edit);
 
+    void setSize(float w, float h);
+
 
 
 private:

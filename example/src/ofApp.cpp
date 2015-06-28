@@ -14,27 +14,30 @@ void ofApp::setup(){
 
     //option to add shapes that show the content of a given fbo
 
-    ofPtr<MappingFbo> content1 = mapping.getControl()->addTemplate<MappingFbo>("scene");
+    ofPtr<MappingFbo> content1 = mapping.addTemplate<MappingFbo>("scene");
     content1->setFbo(scene.getFbo());
 
     //option to add black shapes
-    ofPtr<MappingColorShape> black_shape = mapping.getControl()->addTemplate<MappingColorShape>("black");
+    ofPtr<MappingColorShape> black_shape = mapping.addTemplate<MappingColorShape>("black");
     black_shape->setColor(ofColor(0));
 
     //option to add an image
-    ofPtr<MappingImage> logo = mapping.getControl()->addTemplate<MappingImage>("image");
+    ofPtr<MappingImage> logo = mapping.addTemplate<MappingImage>("image");
     logo->loadImage("images/ente.jpg");
     logo->setColor(ofColor(0,200,255));
 
     //option to add custom class
-    ofPtr<Star> star = mapping.getControl()->addTemplate<Star>("star");
+    ofPtr<Star> star = mapping.addTemplate<Star>("star");
     star->pos = ofPoint(0.2, 0.2);
 
     //init mapping and load mapping settings from xml
     mapping.setup("mapping/mapping.xml");
 
-    //set size of control panel
-    mapping.getControlView()->setup(ofGetWindowWidth()/2, ofGetWindowHeight());
+    //set output position and size
+    mapping.setOutputShape(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
+
+    //set position and size of control panel
+    mapping.setControlShape(0, 0, ofGetWindowWidth()/2, ofGetWindowHeight());
 
 }
 
@@ -55,12 +58,8 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    ofSetColor(255);
-
     //draw the mapped output image and the controls
-    mapping.draw(
-                ofGetWidth()/2, 0,
-                ofGetWidth()/2, ofGetHeight());
+    mapping.draw();
 
 }
 
@@ -103,7 +102,12 @@ void ofApp::mouseReleased(ofMouseEventArgs &args){
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
+void ofApp::windowResized(int w, int h) {
+    //update output position and size
+    mapping.setOutputShape(w/2, 0, w/2, h);
+
+    //update position and size of control panel
+    mapping.setControlShape(0, 0, w/2, h);
 }
 
 //--------------------------------------------------------------

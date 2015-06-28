@@ -12,12 +12,20 @@ public:
     void setup();
     void setup(string mapping_path);
     void update();
-    void draw(float x, float y, float w, float h);
+    void draw();
 
     void showControls(bool show);
 
     ofx2DMappingController* getControl();
     ofx2DMappingView* getControlView();
+
+    void setOutputShape(float x, float y, float width, float height);
+    void setControlShape(float x, float y, float width, float height);
+
+    template <class T>
+    ofPtr<T> addTemplate(string name) {
+        return ctrl.addTemplate<T>(name);
+    }
 
 private:
 

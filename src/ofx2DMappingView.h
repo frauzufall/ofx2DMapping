@@ -8,7 +8,7 @@ class ofx2DMappingView {
 
 public:
     ofx2DMappingView();
-    void setup(float w, float h);
+    void setup(float x, float y, float w, float h);
     void update();
     void draw();
     void draw(ofPoint pos);
@@ -20,7 +20,10 @@ public:
 
     void importSvg();
 
-    FormMapping* getMappingList();
+    FormMapping* getFormMapping();
+
+    void setShape(ofRectangle shape);
+    ofRectangle getShape();
 
 private:
 
