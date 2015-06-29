@@ -1,32 +1,32 @@
 #pragma once
 
-#include "MappingObject.h"
+#include "ofx2DMappingObject.h"
 
-class MappingPoint : public MappingObject {
+class ofx2DMappingPoint : public ofx2DMappingObject {
 
     public:
 
     ofPoint     pos;
 
-    MappingPoint() {
+    ofx2DMappingPoint() {
         this->nature = "POINT";
     }
 
-    MappingPoint(const MappingPoint& obj) : MappingObject(obj) {
+    ofx2DMappingPoint(const ofx2DMappingPoint& obj) : ofx2DMappingObject(obj) {
         this->pos = obj.pos;
     }
 
-    ofPtr<MappingObject> clone() const {
-        return ofPtr<MappingObject>(new MappingPoint(*this));
+    ofPtr<ofx2DMappingObject> clone() const {
+        return ofPtr<ofx2DMappingObject>(new ofx2DMappingPoint(*this));
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {
-        MappingObject::loadXml(xml);
+        ofx2DMappingObject::loadXml(xml);
         pos = this->getPoint(xml);
     }
 
     void saveXml(ofxXmlSettings_ptr xml) {
-        MappingObject::saveXml(xml);
+        ofx2DMappingObject::saveXml(xml);
         xml->addValue("x", pos.x);
         xml->addValue("y", pos.y);
     }

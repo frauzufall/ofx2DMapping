@@ -1,37 +1,37 @@
 #pragma once
 
-#include "MappingContentShape.h"
+#include "ofx2DMappingContentShape.h"
 
-class MappingImage : public MappingContentShape {
+class ofx2DMappingImage : public ofx2DMappingContentShape {
 
     public:
 
     ofImage     image;
     string      img_src;
 
-    MappingImage() {
+    ofx2DMappingImage() {
         this->image.clear();
         this->img_src = "";
         this->nature = "IMAGE";
     }
 
-    MappingImage(const MappingImage& obj) : MappingContentShape(obj) {
+    ofx2DMappingImage(const ofx2DMappingImage& obj) : ofx2DMappingContentShape(obj) {
         this->image = obj.image;
         this->img_src = obj.img_src;
     }
 
-    ofPtr<MappingObject> clone() const {
-        return ofPtr<MappingObject>(new MappingImage(*this));
+    ofPtr<ofx2DMappingObject> clone() const {
+        return ofPtr<ofx2DMappingObject>(new ofx2DMappingImage(*this));
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {
-        MappingContentShape::loadXml(xml);
+        ofx2DMappingContentShape::loadXml(xml);
         string url = xml->getValue("url", "images/notfound.png");
         loadImage(url);
     }
 
     virtual void saveXml(ofxXmlSettings_ptr xml) {
-        MappingContentShape::saveXml(xml);
+        ofx2DMappingContentShape::saveXml(xml);
         xml->addValue("url", img_src);
     }
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MappingPoint.h"
+#include "ofx2DMappingPoint.h"
 
-class Star : public MappingPoint {
+class Star : public ofx2DMappingPoint {
 
     public:
 
@@ -10,7 +10,7 @@ class Star : public MappingPoint {
 
     Star(const Star& obj);
 
-    ofPtr<MappingObject> clone() const;
+    ofPtr<ofx2DMappingObject> clone() const;
 
     void loadXml(ofxXmlSettings_ptr xml);
 

@@ -1,6 +1,6 @@
-#include "FormMapping.h"
+#include "ofx2DFormMapping.h"
 
-FormMapping::FormMapping(): ofxPanel() {
+ofx2DFormMapping::ofx2DFormMapping(): ofxPanel() {
 
     shapes.clear();
     zoom_factor = 0;
@@ -10,7 +10,7 @@ FormMapping::FormMapping(): ofxPanel() {
 
 }
 
-void FormMapping::setup(string title, Projector *parent_projector, ofxSortableList *parent_list, float w, float h) {
+void ofx2DFormMapping::setup(string title, ofx2DMappingProjector *parent_projector, ofxSortableList *parent_list, float w, float h) {
     ofxPanel::setup(title);
     ofxPanel::setSize(w, h);
     control_rect = this->getShape();
@@ -19,7 +19,7 @@ void FormMapping::setup(string title, Projector *parent_projector, ofxSortableLi
     this->parent_list = parent_list;
 }
 
-void FormMapping::setMappingRects() {
+void ofx2DFormMapping::setMappingRects() {
 
     int margin = 10;
     int header = 20;
@@ -71,15 +71,15 @@ void FormMapping::setMappingRects() {
     }
 }
 
-void FormMapping::updateForms() {
+void ofx2DFormMapping::updateForms() {
 
     shapes.clear();
 
     for (uint i = 0; i < parent_projector->shapeCount(); i++) {
 
-        MappingObject_ptr obj = parent_projector->getMappingObject(i);
+        ofPtr<ofx2DMappingObject> obj = parent_projector->getMappingObject(i);
 
-        if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(obj)) {
+        if(ofPtr<ofx2DMappingShape> shape = std::dynamic_pointer_cast<ofx2DMappingShape>(obj)) {
 
             mappableShape ms;
             ms.color = shape->color;
@@ -103,7 +103,7 @@ void FormMapping::updateForms() {
                 ms.dst[j].y = shape->dst[j].y*mapping_rect_dst.height+mapping_rect_dst.y;
             }
 
-            if(MappingContentShape_ptr cshape = std::dynamic_pointer_cast<MappingContentShape>(shape)) {
+            if(ofPtr<ofx2DMappingContentShape> cshape = std::dynamic_pointer_cast<ofx2DMappingContentShape>(shape)) {
                 for(int j = 0; j < 4; j++) {
                     ms.src.push_back(draggableVertex());
                     ms.src[j].x = cshape->src[j].x*mapping_rect_src.width+mapping_rect_src.x;
@@ -118,7 +118,7 @@ void FormMapping::updateForms() {
 
         }
         else {
-            if(MappingPoint_ptr point = std::dynamic_pointer_cast<MappingPoint>(obj)) {
+            if(ofPtr<ofx2DMappingPoint> point = std::dynamic_pointer_cast<ofx2DMappingPoint>(obj)) {
 
                 mappableShape ms;
                 ms.color = point->color;
@@ -144,11 +144,11 @@ void FormMapping::updateForms() {
 
 }
 
-void FormMapping::updateSourceBackground() {
+void ofx2DFormMapping::updateSourceBackground() {
     //find first content shape from top to use as background for source mapping
 
     source_bg = 0;
-    vector<MappingContentShape_ptr> objs = parent_projector->getShapesByClass<MappingContentShape>();
+    vector<ofPtr<ofx2DMappingContentShape>> objs = parent_projector->getShapesByClass<ofx2DMappingContentShape>();
     if(objs.size() > 0) {
         for(int i = objs.size()-1; i >= 0; i--) {
             if(objs.at(i)->editable) {
@@ -159,7 +159,7 @@ void FormMapping::updateSourceBackground() {
     }
 }
 
-void FormMapping::update() {
+void ofx2DFormMapping::update() {
 
     if(control_rect.position != this->getPosition()) {
         control_rect.position = this->getPosition();
@@ -173,12 +173,12 @@ void FormMapping::update() {
 
 }
 
-void FormMapping::rebuild() {
+void ofx2DFormMapping::rebuild() {
     setMappingRects();
     updateForms();
 }
 
-void FormMapping::draw(bool show_source) {
+void ofx2DFormMapping::draw(bool show_source) {
 
     ofSetColor(42);
     ofFill();
@@ -325,7 +325,7 @@ void FormMapping::draw(bool show_source) {
 
 }
 
-bool FormMapping::mouseMoved(ofMouseEventArgs& args) {
+bool ofx2DFormMapping::mouseMoved(ofMouseEventArgs& args) {
 
     ofPoint mouse(args.x,args.y);
     for (uint i = 0; i < shapes.size(); i++){
@@ -356,13 +356,13 @@ bool FormMapping::mouseMoved(ofMouseEventArgs& args) {
 }
 
 
-bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
+bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
 
     ofPoint mouse(args.x,args.y);
 
     for (uint i = 0; i < shapes.size(); i++) {
 
-        MappingObject_ptr obj = parent_projector->getMappingObject(i);
+        ofPtr<ofx2DMappingObject> obj = parent_projector->getMappingObject(i);
 
         for (uint j = 0; j < shapes[i].polyline.size(); j++) {
 
@@ -393,7 +393,7 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
 
                 if(shapes[i].polyline.size() == 4) {
 
-                    if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(obj)) {
+                    if(ofPtr<ofx2DMappingShape> shape = std::dynamic_pointer_cast<ofx2DMappingShape>(obj)) {
                         shape->dst[j].x = (shapes[i].polyline[j].x-mapping_rect_dst.x)/mapping_rect_dst.width;
                         shape->dst[j].y = (shapes[i].polyline[j].y-mapping_rect_dst.y)/mapping_rect_dst.height;
 
@@ -404,7 +404,7 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
                 }
                 else {
 
-                    if(MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(obj)) {
+                    if(ofPtr<ofx2DMappingShape> shape = std::dynamic_pointer_cast<ofx2DMappingShape>(obj)) {
                         shape->polyline[j].x = (shapes[i].polyline[j].x-mapping_rect_dst.x)/mapping_rect_dst.width;
                         shape->polyline[j].y = (shapes[i].polyline[j].y-mapping_rect_dst.y)/mapping_rect_dst.height;
 
@@ -419,7 +419,7 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
                         shape->dst[3].x = bounding.x;
                         shape->dst[3].y = bounding.y+bounding.height;
                     }
-                    if(MappingPoint_ptr point = std::dynamic_pointer_cast<MappingPoint>(obj)) {
+                    if(ofPtr<ofx2DMappingPoint> point = std::dynamic_pointer_cast<ofx2DMappingPoint>(obj)) {
                         //j should be 0
                         point->pos.x = (shapes[i].polyline[j].x-mapping_rect_dst.x)/mapping_rect_dst.width;
                         point->pos.y = (shapes[i].polyline[j].y-mapping_rect_dst.y)/mapping_rect_dst.height;
@@ -434,7 +434,7 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
             }
         }
 
-        if(MappingContentShape_ptr cshape = std::dynamic_pointer_cast<MappingContentShape>(obj)) {
+        if(ofPtr<ofx2DMappingContentShape> cshape = std::dynamic_pointer_cast<ofx2DMappingContentShape>(obj)) {
 
             for (uint j = 0; j < shapes[i].src.size(); j++){
                 if (shapes[i].src[j].bBeingDragged == true){
@@ -508,7 +508,7 @@ bool FormMapping::mouseDragged(ofMouseEventArgs &args) {
     return ofxPanel::mouseDragged(args);
 }
 
-bool FormMapping::mousePressed(ofMouseEventArgs& args) {
+bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
 
     ofPoint mouse(args.x,args.y);
 
@@ -552,7 +552,7 @@ bool FormMapping::mousePressed(ofMouseEventArgs& args) {
     return ofxPanel::mousePressed(args);
 }
 
-bool FormMapping::mouseReleased(ofMouseEventArgs &args) {
+bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
 
     for (uint i = 0; i < shapes.size(); i++){
         for (uint j = 0; j < shapes[i].polyline.size(); j++){
@@ -570,7 +570,7 @@ bool FormMapping::mouseReleased(ofMouseEventArgs &args) {
     return ofxPanel::mouseReleased(args);
 }
 
-bool FormMapping::mouseScrolled(ofMouseEventArgs &args) {
+bool ofx2DFormMapping::mouseScrolled(ofMouseEventArgs &args) {
 
     if(!direct_edit && mapping_rect_dst.inside(ofGetMouseX(), ofGetMouseY())) {
         setZoomFactor(args.y);
@@ -579,11 +579,11 @@ bool FormMapping::mouseScrolled(ofMouseEventArgs &args) {
     return ofxPanel::mouseScrolled(args);
 }
 
-void FormMapping::setMappingBackground(ofFbo_ptr &fbo) {
+void ofx2DFormMapping::setMappingBackground(ofFbo_ptr &fbo) {
     mapping_bg = fbo;
 }
 
-void FormMapping::setEditMode(bool direct_edit) {
+void ofx2DFormMapping::setEditMode(bool direct_edit) {
     this->direct_edit = direct_edit;
     if(direct_edit) {
         control_rect_backup = control_rect;
@@ -595,7 +595,7 @@ void FormMapping::setEditMode(bool direct_edit) {
     rebuild();
 }
 
-void FormMapping::setOutputForm(float x, float y, float w, float h) {
+void ofx2DFormMapping::setOutputForm(float x, float y, float w, float h) {
     if(x != mapping_rect_output.x || y != mapping_rect_output.y || w != mapping_rect_output.width || h != mapping_rect_output.height) {
         mapping_rect_output = ofRectangle(x,y,w,h);
         rebuild();
@@ -605,11 +605,11 @@ void FormMapping::setOutputForm(float x, float y, float w, float h) {
     }
 }
 
-void FormMapping::setOutputForm(ofRectangle rect) {
+void ofx2DFormMapping::setOutputForm(ofRectangle rect) {
     mapping_rect_output = rect;
 }
 
-void FormMapping::setZoomFactor(int factor) {
+void ofx2DFormMapping::setZoomFactor(int factor) {
 
     int old_zoom_factor = zoom_factor;
 
@@ -637,28 +637,28 @@ void FormMapping::setZoomFactor(int factor) {
 
 }
 
-ofPoint FormMapping::addZoom(ofPoint p) {
+ofPoint ofx2DFormMapping::addZoom(ofPoint p) {
     return p*(1+zoom_factor*zoom_speed);
 }
 
-ofPoint FormMapping::addZoomRelativeOfDstRect(ofPoint p) {
+ofPoint ofx2DFormMapping::addZoomRelativeOfDstRect(ofPoint p) {
     return addZoom(p-mapping_rect_dst.getPosition())+mapping_rect_dst.getPosition()+translation_dst;
 }
 
-ofPoint FormMapping::removeZoomRelativeOfDstRect(ofPoint p) {
+ofPoint ofx2DFormMapping::removeZoomRelativeOfDstRect(ofPoint p) {
     return removeZoom(p-mapping_rect_dst.getPosition()-translation_dst)+mapping_rect_dst.getPosition();
 }
 
-float FormMapping::addZoom(float p) {
+float ofx2DFormMapping::addZoom(float p) {
     return p*(1+zoom_factor*zoom_speed);
 }
 
 
-ofPoint FormMapping::removeZoom(ofPoint p) {
+ofPoint ofx2DFormMapping::removeZoom(ofPoint p) {
     return p/(1+zoom_factor*zoom_speed);
 }
 
-void FormMapping::setSize(float w, float h) {
+void ofx2DFormMapping::setSize(float w, float h) {
     ofxPanel::setSize(w,h);
     control_rect = this->getShape();
     rebuild();

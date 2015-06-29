@@ -1,32 +1,24 @@
 #pragma once
 
-#include "MappingObject.h"
-#include "MappingContentShape.h"
-#include "MappingFbo.h"
-#include "MappingColorShape.h"
-#include "MappingShape.h"
-#include "MappingImage.h"
-#include "MappingPoint.h"
+#include "ofx2DMappingObject.h"
+#include "ofx2DMappingContentShape.h"
+#include "ofx2DMappingFbo.h"
+#include "ofx2DMappingColorShape.h"
+#include "ofx2DMappingShape.h"
+#include "ofx2DMappingImage.h"
+#include "ofx2DMappingPoint.h"
 #include "ofxSvg.h"
 
-typedef ofPtr<ofxSVG> ofxSVG_ptr;
 typedef ofPtr< vector<ofPolyline> > ofPolylines_ptr;
 typedef ofPtr< vector<ofPtr<ofPath>> > ofPaths_ptr;
-typedef ofPtr<MappingObject> MappingObject_ptr;
-typedef ofPtr<MappingShape> MappingShape_ptr;
-typedef ofPtr<MappingContentShape> MappingContentShape_ptr;
-typedef ofPtr<MappingColorShape> MappingColorShape_ptr;
-typedef ofPtr<MappingImage> MappingImage_ptr;
-typedef ofPtr<MappingFbo> MappingFbo_ptr;
-typedef ofPtr<MappingPoint> MappingPoint_ptr;
 
-class Projector {
+class ofx2DMappingProjector {
 
 public:
 
-    Projector(float w, float h);
+    ofx2DMappingProjector(float w, float h);
 
-    ~Projector();
+    ~ofx2DMappingProjector();
 
     void update();
     void                        updateOutlines();
@@ -34,20 +26,20 @@ public:
 
     ofPoint relative(ofPoint orig);
 
-    MappingObject_ptr addShape(MappingObject_ptr obj, bool swap = false);
-    MappingObject_ptr addShape(string type, string name, bool swap = false);
-    MappingObject_ptr copyShape(MappingObject_ptr obj, bool swap = false);
+    ofPtr<ofx2DMappingObject> addShape(ofPtr<ofx2DMappingObject> obj, bool swap = false);
+    ofPtr<ofx2DMappingObject> addShape(string type, string name, bool swap = false);
+    ofPtr<ofx2DMappingObject> copyShape(ofPtr<ofx2DMappingObject> obj, bool swap = false);
 
     bool removeShape(int id);
     void removeAllShapes();
 
     bool swapShapes(int index1, int index2);
 
-    MappingObject_ptr getMappingObject(int id);
+    ofPtr<ofx2DMappingObject> getMappingObject(int id);
 
     uint shapeCount();
 
-    MappingObject_ptr getFirstImageShape();
+    ofPtr<ofx2DMappingObject> getFirstImageShape();
 
     template <class T>
     vector<ofPtr<T>> getShapesByClass() {
@@ -65,7 +57,7 @@ public:
 
     ofMatrix4x4 getMatrixOfImageAtPoint(ofPoint p);
 
-    bool pointVisibleInShape(ofPoint p, MappingContentShape_ptr mq);
+    bool pointVisibleInShape(ofPoint p, ofPtr<ofx2DMappingContentShape> mq);
 
     bool isLeft(ofPoint a, ofPoint b, ofPoint c);
 
@@ -75,7 +67,7 @@ public:
 
     void                        exportSvg(string path);
 
-    ofxSVG_ptr                  svg();
+    ofPtr<ofxSVG>                  svg();
     ofPolylines_ptr             outlines();
     ofPolylines_ptr             outlinesRaw();
     ofPaths_ptr                 paths();
@@ -91,12 +83,12 @@ private:
 
     float                       output_w, output_h;
 
-    ofxSVG_ptr                  _svg;
+    ofPtr<ofxSVG>                  _svg;
     ofPaths_ptr                 _paths;
     ofPolylines_ptr             _outlines;
     ofPolylines_ptr             _outlines_raw;
 
-    vector<MappingObject_ptr> shapes;
+    vector<ofPtr<ofx2DMappingObject>> shapes;
     ofPoint                 start_point;
     ofPoint                 plane[4];
 

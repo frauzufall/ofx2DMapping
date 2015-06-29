@@ -1,8 +1,8 @@
-#include "Projector.h"
-#include "Helper.h"
-#include "MappingObjectFactory.h"
+#include "ofx2DMappingProjector.h"
+#include "ofx2DMappingHelper.h"
+#include "ofx2DMappingObjectFactory.h"
 	
-Projector::Projector(float w, float h) {
+ofx2DMappingProjector::ofx2DMappingProjector(float w, float h) {
     shapes.clear();
     shapes.resize(0);
     start_point = ofPoint(0,0);
@@ -11,7 +11,7 @@ Projector::Projector(float w, float h) {
     plane[2] = ofPoint(1, 1, 0);
     plane[3] = ofPoint(0, 1, 0);
 
-    _svg = ofxSVG_ptr(new ofxSVG());
+    _svg = ofPtr<ofxSVG>(new ofxSVG());
     _outlines = ofPolylines_ptr(new vector<ofPolyline>());
     _outlines_raw = ofPolylines_ptr(new vector<ofPolyline>());
     _paths = ofPaths_ptr(new vector<ofPtr<ofPath>>());
@@ -22,18 +22,18 @@ Projector::Projector(float w, float h) {
     output_w = w;
     output_h = h;
 
-    RegisterInFactory<MappingObject, MappingFbo> register1(MappingFbo().nature);
-    RegisterInFactory<MappingObject, MappingColorShape> register2(MappingColorShape().nature);
-    RegisterInFactory<MappingObject, MappingImage> register3(MappingImage().nature);
+    RegisterInFactory<ofx2DMappingObject, ofx2DMappingFbo> register1(ofx2DMappingFbo().nature);
+    RegisterInFactory<ofx2DMappingObject, ofx2DMappingColorShape> register2(ofx2DMappingColorShape().nature);
+    RegisterInFactory<ofx2DMappingObject, ofx2DMappingImage> register3(ofx2DMappingImage().nature);
 
 }
 
-Projector::~Projector() {
+ofx2DMappingProjector::~ofx2DMappingProjector() {
 
 }
 
-void Projector::update() {
-    MappingObject_ptr mq;
+void ofx2DMappingProjector::update() {
+    ofPtr<ofx2DMappingObject> mq;
     for(uint i = 0; i < shapeCount(); i++) {
         mq = getMappingObject(i);
         if(mq) {
@@ -52,11 +52,11 @@ void Projector::update() {
     }
 }
 
-ofPoint Projector::relative(ofPoint orig) {
+ofPoint ofx2DMappingProjector::relative(ofPoint orig) {
     return orig*getMatrixOfImageAtPoint(orig);
 }
 
-MappingObject_ptr Projector::addShape(MappingObject_ptr obj, bool swap) {
+ofPtr<ofx2DMappingObject> ofx2DMappingProjector::addShape(ofPtr<ofx2DMappingObject> obj, bool swap) {
     shapes.push_back(obj);
     if(swap) {
         update();
@@ -68,8 +68,8 @@ MappingObject_ptr Projector::addShape(MappingObject_ptr obj, bool swap) {
     return shapes.at(shapes.size()-1);
 }
 
-MappingObject_ptr Projector::addShape(string type, string name, bool swap) {
-    MappingObject_ptr obj = MappingObjectFactory<MappingObject>::instance().Create(type);
+ofPtr<ofx2DMappingObject> ofx2DMappingProjector::addShape(string type, string name, bool swap) {
+    ofPtr<ofx2DMappingObject> obj = ofx2DMappingObjectFactory<ofx2DMappingObject>::instance().Create(type);
     if(obj) {
         shapes.push_back(obj);
         shapes.at(shapes.size()-1)->name = name;
@@ -87,7 +87,7 @@ MappingObject_ptr Projector::addShape(string type, string name, bool swap) {
 
 }
 
-MappingObject_ptr Projector::copyShape(MappingObject_ptr original, bool swap) {
+ofPtr<ofx2DMappingObject> ofx2DMappingProjector::copyShape(ofPtr<ofx2DMappingObject> original, bool swap) {
     shapes.push_back(original->clone());
     if(swap) {
         update();
@@ -99,7 +99,7 @@ MappingObject_ptr Projector::copyShape(MappingObject_ptr original, bool swap) {
     return shapes.at(shapes.size()-1);
 }
 
-bool Projector::removeShape(int id) {
+bool ofx2DMappingProjector::removeShape(int id) {
     if(id >= 0 && id < (int)shapes.size()) {
         shapes.at(id).reset();
         shapes.erase(shapes.begin()+id);
@@ -108,14 +108,14 @@ bool Projector::removeShape(int id) {
     return false;
 }
 
-void Projector::removeAllShapes() {
+void ofx2DMappingProjector::removeAllShapes() {
     for(uint i = 0; i < shapes.size(); i++) {
         shapes.at(i).reset();
     }
     shapes.clear();
 }
 
-bool Projector::swapShapes(int index1, int index2) {
+bool ofx2DMappingProjector::swapShapes(int index1, int index2) {
     if(index1 < 0 || index2 < 0) {
         return false;
     }
@@ -128,28 +128,28 @@ bool Projector::swapShapes(int index1, int index2) {
     return false;
 }
 
-MappingObject_ptr Projector::getMappingObject(int id) {
+ofPtr<ofx2DMappingObject> ofx2DMappingProjector::getMappingObject(int id) {
     if(id < (int)shapes.size()) {
         return shapes[id];
     }
     else {
         ofLogError("Projector: getMappingObject()","trying to get object " + ofToString(id) + " but objects size is " + ofToString(shapes.size()));
-        return MappingObject_ptr();
+        return ofPtr<ofx2DMappingObject>();
     }
 
 }
 
-uint Projector::shapeCount() {
+uint ofx2DMappingProjector::shapeCount() {
     return shapes.size();
 }
 
-MappingObject_ptr Projector::getFirstImageShape() {
-    MappingObject_ptr mq;
-    MappingObject_ptr mq_res;
+ofPtr<ofx2DMappingObject> ofx2DMappingProjector::getFirstImageShape() {
+    ofPtr<ofx2DMappingObject> mq;
+    ofPtr<ofx2DMappingObject> mq_res;
     for(uint i = 0; i < shapeCount(); i++) {
         mq = shapes.at(i);
         if(mq) {
-            if(std::dynamic_pointer_cast<MappingContentShape>(mq)) {
+            if(std::dynamic_pointer_cast<ofx2DMappingContentShape>(mq)) {
                 mq_res = mq;
                 break;
             }
@@ -172,8 +172,8 @@ MappingObject_ptr Projector::getFirstImageShape() {
 //    return res;
 //}
 
-ofMatrix4x4 Projector::getMatrixOfImageAtPoint(ofPoint p) {
-    vector<MappingContentShape_ptr> images = getShapesByClass<MappingContentShape>();
+ofMatrix4x4 ofx2DMappingProjector::getMatrixOfImageAtPoint(ofPoint p) {
+    vector<ofPtr<ofx2DMappingContentShape>> images = getShapesByClass<ofx2DMappingContentShape>();
     for(uint ii = 0; ii < images.size(); ii++) {
         if( pointVisibleInShape(p,images.at(ii))) {
             return images.at(ii)->matrix_src_dst;
@@ -182,7 +182,7 @@ ofMatrix4x4 Projector::getMatrixOfImageAtPoint(ofPoint p) {
     return ofMatrix4x4::newIdentityMatrix();
 }
 
-bool Projector::pointVisibleInShape(ofPoint p, MappingContentShape_ptr mq) {
+bool ofx2DMappingProjector::pointVisibleInShape(ofPoint p, ofPtr<ofx2DMappingContentShape> mq) {
 
     ofPoint poly[4];
 
@@ -208,29 +208,29 @@ bool Projector::pointVisibleInShape(ofPoint p, MappingContentShape_ptr mq) {
     return intersections%2;
 }
 
-bool Projector::isLeft(ofPoint a, ofPoint b, ofPoint c){
+bool ofx2DMappingProjector::isLeft(ofPoint a, ofPoint b, ofPoint c){
      return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
 }
 
 
 
-ofPoint Projector::getStartPoint() {
+ofPoint ofx2DMappingProjector::getStartPoint() {
     return start_point;
 }
 
-void Projector::setStartPoint(ofPoint p) {
+void ofx2DMappingProjector::setStartPoint(ofPoint p) {
     start_point = p;
 }
 
-ofxSVG_ptr Projector::svg() {
+ofPtr<ofxSVG> ofx2DMappingProjector::svg() {
     return _svg;
 }
 
-ofPolylines_ptr Projector::outlines() {
+ofPolylines_ptr ofx2DMappingProjector::outlines() {
     return _outlines;
 }
 
-void Projector::updateOutlines() {
+void ofx2DMappingProjector::updateOutlines() {
 
     _outlines->clear();
     _outlines_raw->clear();
@@ -238,11 +238,11 @@ void Projector::updateOutlines() {
 
     for(uint i = 0; i < shapeCount(); i++) {
 
-        MappingObject_ptr mq = getMappingObject(i);
+        ofPtr<ofx2DMappingObject> mq = getMappingObject(i);
 
         _paths->push_back(ofPtr<ofPath>(new ofPath()));
 
-        if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(mq)) {
+        if(ofPtr<ofx2DMappingShape> shape = dynamic_pointer_cast<ofx2DMappingShape>(mq)) {
             _outlines_raw->push_back(shape->polyline);
         }
         else {
@@ -267,15 +267,15 @@ void Projector::updateOutlines() {
 
 }
 
-void Projector::updateOutline(int shape_id) {
+void ofx2DMappingProjector::updateOutline(int shape_id) {
 
     _outlines->at(shape_id).clear();
     _outlines_raw->at(shape_id).clear();
     _paths->at(shape_id)->clear();
 
-    MappingObject_ptr mq = getMappingObject(shape_id);
+    ofPtr<ofx2DMappingObject> mq = getMappingObject(shape_id);
 
-    if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(mq)) {
+    if(ofPtr<ofx2DMappingShape> shape = dynamic_pointer_cast<ofx2DMappingShape>(mq)) {
         _outlines_raw->at(shape_id) = shape->polyline.getVertices();
     }
 
@@ -299,15 +299,15 @@ void Projector::updateOutline(int shape_id) {
 
 }
 
-ofPolylines_ptr Projector::outlinesRaw() {
+ofPolylines_ptr ofx2DMappingProjector::outlinesRaw() {
     return _outlines_raw;
 }
 
-ofPaths_ptr Projector::paths() {
+ofPaths_ptr ofx2DMappingProjector::paths() {
     return _paths;
 }
 
-void Projector::importSvg(string svg) {
+void ofx2DMappingProjector::importSvg(string svg) {
 
     if(reloadSvg(svg)) {
         int outlinescount = _outlines_raw->size();
@@ -320,7 +320,7 @@ void Projector::importSvg(string svg) {
 
             getMappingObject(j)->color = fill_col;
 
-            if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(getMappingObject(j))) {
+            if(ofPtr<ofx2DMappingShape> shape = dynamic_pointer_cast<ofx2DMappingShape>(getMappingObject(j))) {
                 if(l.size() == 4) {
                     shape->dst[0].x = l[0].x/output_w;
                     shape->dst[0].y = l[0].y/output_h;
@@ -352,7 +352,7 @@ void Projector::importSvg(string svg) {
                 shape->newpos = true;
             }
 
-            if(MappingPoint_ptr point = dynamic_pointer_cast<MappingPoint>(getMappingObject(j))) {
+            if(ofPtr<ofx2DMappingPoint> point = dynamic_pointer_cast<ofx2DMappingPoint>(getMappingObject(j))) {
                 point->pos.x = l[0].x/output_w;
                 point->pos.y = l[0].y/output_h;
                 point->newpos = true;
@@ -363,9 +363,9 @@ void Projector::importSvg(string svg) {
 
 }
 
-bool Projector::reloadSvg(string file) {
+bool ofx2DMappingProjector::reloadSvg(string file) {
 
-    ofxSVG_ptr svg = ofxSVG_ptr(new ofxSVG());
+    ofPtr<ofxSVG> svg = ofPtr<ofxSVG>(new ofxSVG());
     svg->load(file);
 
     if(svg->getNumPath() == (int)shapeCount()) {
@@ -378,7 +378,7 @@ bool Projector::reloadSvg(string file) {
 
         for(int j = 0; j<_svg->getNumPath(); j++) {
             _paths->push_back(ofPtr<ofPath>(new ofPath(_svg->getPathAt(j))));
-            _outlines_raw->push_back(Helper::ofPathToOfPolyline(_svg->getPathAt(j), true));
+            _outlines_raw->push_back(ofx2DMappingHelper::ofPathToOfPolyline(_svg->getPathAt(j), true));
             _outlines->push_back(_outlines_raw->at(paths_num).getResampledBySpacing(1));
             paths_num++;
         }
@@ -393,7 +393,7 @@ bool Projector::reloadSvg(string file) {
 
 }
 
-void Projector::reloadLinesFromRaw() {
+void ofx2DMappingProjector::reloadLinesFromRaw() {
 
     for (int i = 0; i < (int)_outlines_raw->size(); i++){
 
@@ -403,7 +403,7 @@ void Projector::reloadLinesFromRaw() {
 
 }
 
-void Projector::exportSvg(string path) {
+void ofx2DMappingProjector::exportSvg(string path) {
     ofxXmlSettings xml;
 
     xml.clear();
@@ -429,7 +429,7 @@ void Projector::exportSvg(string path) {
             int i = 0;
             for(uint j = 0; j < shapeCount(); j++) {
 
-                MappingObject_ptr mq = getMappingObject(j);
+                ofPtr<ofx2DMappingObject> mq = getMappingObject(j);
 
                 if(mq) {
 
@@ -438,8 +438,8 @@ void Projector::exportSvg(string path) {
                     id_sstr << "mappingobject_" << i << "_" << mq->name;
                     xml.addAttribute("path", "id", id_sstr.str(), i);
 //                    xml.addAttribute("path", "inkscape:label", mq->nature, i);
-                    xml.addAttribute("path", "fill", Helper::getColorAsHex(mq->color), i);
-                    if(MappingShape_ptr shape = dynamic_pointer_cast<MappingShape>(mq)) {
+                    xml.addAttribute("path", "fill", ofx2DMappingHelper::getColorAsHex(mq->color), i);
+                    if(ofPtr<ofx2DMappingShape> shape = dynamic_pointer_cast<ofx2DMappingShape>(mq)) {
                         stringstream path_sstr;
                         path_sstr << "m";
                         ofPoint last_p;
@@ -457,7 +457,7 @@ void Projector::exportSvg(string path) {
                         xml.addAttribute("path", "stroke", "#000000", i);
                     }
 
-                    if(MappingPoint_ptr shape = dynamic_pointer_cast<MappingPoint>(mq)) {
+                    if(ofPtr<ofx2DMappingPoint> shape = dynamic_pointer_cast<ofx2DMappingPoint>(mq)) {
                         stringstream path_sstr;
                         path_sstr << "m";
                         ofPoint cur_p = ofPoint(shape->pos.x*output_w, shape->pos.y*output_h);
@@ -480,11 +480,11 @@ void Projector::exportSvg(string path) {
     xml.saveFile(path);
 }
 
-ofParameter<float> Projector::outputWidth() {
+ofParameter<float> ofx2DMappingProjector::outputWidth() {
     return output_w;
 }
 
-ofParameter<float> Projector::outputHeight() {
+ofParameter<float> ofx2DMappingProjector::outputHeight() {
     return output_h;
 }
 

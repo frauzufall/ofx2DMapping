@@ -1,20 +1,20 @@
 #pragma once
 
-#include "MappingShape.h"
+#include "ofx2DMappingShape.h"
 
-class MappingColorShape : public MappingShape {
+class ofx2DMappingColorShape : public ofx2DMappingShape {
 
     public:
 
-    MappingColorShape() {
+    ofx2DMappingColorShape() {
         this->nature = "COLOR_SHAPE";
     }
 
-    MappingColorShape(const MappingColorShape& obj) : MappingShape(obj) {
+    ofx2DMappingColorShape(const ofx2DMappingColorShape& obj) : ofx2DMappingShape(obj) {
     }
 
-    ofPtr<MappingObject> clone() const {
-        return ofPtr<MappingObject>(new MappingColorShape(*this));
+    ofPtr<ofx2DMappingObject> clone() const {
+        return ofPtr<ofx2DMappingObject>(new ofx2DMappingColorShape(*this));
     }
 
     void draw(float w, float h) {

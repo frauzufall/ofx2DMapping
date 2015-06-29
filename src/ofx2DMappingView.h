@@ -2,7 +2,7 @@
 #include "ofMain.h"
 #include "ofx2DMappingController.h"
 #include "ofxSortableList.h"
-#include "FormMapping.h"
+#include "ofx2DFormMapping.h"
 
 class ofx2DMappingView {
 
@@ -20,7 +20,7 @@ public:
 
     void importSvg();
 
-    FormMapping* getFormMapping();
+    ofx2DFormMapping* getFormMapping();
 
     void setShape(ofRectangle shape);
     ofRectangle getShape();
@@ -44,7 +44,7 @@ private:
     ofPoint pos_main_options, pos_calibration_options, pos_add_buttons, pos_shape_list;
 
     ofxPanel add_buttons_panel;
-    FormMapping mapping_forms;
+    ofx2DFormMapping mapping_forms;
     ofxPanel main_options, calibration_options, list_options;
 
     void removeForm(RemovedElementData& data);

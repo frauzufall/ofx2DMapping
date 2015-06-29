@@ -1,15 +1,15 @@
 #pragma once
 
 #include "ofMain.h"
-#include "MappingObjectFactory.h"
+#include "ofx2DMappingObjectFactory.h"
 #include "ofxTriangle.h"
 #include "ofxXmlSettings.h"
-#include "Helper.h"
+#include "ofx2DMappingHelper.h"
 
 typedef ofPtr<ofFbo> ofFbo_ptr;
 typedef ofPtr<ofxXmlSettings> ofxXmlSettings_ptr;
 
-class MappingObject {
+class ofx2DMappingObject {
 public:
 
     string  nature;
@@ -17,7 +17,7 @@ public:
     string name;
     ofColor color;
 
-    MappingObject() {
+    ofx2DMappingObject() {
         newpos = true;
         newitem = true;
 
@@ -26,7 +26,7 @@ public:
         editable.set(nature, false);
     }
 
-    MappingObject(const MappingObject& obj) {
+    ofx2DMappingObject(const ofx2DMappingObject& obj) {
         this->color = obj.color;
         this->name = obj.name;
         this->nature = obj.nature;
@@ -34,7 +34,7 @@ public:
         this->editable.set(obj.name, true);
     }
 
-    virtual ofPtr<MappingObject> clone() const = 0;
+    virtual ofPtr<ofx2DMappingObject> clone() const = 0;
 
     void setColor(ofColor color) {
         this->color = color;
@@ -198,7 +198,7 @@ public:
     bool        newitem;
     ofParameter<bool> editable;
 
-    ~MappingObject(){}
+    ~ofx2DMappingObject(){}
 
 protected:
 

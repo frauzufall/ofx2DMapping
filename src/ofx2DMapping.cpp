@@ -56,5 +56,24 @@ void ofx2DMapping::showControls(bool show) {
 //    view.setEditMode(direct);
 //}
 
+ofPtr<ofx2DMappingImage> ofx2DMapping::addImageTemplate(string name, string path) {
+    ofPtr<ofx2DMappingImage> image = addTemplate<ofx2DMappingImage>(name);
+    image->loadImage(path);
+    image->setColor(ofColor(0,200,255));
+    return image;
+}
+
+ofPtr<ofx2DMappingFbo> ofx2DMapping::addFboTemplate(string name, ofPtr<ofFbo> fbo) {
+    ofPtr<ofx2DMappingFbo> content = addTemplate<ofx2DMappingFbo>(name);
+    content->setFbo(fbo);
+    return content;
+}
+
+ofPtr<ofx2DMappingColorShape> ofx2DMapping::addColorTemplate(string name, ofColor color) {
+    ofPtr<ofx2DMappingColorShape> shape = addTemplate<ofx2DMappingColorShape>(name);
+    shape->setColor(color);
+    return shape;
+}
+
 ofx2DMapping::~ofx2DMapping() {
 }

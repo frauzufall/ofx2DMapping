@@ -1,5 +1,5 @@
 #include "ofx2DMappingController.h"
-#include "MappingObject.h"
+#include "ofx2DMappingObject.h"
 
 ofx2DMappingController::ofx2DMappingController() {
 
@@ -115,7 +115,7 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
                     xml->pushTag("object", j);
 
-                        MappingObject_ptr obj = createShape(getProjector(i), type, name);
+                        ofPtr<ofx2DMappingObject> obj = createShape(getProjector(i), type, name);
                         if(obj) {
                             obj->loadXml(xml);
                         }
@@ -142,9 +142,9 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
 }
 
-MappingObject_ptr ofx2DMappingController::createShape(Projector* projector, string type, string name) {
+ofPtr<ofx2DMappingObject> ofx2DMappingController::createShape(ofx2DMappingProjector* projector, string type, string name) {
 
-    MappingObject_ptr res;
+    ofPtr<ofx2DMappingObject> res;
 
     uint i = 0;
     for(; i < available_shapes.size(); i++) {
@@ -181,7 +181,7 @@ void ofx2DMappingController::updateFbo(int projector_id) {
 
     if(projector_id < (int)projectors.size()) {
 
-        Projector* p = &(projectors[projector_id]);
+        ofx2DMappingProjector* p = &(projectors[projector_id]);
 
         mappedContentToFbo(p);
 
@@ -200,7 +200,7 @@ void ofx2DMappingController::updateAreaFbo(int projector_id) {
 
     if(projector_id < (int)projectors.size()) {
 
-        Projector* p = &(projectors[projector_id]);
+        ofx2DMappingProjector* p = &(projectors[projector_id]);
 
         mappedAreaToFbo(p);
 
@@ -211,7 +211,7 @@ void ofx2DMappingController::updateAreaFbo(int projector_id) {
 }
 
 
-void ofx2DMappingController::mappedContentToFbo(Projector *p) {
+void ofx2DMappingController::mappedContentToFbo(ofx2DMappingProjector *p) {
 
     ofEnableAlphaBlending();
     glEnable (GL_LINE_SMOOTH);
@@ -223,7 +223,7 @@ void ofx2DMappingController::mappedContentToFbo(Projector *p) {
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
-        MappingObject_ptr q = p->getMappingObject(i);
+        ofPtr<ofx2DMappingObject> q = p->getMappingObject(i);
         q->draw(p->outputWidth(), p->outputHeight());
     }
 
@@ -233,7 +233,7 @@ void ofx2DMappingController::mappedContentToFbo(Projector *p) {
 
 }
 
-void ofx2DMappingController::mappedAreaToFbo(Projector *p) {
+void ofx2DMappingController::mappedAreaToFbo(ofx2DMappingProjector *p) {
 
     mapped_area_fbo->begin();
     ofClear(0, 0, 0, 255);
@@ -247,13 +247,13 @@ void ofx2DMappingController::mappedAreaToFbo(Projector *p) {
 
 }
 
-void ofx2DMappingController::drawCalibration(Projector* p) {
+void ofx2DMappingController::drawCalibration(ofx2DMappingProjector* p) {
 
     ofEnableAlphaBlending();
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
-       MappingObject_ptr q = p->getMappingObject(i);
+       ofPtr<ofx2DMappingObject> q = p->getMappingObject(i);
 
         if(q) {
 
@@ -291,11 +291,11 @@ ofParameter<int>& ofx2DMappingController::getCalGrey() {
 
 void ofx2DMappingController::addProjector(float w, float h) {
 
-    projectors.push_back(Projector(w,h));
+    projectors.push_back(ofx2DMappingProjector(w,h));
 
 }
 
-Projector* ofx2DMappingController::getProjector(int id) {
+ofx2DMappingProjector* ofx2DMappingController::getProjector(int id) {
     if(id < (int)projectors.size()) {
         return &(projectors[id]);
     }
@@ -307,7 +307,7 @@ Projector* ofx2DMappingController::getProjector(int id) {
 
 ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint next_p) {
 
-    Projector *p = getProjector(0);
+    ofx2DMappingProjector *p = getProjector(0);
     ofPoint last_p_norm(last_p.x/p->outputWidth(), last_p.y/p->outputHeight());
     ofPoint res_norm;
     ofPoint res = next_p;
@@ -548,7 +548,7 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
 
             for(uint j = 0; j < getProjector(0)->shapeCount(); j++) {
 
-                MappingObject_ptr mq = getProjector(0)->getMappingObject(j);
+                ofPtr<ofx2DMappingObject> mq = getProjector(0)->getMappingObject(j);
 
                 if(mq) {
 
@@ -656,11 +656,11 @@ void ofx2DMappingController::setControlHeight(float val) {
     control_h = val;
 }
 
-void ofx2DMappingController::addTemplate(MappingObject_ptr obj) {
+void ofx2DMappingController::addTemplate(ofPtr<ofx2DMappingObject> obj) {
     available_shapes.push_back(obj);
 }
 
-vector<MappingObject_ptr> ofx2DMappingController::getOptions() {
+vector<ofPtr<ofx2DMappingObject>> ofx2DMappingController::getOptions() {
     return available_shapes;
 }
 

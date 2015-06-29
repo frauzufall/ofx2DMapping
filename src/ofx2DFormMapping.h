@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxPanel.h"
-#include "Projector.h"
+#include "ofx2DMappingProjector.h"
 #include "ofxSortableList.h"
 
 struct draggableVertex : public ofPoint {
@@ -22,10 +22,10 @@ struct mappableShape {
 };
 
 
-class FormMapping : public ofxPanel {
+class ofx2DFormMapping : public ofxPanel {
 
 public:
-    FormMapping();
+    ofx2DFormMapping();
 
     bool mouseMoved(ofMouseEventArgs &args);
     bool mouseDragged(ofMouseEventArgs &args);
@@ -33,7 +33,7 @@ public:
     bool mouseReleased(ofMouseEventArgs &args);
     bool mouseScrolled(ofMouseEventArgs &args);
 
-    void setup(string title, Projector* parent_projector, ofxSortableList* parent_list, float w, float h);
+    void setup(string title, ofx2DMappingProjector* parent_projector, ofxSortableList* parent_list, float w, float h);
 
     void rebuild();
     void updateForms();
@@ -75,7 +75,7 @@ private:
 
     ofParameter<string> explanation;
 
-    Projector* parent_projector;
+    ofx2DMappingProjector* parent_projector;
     ofxSortableList* parent_list;
 
     int zoom_factor;

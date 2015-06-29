@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "Projector.h"
+#include "ofx2DMappingProjector.h"
 #include "ofxXmlSettings.h"
 
 typedef ofPtr<ofxXmlSettings> ofxXmlSettings_ptr;
@@ -29,10 +29,10 @@ class ofx2DMappingController {
         ofPoint                     getPoint(ofxXmlSettings_ptr xml);
         ofPolyline                  getPolyline(ofxXmlSettings_ptr xml);
 
-        void                        drawCalibration(Projector *p);
+        void                        drawCalibration(ofx2DMappingProjector *p);
 
         void						addProjector(float w, float h);
-        Projector*                  getProjector(int id);
+        ofx2DMappingProjector*                  getProjector(int id);
 
         ofPoint                     getPointInMappedArea(ofPoint last_p,ofPoint next_p);
         ofPoint                     intersectionPointPolyline(ofPoint last_p, ofPoint next_p, ofPolyline polyline);
@@ -77,7 +77,7 @@ class ofx2DMappingController {
         void                        saveMappingAsSvg();
         void                        importSvg();
 
-        void addTemplate(MappingObject_ptr obj);
+        void addTemplate(ofPtr<ofx2DMappingObject> obj);
         template <class T>
         ofPtr<T> addTemplate(string name) {
             ofPtr<T> obj  = ofPtr<T>(new T());
@@ -86,14 +86,14 @@ class ofx2DMappingController {
             return obj;
         }
 
-        vector<MappingObject_ptr> getOptions();
+        vector<ofPtr<ofx2DMappingObject>> getOptions();
 
         ofRectangle                 getOutputRectangle();
         void                        setOutputRectangle(ofRectangle r);
 
     private:
 
-        MappingObject_ptr createShape(Projector* projector, string type, string name);
+        ofPtr<ofx2DMappingObject> createShape(ofx2DMappingProjector* projector, string type, string name);
 
         bool use_mapping;
 
@@ -103,7 +103,7 @@ class ofx2DMappingController {
         float control_w, control_h;
         float vid_max_w, vid_max_h;
 
-        vector<Projector>			projectors;
+        vector<ofx2DMappingProjector>			projectors;
         GLfloat						matrix[16];
         ofPoint						plane[4];
 
@@ -114,10 +114,10 @@ class ofx2DMappingController {
         ofFbo_ptr           		mapped_content_fbo;
         ofFbo_ptr                   mapped_area_fbo;
 
-        void                        mappedContentToFbo(Projector *p);
-        void                        mappedAreaToFbo(Projector *p);
+        void                        mappedContentToFbo(ofx2DMappingProjector *p);
+        void                        mappedAreaToFbo(ofx2DMappingProjector *p);
 
-        vector<MappingObject_ptr>   available_shapes;
+        vector<ofPtr<ofx2DMappingObject>>   available_shapes;
 
         ofRectangle                 output_rectangle;
 

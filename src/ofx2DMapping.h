@@ -29,6 +29,10 @@ public:
         return ctrl.addTemplate<T>(name);
     }
 
+    ofPtr<ofx2DMappingImage> addImageTemplate(string name, string path);
+    ofPtr<ofx2DMappingFbo> addFboTemplate(string name, ofPtr<ofFbo> fbo);
+    ofPtr<ofx2DMappingColorShape> addColorTemplate(string name, ofColor color);
+
 private:
 
     ofx2DMappingController ctrl;

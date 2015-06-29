@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MappingShape.h"
+#include "ofx2DMappingShape.h"
 
-class MappingContentShape : public MappingShape {
+class ofx2DMappingContentShape : public ofx2DMappingShape {
 
     public:
 
@@ -13,7 +13,7 @@ class MappingContentShape : public MappingShape {
 
     ofTexture* texture;
 
-    MappingContentShape() {
+    ofx2DMappingContentShape() {
 
         this->nature = "CONTENT_SHAPE";
 
@@ -29,7 +29,7 @@ class MappingContentShape : public MappingShape {
         this->matrix_src_dst.makeIdentityMatrix();
     }
 
-    MappingContentShape(const MappingContentShape& obj) : MappingShape(obj) {
+    ofx2DMappingContentShape(const ofx2DMappingContentShape& obj) : ofx2DMappingShape(obj) {
         for(int i = 0; i < 4; i++) {
             this->src[i] = obj.src[i];
         }
@@ -39,19 +39,19 @@ class MappingContentShape : public MappingShape {
         this->texture = obj.texture;
     }
 
-    ofPtr<MappingObject> clone() const {
-        return ofPtr<MappingObject>(new MappingContentShape(*this));
+    ofPtr<ofx2DMappingObject> clone() const {
+        return ofPtr<ofx2DMappingObject>(new ofx2DMappingContentShape(*this));
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {
-        MappingShape::loadXml(xml);
+        ofx2DMappingShape::loadXml(xml);
         xml->pushTag("src", 0);
             setRectangle(xml, src);
         xml->popTag();
     }
 
     void saveXml(ofxXmlSettings_ptr xml) {
-        MappingShape::saveXml(xml);
+        ofx2DMappingShape::saveXml(xml);
         xml->addTag("src");
         xml->pushTag("src", 0);
             xml->addTag("lefttop");
@@ -78,7 +78,7 @@ class MappingContentShape : public MappingShape {
     }
 
     void update(float w, float h) {
-        MappingShape::update(w, h);
+        ofx2DMappingShape::update(w, h);
         this->findHomography(this->dst, this->src, (GLfloat*) this->matrix_src_dst.getPtr(), true, w, h);
     }
 

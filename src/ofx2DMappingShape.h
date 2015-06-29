@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MappingObject.h"
+#include "ofx2DMappingObject.h"
 
-class MappingShape : public MappingObject {
+class ofx2DMappingShape : public ofx2DMappingObject {
 
 public:
 
@@ -12,7 +12,7 @@ public:
     ofPolyline  polyline;
     ofPoint     plane[4];
 
-    MappingShape() {
+    ofx2DMappingShape() {
 
         this->nature = "SHAPE";
 
@@ -40,7 +40,7 @@ public:
         this->matrix_dst_norm.makeIdentityMatrix();
     }
 
-    MappingShape(const MappingShape& obj) : MappingObject(obj) {
+    ofx2DMappingShape(const ofx2DMappingShape& obj) : ofx2DMappingObject(obj) {
         for(int i = 0; i < 4; i++) {
             this->dst[i] = obj.dst[i];
             this->plane[i] = obj.plane[i];
@@ -50,12 +50,12 @@ public:
         this->matrix_dst_norm = obj.matrix_dst_norm;
     }
 
-    ofPtr<MappingObject> clone() const {
-        return ofPtr<MappingObject>(new MappingShape(*this));
+    ofPtr<ofx2DMappingObject> clone() const {
+        return ofPtr<ofx2DMappingObject>(new ofx2DMappingShape(*this));
     }
 
     void loadXml(ofxXmlSettings_ptr xml) {
-        MappingObject::loadXml(xml);
+        ofx2DMappingObject::loadXml(xml);
         xml->pushTag("dst", 0);
             setRectangle(xml, dst);
         xml->popTag();
@@ -65,7 +65,7 @@ public:
     }
 
     void saveXml(ofxXmlSettings_ptr xml) {
-        MappingObject::saveXml(xml);
+        ofx2DMappingObject::saveXml(xml);
         xml->addTag("dst");
         xml->pushTag("dst", 0);
             xml->addTag("lefttop");

@@ -47,7 +47,7 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
     add_buttons_panel.setup("ADD MAPPING OBJECTS");
 
     add_button_params.clear();
-    vector<MappingObject_ptr> options = ctrl->getOptions();
+    vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
     for(uint i = 0; i < options.size(); i++) {
         add_button_params.push_back(ofParameter<bool>("add " + options.at(i)->name, false));
         add_buttons_panel.add(add_button_params.at(i));
@@ -137,11 +137,11 @@ void ofx2DMappingView::updateObjectList() {
 
     object_list.clear();
 
-    Projector *p = ctrl->getProjector(0);
+    ofx2DMappingProjector *p = ctrl->getProjector(0);
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
-        MappingObject_ptr mq = p->getMappingObject(i);
+        ofPtr<ofx2DMappingObject> mq = p->getMappingObject(i);
         if(mq) {
 //            string objname = mq->name;
             //insert toggles at beginning of list
@@ -161,7 +161,7 @@ void ofx2DMappingView::importSvg() {
 
 void ofx2DMappingView::removeForm(RemovedElementData &data) {
 
-    Projector *p = ctrl->getProjector(0);
+    ofx2DMappingProjector *p = ctrl->getProjector(0);
     int index = p->shapeCount()-1-data.index;
     if(p->removeShape(index)) {
         p->updateOutlines();
@@ -172,7 +172,7 @@ void ofx2DMappingView::removeForm(RemovedElementData &data) {
 
 void ofx2DMappingView::reorderForm(MovingElementData &data) {
 
-    Projector *p = ctrl->getProjector(0);
+    ofx2DMappingProjector *p = ctrl->getProjector(0);
 
     int index1 = p->shapeCount()-1-data.old_index;
     int index2 = p->shapeCount()-1-data.new_index;
@@ -221,7 +221,7 @@ void ofx2DMappingView::setEditMode(bool &direct_edit) {
     //TODO trigger button
 }
 
-FormMapping* ofx2DMappingView::getFormMapping() {
+ofx2DFormMapping *ofx2DMappingView::getFormMapping() {
     return &mapping_forms;
 }
 

@@ -1,17 +1,17 @@
 #pragma once
 
 template <class ManufacturedType, typename ClassIDKey=std::string>
-class MappingObjectFactory
+class ofx2DMappingObjectFactory
 {
     typedef ofPtr<ManufacturedType> (*BaseCreateFn)();
     typedef std::map<ClassIDKey, BaseCreateFn> FnRegistry;
     FnRegistry registry;
 
-    MappingObjectFactory(){}
+    ofx2DMappingObjectFactory(){}
 
 public:
-    static MappingObjectFactory &instance() {
-        static MappingObjectFactory bf;
+    static ofx2DMappingObjectFactory &instance() {
+        static ofx2DMappingObjectFactory bf;
         return bf;
     }
 
@@ -40,7 +40,7 @@ public:
     }
 
     RegisterInFactory(const ClassIDKey &id) {
-        MappingObjectFactory<AncestorType, ClassIDKey>::instance().RegCreateFn(id, CreateInstance);
+        ofx2DMappingObjectFactory<AncestorType, ClassIDKey>::instance().RegCreateFn(id, CreateInstance);
     }
 };
 

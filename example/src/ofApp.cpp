@@ -1,5 +1,5 @@
 #include "ofApp.h"
-#include "MappingObjectFactory.h"
+#include "ofx2DMappingObjectFactory.h"
 #include "Star.h"
 
 //--------------------------------------------------------------
@@ -14,17 +14,13 @@ void ofApp::setup(){
 
     //option to add shapes that show the content of a given fbo
 
-    ofPtr<MappingFbo> content1 = mapping.addTemplate<MappingFbo>("scene");
-    content1->setFbo(scene.getFbo());
+    mapping.addFboTemplate("scene", scene.getFbo());
 
     //option to add black shapes
-    ofPtr<MappingColorShape> black_shape = mapping.addTemplate<MappingColorShape>("black");
-    black_shape->setColor(ofColor(0));
+    mapping.addColorTemplate("black", ofColor(0));
 
     //option to add an image
-    ofPtr<MappingImage> logo = mapping.addTemplate<MappingImage>("image");
-    logo->loadImage("images/ente.jpg");
-    logo->setColor(ofColor(0,200,255));
+    mapping.addImageTemplate("image","images/ente.jpg");
 
     //option to add custom class
     ofPtr<Star> star = mapping.addTemplate<Star>("star");

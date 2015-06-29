@@ -9,7 +9,7 @@ Star::Star() {
     speed = ofRandom(0,100);
 }
 
-Star::Star(const Star& obj) : MappingPoint(obj) {
+Star::Star(const Star& obj) : ofx2DMappingPoint(obj) {
 
     //the copy constructor is called every time a new object of the template is added to your scene
     //obj is the template object
@@ -23,12 +23,12 @@ Star::Star(const Star& obj) : MappingPoint(obj) {
 
 }
 
-ofPtr<MappingObject> Star::clone() const {
-    return ofPtr<MappingObject>(new Star(*this));
+ofPtr<ofx2DMappingObject> Star::clone() const {
+    return ofPtr<ofx2DMappingObject>(new Star(*this));
 }
 
 void Star::saveXml(ofxXmlSettings_ptr xml) {
-    MappingPoint::saveXml(xml);
+    ofx2DMappingPoint::saveXml(xml);
 
     //add any values of the object you want to save
 
@@ -36,7 +36,7 @@ void Star::saveXml(ofxXmlSettings_ptr xml) {
 }
 
 void Star::loadXml(ofxXmlSettings_ptr xml) {
-    MappingPoint::loadXml(xml);
+    ofx2DMappingPoint::loadXml(xml);
 
     //equivalent to saveXml
 

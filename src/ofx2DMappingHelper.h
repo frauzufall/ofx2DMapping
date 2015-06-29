@@ -4,10 +4,7 @@
 #include "ofxSvg.h"
 #include "ofxXmlSettings.h"
 
-typedef std::shared_ptr<ofxSVG> ofxSVG_ptr;
-
-
-class Helper {
+class ofx2DMappingHelper {
 
 public:
 
