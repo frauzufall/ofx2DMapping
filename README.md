@@ -18,7 +18,8 @@
 - SVG export & import (only meant to be used for geometry changes like moving points or adding vertices, not for object removal or addition; tested with Inkscape)
 
 ##Usage
-Tested with linux 64bit. See example for usage details.
+Tested with linux 64bit. 
+See example for usage details and watch this video: https://vimeo.com/132085632
 
 ##Installation
 Please use the lastest git version of openFrameworks until v0.9 is published. Otherwise the addon will crash. 
