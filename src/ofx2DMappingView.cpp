@@ -28,21 +28,33 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     //MAIN OPTIONS PANEL
 
-    main_options.setup("MAPPING");
+    main_panel.setup("MAPPING");
 
     save_btn.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
     save_btn.setup("save");
-    main_options.add(&save_btn);
+    main_panel.add(&save_btn);
 
     import_btn.addListener(this, &ofx2DMappingView::importSvg);
     import_btn.setup("import svg");
-    main_options.add(&import_btn);
+    main_panel.add(&import_btn);
 
     edit_mode_btn.addListener(this, &ofx2DMappingView::setEditMode);
     edit_mode_btn.setup("direct edit", direct_edit);
-    main_options.add(&edit_mode_btn);
+    main_panel.add(&edit_mode_btn);
 
-    //ADDING BUTTONS PANEL
+    //CALIBRATION OPTIONS
+
+    calibration_options.setup("CALIBRATION OPTIONS");
+
+    calibration_options.add(ctrl->getCalibrating());
+    calibration_options.add(ctrl->getCalBorder());
+    calibration_options.add(ctrl->getCalGrey());
+
+    main_panel.add(&calibration_options);
+
+    //OBJECT LIST PANEL
+
+    list_panel.setup("MAPPING OBJECTS");
 
     add_buttons_panel.setup("ADD MAPPING OBJECTS");
 
@@ -53,20 +65,7 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
         add_buttons_panel.add(add_button_params.at(i));
     }
 
-    //CALIBRATION OPTIONS
-
-    calibration_options.setup("CALIBRATION OPTIONS");
-
-    calibration_options.add(ctrl->getCalibrating());
-    calibration_options.add(ctrl->getCalBorder());
-    calibration_options.add(ctrl->getCalGrey());
-
-    //OBJECT LIST
-
-    object_list.setup("MAPPING OBJECT LIST");
-    ofAddListener(object_list.elementRemoved, this, &ofx2DMappingView::removeForm);
-    ofAddListener(object_list.elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
-    object_list.setHeaderBackgroundColor(ofColor::black);
+    list_panel.add(&add_buttons_panel);
 
     //LIST MANIPULATION OPTIONS
 
@@ -83,6 +82,17 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
     delete_all_btn.addListener(this, &ofx2DMappingView::removeAllObjects);
     delete_all_btn.setup("delete all");
     list_options.add(&delete_all_btn);
+
+    list_panel.add(&list_options);
+
+    //OBJECT LIST
+
+    object_list.setup("MAPPING OBJECT LIST");
+    ofAddListener(object_list.elementRemoved, this, &ofx2DMappingView::removeForm);
+    ofAddListener(object_list.elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
+    object_list.setHeaderBackgroundColor(ofColor::black);
+
+    list_panel.add(&object_list);
 
     setSubpanelPositions();
 
@@ -123,11 +133,8 @@ void ofx2DMappingView::draw(ofPoint pos) {
 
     mapping_forms.draw(show_source);
 
-    object_list.draw();
-    list_options.draw();
-    main_options.draw();
-    calibration_options.draw();
-    add_buttons_panel.draw();
+    main_panel.draw();
+    list_panel.draw();
 
     ofPopStyle();
 
@@ -186,24 +193,15 @@ void ofx2DMappingView::reorderForm(MovingElementData &data) {
 
 void ofx2DMappingView::setSubpanelPositions() {
     float margin = 10;
-    main_options.setPosition(
+    main_panel.setPosition(
                 control_rect.x+margin,
                 control_rect.y+margin);
-    calibration_options.setPosition(
-                main_options.getPosition().x + main_options.getWidth() + margin,
-                main_options.getPosition().y);
+    list_panel.setPosition(
+                control_rect.x+margin,
+                control_rect.y+margin+main_panel.getHeight()+margin*2);
     mapping_forms.setPosition(
-                main_options.getPosition().x,
-                main_options.getPosition().y+main_options.getHeight()+margin);
-    add_buttons_panel.setPosition(
-                mapping_forms.getPosition().x + mapping_forms.getWidth()+margin,
-                mapping_forms.getPosition().y);
-    object_list.setPosition(
-                add_buttons_panel.getPosition().x,
-                add_buttons_panel.getPosition().y + add_buttons_panel.getHeight()+margin);
-    list_options.setPosition(
-                max(add_buttons_panel.getPosition().x, calibration_options.getPosition().x+calibration_options.getWidth()+margin),
-                add_buttons_panel.getPosition().y - list_options.getHeight() - margin);
+                main_panel.getPosition().x + main_panel.getWidth()+margin,
+                control_rect.y+margin);
 }
 
 void ofx2DMappingView::setMappingBackground(ofFbo_ptr fbo) {
@@ -251,6 +249,6 @@ ofRectangle ofx2DMappingView::getShape() {
 void ofx2DMappingView::setShape(ofRectangle shape) {
     control_rect = shape;
     int margin = 10;
-    mapping_forms.setSize(control_rect.getWidth()-object_list.getWidth()-margin*3, control_rect.getHeight()-main_options.getHeight()-margin*3);
+    mapping_forms.setSize(control_rect.getWidth()-object_list.getWidth()-margin*3, control_rect.getHeight()-main_panel.getHeight()-margin*3);
     setSubpanelPositions();
 }

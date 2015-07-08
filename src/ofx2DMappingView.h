@@ -43,9 +43,10 @@ private:
 
     ofPoint pos_main_options, pos_calibration_options, pos_add_buttons, pos_shape_list;
 
-    ofxPanel add_buttons_panel;
+    ofxGuiGroup add_buttons_panel;
     ofx2DFormMapping mapping_forms;
-    ofxPanel main_options, calibration_options, list_options;
+    ofxPanel main_panel, list_panel;
+    ofxGuiGroup calibration_options, list_options;
 
     void removeForm(RemovedElementData& data);
     void reorderForm(MovingElementData& data);
