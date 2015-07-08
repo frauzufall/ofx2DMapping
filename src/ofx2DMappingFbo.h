@@ -22,9 +22,11 @@ class ofx2DMappingFbo : public ofx2DMappingContentShape {
 
     void setFbo(ofFbo_ptr &fbo) {
         this->fbo = fbo;
-        src_width = fbo->getWidth();
-        src_height = fbo->getHeight();
-        setTexture(&fbo->getTexture());
+        if(fbo) {
+            src_width = fbo->getWidth();
+            src_height = fbo->getHeight();
+            setTexture(&fbo->getTexture());
+        }
     }
 
 };
