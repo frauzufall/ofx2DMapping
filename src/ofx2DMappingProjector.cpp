@@ -42,7 +42,7 @@ void ofx2DMappingProjector::update() {
                     updateOutline(i);
                 }
                 else {
-                    updateOutlines();
+//                    updateOutlines();
                 }
             }
             mq->update(output_w, output_h);
@@ -58,6 +58,7 @@ ofPoint ofx2DMappingProjector::relative(ofPoint orig) {
 
 ofPtr<ofx2DMappingObject> ofx2DMappingProjector::addShape(ofPtr<ofx2DMappingObject> obj, bool swap) {
     shapes.push_back(obj);
+    updateOutline(shapes.size()-1);
     if(swap) {
         update();
         for(int i = shapes.size()-1; i>0;i--) {
@@ -72,6 +73,7 @@ ofPtr<ofx2DMappingObject> ofx2DMappingProjector::addShape(string type, string na
     ofPtr<ofx2DMappingObject> obj = ofx2DMappingObjectFactory<ofx2DMappingObject>::instance().Create(type);
     if(obj) {
         shapes.push_back(obj);
+        updateOutline(shapes.size()-1);
         shapes.at(shapes.size()-1)->name = name;
         if(swap) {
             update();
@@ -88,15 +90,17 @@ ofPtr<ofx2DMappingObject> ofx2DMappingProjector::addShape(string type, string na
 }
 
 ofPtr<ofx2DMappingObject> ofx2DMappingProjector::copyShape(ofPtr<ofx2DMappingObject> original, bool swap) {
+    int pos = shapes.size();
     shapes.push_back(original->clone());
+    updateOutline(pos);
     if(swap) {
         update();
-        for(int i = shapes.size()-1; i>0;i--) {
-            swapShapes(i, i-1);
+        for(; pos>0;pos--) {
+            swapShapes(pos, pos-1);
         }
-        return shapes.at(0);
+        pos = 0;
     }
-    return shapes.at(shapes.size()-1);
+    return shapes.at(pos);
 }
 
 bool ofx2DMappingProjector::removeShape(int id) {
@@ -269,9 +273,16 @@ void ofx2DMappingProjector::updateOutlines() {
 
 void ofx2DMappingProjector::updateOutline(int shape_id) {
 
-    _outlines->at(shape_id).clear();
-    _outlines_raw->at(shape_id).clear();
-    _paths->at(shape_id)->clear();
+    if(_outlines->size() > shape_id) {
+        _outlines->at(shape_id).clear();
+        _outlines_raw->at(shape_id).clear();
+        _paths->at(shape_id)->clear();
+    }
+    else {
+        _outlines->push_back(ofPolyline());
+        _outlines_raw->push_back(ofPolyline());
+        _paths->push_back(ofPtr<ofPath>(new ofPath()));
+    }
 
     ofPtr<ofx2DMappingObject> mq = getMappingObject(shape_id);
 

@@ -127,8 +127,6 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
                 }
 
-                getProjector(i)->updateOutlines();
-
             xml->popTag();
 
             ofLogNotice("ofx2DMappingController: reloadMapping()", "projector " + ofToString(i) + " with " + ofToString(getProjector(i)->shapeCount()) + " mapping objects loaded.");
