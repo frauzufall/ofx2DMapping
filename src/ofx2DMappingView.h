@@ -25,7 +25,7 @@ public:
     void setShape(ofRectangle shape);
     ofRectangle getShape();
 
-private:
+protected:
 
     ofx2DMappingController* ctrl;
 
@@ -34,6 +34,8 @@ private:
     void selectAllObjects();
     void deselectAllObjects();
     void removeAllObjects();
+
+    void addedObject(bool&clickstart);
 
     bool show_source, direct_edit;
 
@@ -53,10 +55,8 @@ private:
 
     ofxButton save_btn, import_btn, select_all_btn, deselect_all_btn, delete_all_btn;
     ofxToggle edit_mode_btn;
-    vector<ofParameter<bool>> add_button_params;
 
     float zoom;
     ofPoint zoom_pos;
-
 
 };

@@ -28,7 +28,6 @@ public:
 private:
 
     ofx2DMapping mapping;
-    ofPtr<ofx2DMappingContentShape> cshape;
 
     SomeScene scene;
 

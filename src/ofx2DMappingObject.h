@@ -197,6 +197,7 @@ public:
     bool        newpos;
     bool        newitem;
     ofParameter<bool> editable;
+    ofParameter<bool> pleaseCopyMe;
 
     ~ofx2DMappingObject(){}
 

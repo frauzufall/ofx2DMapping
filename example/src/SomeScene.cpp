@@ -12,7 +12,7 @@ void SomeScene::setup(float w, float h) {
     ofClear(0,0,0,0);
     fbo->end();
 
-    myfont.loadFont("arial.ttf", 112);
+    myfont.load("arial.ttf", 112);
 }
 
 void SomeScene::update() {

@@ -33,6 +33,7 @@ ofx2DMappingProjector::~ofx2DMappingProjector() {
 }
 
 void ofx2DMappingProjector::update() {
+
     ofPtr<ofx2DMappingObject> mq;
     for(uint i = 0; i < shapeCount(); i++) {
         mq = getMappingObject(i);

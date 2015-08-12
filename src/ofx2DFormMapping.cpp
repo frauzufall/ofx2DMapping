@@ -429,8 +429,8 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
                 }
 
                 obj->newpos = true;
-                parent_list->getListItems().at(shapes.size()-1-i)->setBackgroundColor(ofColor(0,200,210));
-//                    Visuals::get().reloadLinesFromRaw();
+                ofColor c = parent_list->getControl(shapes.size()-1-i)->getFillColor();
+                parent_list->getControl(shapes.size()-1-i)->setBackgroundColor(c);
             }
         }
 
@@ -557,8 +557,8 @@ bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
     for (uint i = 0; i < shapes.size(); i++){
         for (uint j = 0; j < shapes[i].polyline.size(); j++){
             shapes[i].polyline[j].bBeingDragged = false;
-            if(shapes.size()-1-i < parent_list->getListItems().size() && parent_list->getListItems().size() > 0 && shapes.size() == parent_list->getListItems().size())
-                parent_list->getListItems().at(shapes.size()-1-i)->setBackgroundColor(parent_list->getBackgroundColor());
+            if(shapes.size()-1-i < parent_list->getNumControls() && parent_list->getNumControls() > 0 && shapes.size() == parent_list->getNumControls())
+                parent_list->getControl(shapes.size()-1-i)->setBackgroundColor(parent_list->getBackgroundColor());
         }
         for (uint j = 0; j < shapes[i].src.size(); j++){
             shapes[i].src[j].bBeingDragged = false;

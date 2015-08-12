@@ -161,6 +161,14 @@ ofPtr<ofx2DMappingObject> ofx2DMappingController::createShape(ofx2DMappingProjec
 
 void ofx2DMappingController::update() {
 
+    //check if any object template wants to be copied to stage
+    for(auto &e: getOptions()){
+        if(e->pleaseCopyMe.get()){
+            e->pleaseCopyMe.set(false);
+            getProjector(0)->copyShape(e);
+        }
+    }
+
     for(uint i = 0; i < projectors.size(); i++) {
         projectors[i].update();
     }

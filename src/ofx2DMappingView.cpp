@@ -32,15 +32,15 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     save_btn.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
     save_btn.setup("save");
-    main_panel.add(&save_btn);
+    main_panel.add(save_btn);
 
     import_btn.addListener(this, &ofx2DMappingView::importSvg);
     import_btn.setup("import svg");
-    main_panel.add(&import_btn);
+    main_panel.add(import_btn);
 
     edit_mode_btn.addListener(this, &ofx2DMappingView::setEditMode);
     edit_mode_btn.setup("direct edit", direct_edit);
-    main_panel.add(&edit_mode_btn);
+    main_panel.add(edit_mode_btn);
 
     //CALIBRATION OPTIONS
 
@@ -50,7 +50,7 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
     calibration_options.add(ctrl->getCalBorder());
     calibration_options.add(ctrl->getCalGrey());
 
-    main_panel.add(&calibration_options);
+    main_panel.add(calibration_options);
 
     //OBJECT LIST PANEL
 
@@ -58,14 +58,19 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     add_buttons_panel.setup("ADD MAPPING OBJECTS");
 
-    add_button_params.clear();
     vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
     for(uint i = 0; i < options.size(); i++) {
-        add_button_params.push_back(ofParameter<bool>("add " + options.at(i)->name, false));
-        add_buttons_panel.add(add_button_params.at(i));
+        ofxToggle::Config config;
+        ofColor c = options.at(i)->color;
+        if(c.getBrightness() < 200){
+            c.setBrightness(200);
+        }
+        config.textColor = c;
+        add_buttons_panel.add(options.at(i)->pleaseCopyMe.set("add " + options.at(i)->name, false), config);
+        options.at(i)->pleaseCopyMe.addListener(this, &ofx2DMappingView::addedObject);
     }
 
-    list_panel.add(&add_buttons_panel);
+    list_panel.add(add_buttons_panel);
 
     //LIST MANIPULATION OPTIONS
 
@@ -73,26 +78,25 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     select_all_btn.addListener(this, &ofx2DMappingView::selectAllObjects);
     select_all_btn.setup("select all");
-    list_options.add(&select_all_btn);
+    list_options.add(select_all_btn);
 
     deselect_all_btn.addListener(this, &ofx2DMappingView::deselectAllObjects);
     deselect_all_btn.setup("deselect all");
-    list_options.add(&deselect_all_btn);
+    list_options.add(deselect_all_btn);
 
     delete_all_btn.addListener(this, &ofx2DMappingView::removeAllObjects);
     delete_all_btn.setup("delete all");
-    list_options.add(&delete_all_btn);
+    list_options.add(delete_all_btn);
 
-    list_panel.add(&list_options);
+    list_panel.add(list_options);
 
     //OBJECT LIST
 
     object_list.setup("MAPPING OBJECT LIST");
     ofAddListener(object_list.elementRemoved, this, &ofx2DMappingView::removeForm);
     ofAddListener(object_list.elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
-    object_list.setHeaderBackgroundColor(ofColor::black);
 
-    list_panel.add(&object_list);
+    list_panel.add(object_list);
 
     setSubpanelPositions();
 
@@ -104,15 +108,6 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 void ofx2DMappingView::update() {
 
     mapping_forms.update();
-
-    for(uint i = 0; i < add_button_params.size(); i++) {
-        if(add_button_params.at(i)) {
-            ctrl->getProjector(0)->copyShape(ctrl->getOptions().at(i));
-            mapping_forms.updateForms();
-            updateObjectList();
-            add_button_params.at(i) = false;
-        }
-    }
 
 }
 
@@ -140,6 +135,14 @@ void ofx2DMappingView::draw(ofPoint pos) {
 
 }
 
+void ofx2DMappingView::addedObject(bool & clickstart){
+    if(clickstart){
+        ctrl->update();
+        mapping_forms.updateForms();
+        updateObjectList();
+    }
+}
+
 void ofx2DMappingView::updateObjectList() {
 
     object_list.clear();
@@ -150,11 +153,15 @@ void ofx2DMappingView::updateObjectList() {
 
         ofPtr<ofx2DMappingObject> mq = p->getMappingObject(i);
         if(mq) {
-//            string objname = mq->name;
             //insert toggles at beginning of list
             mq->editable.setName(mq->name);
-            object_list.add(mq->editable,false);
-            object_list.getListItems().at(0)->setBorderColor(mq->color);
+            ofColor c = mq->color;
+            if(c.getBrightness() < 200){
+                c.setBrightness(200);
+            }
+            ofxToggle::Config config;
+            config.textColor = c;
+            object_list.add(mq->editable, config, false);
         }
     }
 }

@@ -91,7 +91,7 @@ class ofx2DMappingController {
         ofRectangle                 getOutputRectangle();
         void                        setOutputRectangle(ofRectangle r);
 
-    private:
+    protected:
 
         ofPtr<ofx2DMappingObject> createShape(ofx2DMappingProjector* projector, string type, string name);
 
