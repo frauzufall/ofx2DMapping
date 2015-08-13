@@ -5,6 +5,7 @@
 #include "ofxTriangle.h"
 #include "ofxXmlSettings.h"
 #include "ofx2DMappingHelper.h"
+#include "IDGenerator.h"
 
 typedef ofPtr<ofFbo> ofFbo_ptr;
 typedef ofPtr<ofxXmlSettings> ofxXmlSettings_ptr;
@@ -12,12 +13,16 @@ typedef ofPtr<ofxXmlSettings> ofxXmlSettings_ptr;
 class ofx2DMappingObject {
 public:
 
+    string id;
     string  nature;
 
     string name;
     ofColor color;
 
     ofx2DMappingObject() {
+        stringstream id_str;
+        id_str << IDGenerator::getInstance().next();
+        id = id_str.str();
         newpos = true;
         newitem = true;
 
@@ -59,7 +64,7 @@ public:
 
     virtual void update(float w, float h) = 0;
 
-    void gaussian_elimination(float *input, int n)
+    static void gaussian_elimination(float *input, int n)
     {
         // ported to c from pseudocode in
         // http://en.wikipedia.org/wiki/Gaussian_elimination
@@ -124,7 +129,7 @@ public:
         }
     }
 
-    void findHomography(ofPoint src_norm[4], ofPoint dst_norm[4], float homography[16], bool points_normalized, float w, float h)
+    static void findHomography(ofPoint src_norm[4], ofPoint dst_norm[4], float homography[16], bool points_normalized, float w, float h)
     {
 
         ofPoint src[4];
