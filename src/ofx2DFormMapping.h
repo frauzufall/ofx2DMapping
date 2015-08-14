@@ -15,9 +15,32 @@ struct draggableVertex : public ofPoint {
 
 struct mappableShape {
 
+    mappableShape(){
+        dst_bg.setFilled(true);
+        dst_border.setFilled(false);
+        dst_border.setStrokeWidth(2);
+        src_border.setFilled(false);
+        src_border.setStrokeWidth(2);
+        dst_drag_unset.setFilled(false);
+        dst_drag_unset.setStrokeWidth(2);
+        dst_drag_set.setFilled(true);
+        src_drag_unset.setFilled(false);
+        src_drag_unset.setStrokeWidth(2);
+        src_drag_unset.setStrokeColor(ofColor(255,255,255,200));
+        src_drag_set.setFilled(true);
+        src_drag_set.setFillColor(ofColor(255,255,255,200));
+    }
+
     vector <draggableVertex> polyline, src;
     vector<ofPoint> dst;
     ofColor color;
+    ofPath dst_border;
+    ofPath dst_bg;
+    ofPath dst_drag_unset;
+    ofPath dst_drag_set;
+    ofPath src_border;
+    ofPath src_drag_unset;
+    ofPath src_drag_set;
 
 };
 
@@ -38,8 +61,8 @@ public:
     void rebuild();
     void updateForms();
 
-    void update();
-    void draw(bool show_source);
+    void generateDraw();
+    void render();
 
     void setMappingBackground(ofFbo_ptr &fbo);
     void setOutputForm(ofRectangle rect);
@@ -47,7 +70,12 @@ public:
 
     void setEditMode(bool direct_edit);
 
-    void setSize(float w, float h);
+    virtual void setPosition(float x, float y);
+    virtual void setSize(float w, float h);
+    virtual void setShape(float x, float y, float w, float h);
+    virtual void setShape(ofRectangle r);
+
+    ofParameter<bool>& getShowSource();
 
 
 
@@ -64,10 +92,6 @@ private:
     ofPoint removeZoomRelativeOfDstRect(ofPoint p);
 
     bool direct_edit;
-
-    ofFbo_ptr mapping_bg;
-    ofFbo mapping_front;
-    ofTexture* source_bg;
 
     vector<mappableShape> shapes;
     ofRectangle control_rect, control_rect_backup;
@@ -87,5 +111,13 @@ private:
     ofPoint last_mouse;
 
     int mapping_margin;
+
+    ofParameter<bool> show_source;
+
+    //gui elements
+    ofFbo_ptr mapping_bg;
+    ofFbo mapping_front;
+    ofTexture* source_bg;
+    ofPath source_empty_bg;
 
 };

@@ -7,14 +7,16 @@ ofx2DFormMapping::ofx2DFormMapping(): ofxPanel() {
     zoom_speed = 0.1;
     dragging_dst = false;
     mapping_margin = 10;
+    show_source.set("show source", true);
+    parent_projector = nullptr;
+    source_empty_bg.setFillColor(ofColor(0,0,0,100));
+    source_empty_bg.setFilled(true);
 
 }
 
 void ofx2DFormMapping::setup(string title, ofx2DMappingProjector *parent_projector, ofxSortableList *parent_list, float w, float h) {
     ofxPanel::setup(title);
     ofxPanel::setSize(w, h);
-    control_rect = this->getShape();
-    control_rect_backup = control_rect;
     this->parent_projector = parent_projector;
     this->parent_list = parent_list;
 }
@@ -24,51 +26,54 @@ void ofx2DFormMapping::setMappingRects() {
     int margin = 10;
     int header = 20;
 
-    if(direct_edit) {
-        mapping_rect_dst = mapping_rect_output;
-        mapping_rect_src.x = control_rect.x+margin;
-        mapping_rect_src.y = control_rect.y+margin+header;
-        mapping_rect_src.height = control_rect.height-margin-header;
-        float output_ratio = parent_projector->outputWidth()/parent_projector->outputHeight();
-        float output_ratio_inv = parent_projector->outputHeight()/parent_projector->outputWidth();
-        mapping_rect_src.width = mapping_rect_src.height*output_ratio;
-        if(mapping_rect_src.width > control_rect.width-2*margin) {
-            mapping_rect_src.width = control_rect.width-2*margin;
-            mapping_rect_src.height = mapping_rect_src.width*output_ratio_inv;
+    if(parent_projector){
+        if(direct_edit) {
+            mapping_rect_dst = mapping_rect_output;
+            mapping_rect_src.x = this->getPosition().x+margin;
+            mapping_rect_src.y = this->getPosition().y+margin+header;
+            mapping_rect_src.height = this->getHeight()-margin-header;
+            float output_ratio = parent_projector->outputWidth()/parent_projector->outputHeight();
+            float output_ratio_inv = parent_projector->outputHeight()/parent_projector->outputWidth();
+            mapping_rect_src.width = mapping_rect_src.height*output_ratio;
+            if(mapping_rect_src.width > this->getWidth()-2*margin) {
+                mapping_rect_src.width = this->getWidth()-2*margin;
+                mapping_rect_src.height = mapping_rect_src.width*output_ratio_inv;
+            }
+
+            ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
         }
+        else {
+            mapping_rect_dst.x = this->getPosition().x+margin;
+            mapping_rect_dst.y = this->getPosition().y+margin+header;
 
-        ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
-    }
-    else {
-        mapping_rect_dst.x = control_rect.x+margin;
-        mapping_rect_dst.y = control_rect.y+margin+header;
+            mapping_rect_dst.height = this->getHeight()-margin-header;
+            float output_ratio = parent_projector->outputWidth()/parent_projector->outputHeight();
+            float output_ratio_inv = parent_projector->outputHeight()/parent_projector->outputWidth();
+            mapping_rect_dst.width = mapping_rect_dst.height*output_ratio;
+            if(mapping_rect_dst.width > this->getWidth()-2*margin) {
+                mapping_rect_dst.width = this->getWidth()-2*margin;
+                mapping_rect_dst.height = mapping_rect_dst.width*output_ratio_inv;
+            }
 
-        mapping_rect_dst.height = control_rect.height-margin-header;
-        float output_ratio = parent_projector->outputWidth()/parent_projector->outputHeight();
-        float output_ratio_inv = parent_projector->outputHeight()/parent_projector->outputWidth();
-        mapping_rect_dst.width = mapping_rect_dst.height*output_ratio;
-        if(mapping_rect_dst.width > control_rect.width-2*margin) {
-            mapping_rect_dst.width = control_rect.width-2*margin;
-            mapping_rect_dst.height = mapping_rect_dst.width*output_ratio_inv;
+            mapping_rect_src.x = mapping_rect_dst.x;
+            mapping_rect_src.y = mapping_rect_dst.y+mapping_rect_dst.height+13;
+            mapping_rect_src.width = mapping_rect_dst.width/2;
+            float content_ratio = output_ratio_inv;
+        //    float content_ratio = (float)Visuals::get().contentHeight()/(float)Visuals::get().contentWidth();
+        //    float content_ratio_inv = (float)Visuals::get().contentWidth()/(float)Visuals::get().contentHeight();
+            mapping_rect_src.height = mapping_rect_src.width*content_ratio;
+        //    if(mapping_rect_src.height > this->getHeight()*0.8-mapping_rect_dst.height) {
+        //        mapping_rect_src.height = this->getHeight()*0.8-mapping_rect_dst.height;
+        //        mapping_rect_src.width = mapping_rect_src.height*content_ratio_inv;
+        //    }
+
+            ofxPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
+
+            mapping_front.clear();
+            mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
         }
-
-        mapping_rect_src.x = mapping_rect_dst.x;
-        mapping_rect_src.y = mapping_rect_dst.y+mapping_rect_dst.height+13;
-        mapping_rect_src.width = mapping_rect_dst.width/2;
-        float content_ratio = output_ratio_inv;
-    //    float content_ratio = (float)Visuals::get().contentHeight()/(float)Visuals::get().contentWidth();
-    //    float content_ratio_inv = (float)Visuals::get().contentWidth()/(float)Visuals::get().contentHeight();
-        mapping_rect_src.height = mapping_rect_src.width*content_ratio;
-    //    if(mapping_rect_src.height > control_rect.height*0.8-mapping_rect_dst.height) {
-    //        mapping_rect_src.height = control_rect.height*0.8-mapping_rect_dst.height;
-    //        mapping_rect_src.width = mapping_rect_src.height*content_ratio_inv;
-    //    }
-
-        ofxPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
-
-        mapping_front.clear();
-        mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
     }
+
 }
 
 void ofx2DFormMapping::updateForms() {
@@ -140,7 +145,7 @@ void ofx2DFormMapping::updateForms() {
 
     }
 
-    updateSourceBackground();
+    setNeedsRedraw();
 
 }
 
@@ -159,53 +164,117 @@ void ofx2DFormMapping::updateSourceBackground() {
     }
 }
 
-void ofx2DFormMapping::update() {
-
-    if(control_rect.position != this->getPosition()) {
-        control_rect.position = this->getPosition();
-//        control_rect.setWidth(this->getWidth());
-//        control_rect.setHeight(this->getHeight());
-
-        rebuild();
-    }
-
-    updateSourceBackground();
-
-}
-
 void ofx2DFormMapping::rebuild() {
     setMappingRects();
     updateForms();
 }
 
-void ofx2DFormMapping::draw(bool show_source) {
+void ofx2DFormMapping::generateDraw(){
 
-    ofSetColor(42);
-    ofFill();
-    ofDrawRectangle(this->getPosition().x, this->getPosition().y, this->getWidth(), this->getHeight()-2);
+    ofxPanel::generateDraw();
 
-    ofxPanel::draw();
+    updateSourceBackground();
+    source_empty_bg.clear();
+    source_empty_bg.rectangle(mapping_rect_src);
 
-    if(show_source) {
-        //ofDrawRectangle(mapping_rect_src);
-        if(source_bg) {
-            ofSetColor(255,60);
-            source_bg->draw(
-                        mapping_rect_src.x,
-                        mapping_rect_src.y,
-                        mapping_rect_src.width,
-                        mapping_rect_src.height);
-        }
-        else {
-            ofSetColor(0,0,0,100);
-            ofFill();
-            ofDrawRectangle(mapping_rect_src);
-        }
+    if(!direct_edit) {
+
+        //ZOOM TRANSLATION
+
+        translation_dst = zoom_point-zoom_point_scaled+zoom_point_offset;
+        if(translation_dst.x > 0) translation_dst.x = 0;
+        if(translation_dst.y > 0) translation_dst.y = 0;
+        if(translation_dst.x < -addZoom(mapping_rect_dst.getWidth())+mapping_rect_dst.getWidth())
+            translation_dst.x = -addZoom(mapping_rect_dst.getWidth())+mapping_rect_dst.getWidth();
+        if(translation_dst.y < -addZoom(mapping_rect_dst.getHeight())+mapping_rect_dst.getHeight())
+            translation_dst.y = -addZoom(mapping_rect_dst.getHeight())+mapping_rect_dst.getHeight();
     }
 
-    ofEnableAlphaBlending();
+    for (uint i = 0; i < shapes.size(); i++) {
 
-    ofSetLineWidth(2);
+        if(shapes[i].polyline.size() > 0){
+
+            shapes[i].dst_bg.setFillColor(ofColor(shapes[i].color,40));
+
+            if(direct_edit) {
+                shapes[i].dst_border.setStrokeColor(ofColor(255));
+                shapes[i].dst_drag_unset.setStrokeColor(ofColor(255));
+                shapes[i].dst_drag_set.setFillColor(ofColor(255));
+            }else {
+                shapes[i].dst_border.setStrokeColor(ofColor(shapes[i].color,255));
+                shapes[i].dst_drag_unset.setStrokeColor(ofColor(shapes[i].color,255));
+                shapes[i].dst_drag_set.setFillColor(ofColor(shapes[i].color,255));
+            }
+
+            shapes[i].dst_border.clear();
+            shapes[i].dst_bg.clear();
+            shapes[i].dst_drag_unset.clear();
+            shapes[i].dst_drag_set.clear();
+
+            for(uint j = 0; j < shapes[i].polyline.size(); j++) {
+                ofPoint p(addZoom(shapes[i].polyline[j]-mapping_rect_dst.getPosition())+mapping_rect_dst.getPosition());
+                if(j == 0){
+                    shapes[i].dst_border.moveTo(p);
+                    shapes[i].dst_bg.moveTo(p);
+                }else{
+                    shapes[i].dst_border.lineTo(p);
+                    shapes[i].dst_bg.lineTo(p);
+                }
+                if(shapes[i].polyline[j].bOver){
+                    shapes[i].dst_drag_set.moveTo(p);
+                    shapes[i].dst_drag_set.circle(p,6);
+                    shapes[i].dst_drag_set.newSubPath();
+                }else {
+                    shapes[i].dst_drag_unset.moveTo(p);
+                    shapes[i].dst_drag_unset.circle(p,6);
+                    shapes[i].dst_drag_unset.newSubPath();
+                }
+
+            }
+
+            shapes[i].dst_border.close();
+            shapes[i].dst_bg.close();
+
+
+            shapes[i].src_border.setStrokeColor(ofColor(shapes[i].color,255));
+
+            shapes[i].src_border.clear();
+            shapes[i].src_drag_unset.clear();
+            shapes[i].src_drag_set.clear();
+
+            for(uint j = 0; j < shapes[i].src.size(); j++) {
+                ofPoint p(shapes[i].src[j]);
+                if(j == 0){
+                    shapes[i].src_border.moveTo(p);
+                }else{
+                    shapes[i].src_border.lineTo(p);
+                }
+                if(j%2==0){
+                    if (shapes[i].src[j].bOver){
+                        shapes[i].src_drag_set.moveTo(p);
+                        shapes[i].src_drag_set.circle(p,6);
+                        shapes[i].src_drag_set.newSubPath();
+                    }else{
+                        shapes[i].src_drag_unset.moveTo(p);
+                        shapes[i].src_drag_unset.circle(p,6);
+                        shapes[i].src_drag_unset.newSubPath();
+                    }
+                }
+            }
+
+            shapes[i].src_border.close();
+
+        }
+
+    }
+
+}
+
+void ofx2DFormMapping::render() {
+
+    ofxPanel::render();
+
+    ofEnableAlphaBlending();
 
     //draw dst
 
@@ -218,14 +287,6 @@ void ofx2DFormMapping::draw(bool show_source) {
         ofTranslate(-mapping_rect_dst.getPosition());
 
         //ZOOM TRANSLATION
-
-        translation_dst = zoom_point-zoom_point_scaled+zoom_point_offset;
-        if(translation_dst.x > 0) translation_dst.x = 0;
-        if(translation_dst.y > 0) translation_dst.y = 0;
-        if(translation_dst.x < -addZoom(mapping_rect_dst.getWidth())+mapping_rect_dst.getWidth())
-            translation_dst.x = -addZoom(mapping_rect_dst.getWidth())+mapping_rect_dst.getWidth();
-        if(translation_dst.y < -addZoom(mapping_rect_dst.getHeight())+mapping_rect_dst.getHeight())
-            translation_dst.y = -addZoom(mapping_rect_dst.getHeight())+mapping_rect_dst.getHeight();
         ofTranslate(translation_dst);
 
         ofSetColor(255,160);
@@ -252,39 +313,12 @@ void ofx2DFormMapping::draw(bool show_source) {
 
         //draw shape lines and fillings
 
-        for(int j = 0; j < 2; j++) {
-            if(j == 0) {
-                ofFill();
-                ofSetColor(shapes[i].color,40);
-            }
-            else {
-                ofNoFill();
-                if(direct_edit) {
-                    ofSetColor(255);
-                }
-                else {
-                    ofSetColor(shapes[i].color,255);
-                }
+        shapes[i].dst_bg.draw();
+        shapes[i].dst_border.draw();
 
-            }
-            if(!(j == 0 && direct_edit)) {
-                ofBeginShape();
-                for(uint j = 0; j < shapes[i].polyline.size(); j++) {
-                    ofVertex(addZoom(shapes[i].polyline[j].x-mapping_rect_dst.x)+mapping_rect_dst.x,
-                             addZoom(shapes[i].polyline[j].y-mapping_rect_dst.y)+mapping_rect_dst.y);
-                }
-                ofEndShape(true);
-            }
-        }
-
-        //draw dragging points
-        ofSetColor(255,255,255,200);
         if(parent_projector->getMappingObject(i)->editable) {
-            for(uint j = 0; j < shapes[i].polyline.size(); j++) {
-                if (shapes[i].polyline[j].bOver) ofFill();
-                else ofNoFill();
-                ofDrawCircle(addZoom(shapes[i].polyline[j]-mapping_rect_dst.getPosition())+mapping_rect_dst.getPosition(),6);
-            }
+            shapes[i].dst_drag_unset.draw();
+            shapes[i].dst_drag_set.draw();
         }
 
     }
@@ -297,30 +331,26 @@ void ofx2DFormMapping::draw(bool show_source) {
 
     //draw src
 
-    for (uint i = 0; i < shapes.size(); i++) {
-
-        ofNoFill();
-        ofSetColor(shapes[i].color,255);
-        ofBeginShape();
-
-        for(uint j = 0; j < shapes[i].src.size(); j++) {
-            ofVertex(shapes[i].src[j].x, shapes[i].src[j].y);
+    if(show_source) {
+        source_empty_bg.draw();
+        if(source_bg) {
+            ofSetColor(255,60);
+            source_bg->draw(
+                        mapping_rect_src.x,
+                        mapping_rect_src.y,
+                        mapping_rect_src.width,
+                        mapping_rect_src.height);
         }
-        ofEndShape(true);
+        for (uint i = 0; i < shapes.size(); i++) {
 
-        //draw dragging points
-        ofSetColor(255,255,255,200);
-        if(parent_projector->getMappingObject(i)->editable) {
-            for(uint j = 0; j < shapes[i].src.size(); j++) {
+            shapes[i].src_border.draw();
 
-                if (shapes[i].src[j].bOver) ofFill();
-                else ofNoFill();
-                if(j%2==0)
-                    ofDrawCircle(shapes[i].src[j].x, shapes[i].src[j].y,6);
-
+            if(parent_projector->getMappingObject(i)->editable) {
+                shapes[i].src_drag_unset.draw();
+                shapes[i].src_drag_set.draw();
             }
-        }
 
+        }
     }
 
 }
@@ -335,9 +365,15 @@ bool ofx2DFormMapping::mouseMoved(ofMouseEventArgs& args) {
             float diffy = mouse.y - zoomed_p.y;
             float dist = sqrt(diffx*diffx + diffy*diffy);
             if (dist < shapes[i].polyline[j].radius){
-                shapes[i].polyline[j].bOver = true;
+                if(!shapes[i].polyline[j].bOver){
+                    shapes[i].polyline[j].bOver = true;
+                    setNeedsRedraw();
+                }
             } else {
-                shapes[i].polyline[j].bOver = false;
+                if(shapes[i].polyline[j].bOver){
+                    shapes[i].polyline[j].bOver = false;
+                    setNeedsRedraw();
+                }
             }
         }
         for (uint j = 0; j < shapes[i].src.size(); j++){
@@ -345,9 +381,15 @@ bool ofx2DFormMapping::mouseMoved(ofMouseEventArgs& args) {
             float diffy = mouse.y - shapes[i].src[j].y;
             float dist = sqrt(diffx*diffx + diffy*diffy);
             if (dist < shapes[i].src[j].radius){
-                shapes[i].src[j].bOver = true;
+                if(!shapes[i].src[j].bOver){
+                    shapes[i].src[j].bOver = true;
+                    setNeedsRedraw();
+                }
             } else {
-                shapes[i].src[j].bOver = false;
+                if(shapes[i].src[j].bOver){
+                    shapes[i].src[j].bOver = false;
+                    setNeedsRedraw();
+                }
             }
         }
     }
@@ -431,6 +473,7 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
                 obj->newpos = true;
                 ofColor c = parent_list->getControl(shapes.size()-1-i)->getFillColor();
                 parent_list->getControl(shapes.size()-1-i)->setBackgroundColor(c);
+                setNeedsRedraw();
             }
         }
 
@@ -493,6 +536,7 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
                     }
 
                     cshape->newpos = true;
+                    setNeedsRedraw();
                 }
             }
 
@@ -503,6 +547,7 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
     if(dragging_dst) {
         zoom_point_offset += mouse - last_mouse;
         last_mouse = mouse;
+        setNeedsRedraw();
     }
 
     return ofxPanel::mouseDragged(args);
@@ -525,6 +570,7 @@ bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
                 if(editable) {
                     shapes[i].polyline[j].bBeingDragged = true;
                     on_element = true;
+                    break;
                 }
             } else {
                 shapes[i].polyline[j].bBeingDragged = false;
@@ -537,6 +583,7 @@ bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
             if (dist < shapes[i].src[j].radius){
                 if(editable) {
                     shapes[i].src[j].bBeingDragged = true;
+                    break;
                 }
             } else {
                 shapes[i].src[j].bBeingDragged = false;
@@ -574,6 +621,7 @@ bool ofx2DFormMapping::mouseScrolled(ofMouseEventArgs &args) {
 
     if(!direct_edit && mapping_rect_dst.inside(ofGetMouseX(), ofGetMouseY())) {
         setZoomFactor(args.y);
+        setNeedsRedraw();
     }
 
     return ofxPanel::mouseScrolled(args);
@@ -586,17 +634,16 @@ void ofx2DFormMapping::setMappingBackground(ofFbo_ptr &fbo) {
 void ofx2DFormMapping::setEditMode(bool direct_edit) {
     this->direct_edit = direct_edit;
     if(direct_edit) {
-        control_rect_backup = control_rect;
         setZoomFactor(0);
-    }
-    else {
-        control_rect = control_rect_backup;
     }
     rebuild();
 }
 
 void ofx2DFormMapping::setOutputForm(float x, float y, float w, float h) {
-    if(x != mapping_rect_output.x || y != mapping_rect_output.y || w != mapping_rect_output.width || h != mapping_rect_output.height) {
+    if(x != mapping_rect_output.x
+            || y != mapping_rect_output.y
+            || w != mapping_rect_output.width
+            || h != mapping_rect_output.height) {
         mapping_rect_output = ofRectangle(x,y,w,h);
         rebuild();
     }
@@ -658,8 +705,24 @@ ofPoint ofx2DFormMapping::removeZoom(ofPoint p) {
     return p/(1+zoom_factor*zoom_speed);
 }
 
+void ofx2DFormMapping::setPosition(float x, float y) {
+    setShape(x, y, this->getWidth(), this->getHeight());
+}
+
 void ofx2DFormMapping::setSize(float w, float h) {
-    ofxPanel::setSize(w,h);
-    control_rect = this->getShape();
+    setShape(this->getPosition().x, this->getPosition().y, w, h);
+}
+
+void ofx2DFormMapping::setShape(ofRectangle r) {
+    setShape(r.x, r.y, r.width, r.height);
+}
+
+void ofx2DFormMapping::setShape(float x, float y, float w, float h) {
+    b.set(x, y, w, h);
+    sizeChangedE.notify(this);
     rebuild();
+}
+
+ofParameter<bool>& ofx2DFormMapping::getShowSource(){
+    return show_source;
 }

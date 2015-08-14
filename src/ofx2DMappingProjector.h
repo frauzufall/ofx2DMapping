@@ -42,18 +42,7 @@ public:
     ofPtr<ofx2DMappingObject> getFirstImageShape();
 
     template <class T>
-    vector<ofPtr<T>> getShapesByClass() {
-        vector<ofPtr<T>> res;
-        res.clear();
-        ofPtr<T> mo;
-        for(uint i = 0; i < shapeCount(); i++) {
-            mo = dynamic_pointer_cast<T>(getMappingObject(i));
-            if(mo) {
-                res.push_back(mo);
-            }
-        }
-        return res;
-    }
+    vector<ofPtr<T>> getShapesByClass();
 
     ofMatrix4x4 getMatrixOfImageAtPoint(ofPoint p);
 
@@ -76,12 +65,19 @@ public:
     void                        importSvg(string file);
     void                        reloadLinesFromRaw();
 
-    ofParameter<float>			outputWidth();
-    ofParameter<float>			outputHeight();
+    ofParameter<float>&			outputWidth();
+    ofParameter<float>&			outputHeight();
+
+    ofPoint inOutput(ofPoint orig);
+
+    ofParameter<bool> &getUsingCam();
+    ofPoint inCameraView(ofPoint orig);
+    ofPoint (&getCamera())[4];
+    void setCamera(ofPoint (&arr)[4]);
 
 private:
 
-    float                       output_w, output_h;
+    ofParameter<float> output_w, output_h;
 
     ofPtr<ofxSVG>                  _svg;
     ofPaths_ptr                 _paths;
@@ -94,6 +90,23 @@ private:
 
     ofFbo_ptr               input_fbo;
 
+    ofPoint                 camera[4];
+    ofMatrix4x4             camera_homography;
+
+    ofParameter<bool>           use_cam;
+
 };
 
-
+template <class T>
+vector<ofPtr<T>> ofx2DMappingProjector::getShapesByClass() {
+    vector<ofPtr<T>> res;
+    res.clear();
+    ofPtr<T> mo;
+    for(uint i = 0; i < shapeCount(); i++) {
+        mo = dynamic_pointer_cast<T>(getMappingObject(i));
+        if(mo) {
+            res.push_back(mo);
+        }
+    }
+    return res;
+}

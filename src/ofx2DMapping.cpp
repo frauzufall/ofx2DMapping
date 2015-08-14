@@ -17,9 +17,6 @@ void ofx2DMapping::setup(string mapping_path) {
 
 void ofx2DMapping::update() {
     ctrl.update();
-    if(show_controls) {
-        view.update();
-    }
 }
 
 ofx2DMappingController* ofx2DMapping::getControl() {
@@ -41,7 +38,7 @@ void ofx2DMapping::draw() {
 
 void ofx2DMapping::setOutputShape(float x, float y, float width, float height) {
     ctrl.setOutputRectangle(ofRectangle(x,y,width,height));
-    view.getFormMapping()->setOutputForm(x,y,width,height);
+//    view.getFormMapping()->setOutputForm(x,y,width,height);
 }
 
 void ofx2DMapping::setControlShape(float x, float y, float width, float height) {

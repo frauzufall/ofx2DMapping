@@ -1,11 +1,9 @@
 #include "ofx2DMappingView.h"
 
-ofx2DMappingView::ofx2DMappingView() {
+ofx2DMappingView::ofx2DMappingView():ofxGuiPage() {
 
-    control_rect.position = ofPoint(0,0);
     zoom = 1;
     zoom_pos = ofPoint(0.5,0.5);
-    show_source = true;
     direct_edit = false;
 
 }
@@ -15,11 +13,6 @@ void ofx2DMappingView::setControl(ofx2DMappingController *ctrl) {
 }
 
 void ofx2DMappingView::setup(float x, float y, float w, float h) {
-
-    control_rect.x = x;
-    control_rect.y = y;
-    control_rect.width= w;
-    control_rect.height= h;
 
     //MAPPING RECT PANEL
     mapping_forms.setup("MAPPING FORMS", ctrl->getProjector(0), &object_list, w, h);
@@ -98,40 +91,18 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     list_panel.add(object_list);
 
+    ofxGuiPage::setup("Mapping");
+    setShowHeader(false);
+    add(main_panel);
+    add(list_panel);
+    add(mapping_forms);
+
+    setShape(x,y,w,h);
+
     setSubpanelPositions();
 
     updateObjectList();
 
-
-}
-
-void ofx2DMappingView::update() {
-
-    mapping_forms.update();
-
-}
-
-void ofx2DMappingView::draw() {
-    draw(control_rect.getPosition());
-}
-
-void ofx2DMappingView::draw(ofPoint pos) {
-
-    if(pos != control_rect.position) {
-        control_rect.position = pos;
-        mapping_forms.setPosition(control_rect.x, mapping_forms.getPosition().y);
-        mapping_forms.rebuild();
-        setSubpanelPositions();
-    }
-
-    ofPushStyle();
-
-    mapping_forms.draw(show_source);
-
-    main_panel.draw();
-    list_panel.draw();
-
-    ofPopStyle();
 
 }
 
@@ -200,15 +171,22 @@ void ofx2DMappingView::reorderForm(MovingElementData &data) {
 
 void ofx2DMappingView::setSubpanelPositions() {
     float margin = 10;
+    ofPoint pos = this->getPosition();
+    main_panel.sizeChangedE.disable();
+    list_panel.sizeChangedE.disable();
+    mapping_forms.sizeChangedE.disable();
     main_panel.setPosition(
-                control_rect.x+margin,
-                control_rect.y+margin);
+                pos.x+margin,
+                pos.y+margin);
     list_panel.setPosition(
-                control_rect.x+margin,
-                control_rect.y+margin+main_panel.getHeight()+margin*2);
+                pos.x+margin,
+                pos.y+margin+main_panel.getHeight()+margin*2);
     mapping_forms.setPosition(
                 main_panel.getPosition().x + main_panel.getWidth()+margin,
-                control_rect.y+margin);
+                pos.y+margin);
+    main_panel.sizeChangedE.enable();
+    list_panel.sizeChangedE.enable();
+    mapping_forms.sizeChangedE.enable();
 }
 
 void ofx2DMappingView::setMappingBackground(ofFbo_ptr fbo) {
@@ -216,7 +194,7 @@ void ofx2DMappingView::setMappingBackground(ofFbo_ptr fbo) {
 }
 
 void ofx2DMappingView::showSource(bool show) {
-    show_source = show;
+    mapping_forms.getShowSource().set(show);
 }
 
 void ofx2DMappingView::setEditMode(bool &direct_edit) {
@@ -249,13 +227,19 @@ void ofx2DMappingView::removeAllObjects() {
     updateObjectList();
 }
 
-ofRectangle ofx2DMappingView::getShape() {
-    return control_rect;
+void ofx2DMappingView::setSize(float width, float height) {
+    setShape(this->getPosition().y, this->getPosition().y, width, height);
 }
 
 void ofx2DMappingView::setShape(ofRectangle shape) {
-    control_rect = shape;
+    setShape(shape.x, shape.y, shape.width, shape.height);
+}
+
+void ofx2DMappingView::setShape(float x, float y, float width, float height) {
     int margin = 10;
-    mapping_forms.setSize(control_rect.getWidth()-object_list.getWidth()-margin*3, control_rect.getHeight()-main_panel.getHeight()-margin*3);
+    mapping_forms.sizeChangedE.disable();
+    mapping_forms.setSize(width-object_list.getWidth()-margin*3, height-main_panel.getHeight()-margin*3);
+    mapping_forms.sizeChangedE.enable();
     setSubpanelPositions();
+    ofxGuiPage::setShape(x,y,width,height);
 }

@@ -32,7 +32,7 @@ class ofx2DMappingController {
         void                        drawCalibration(ofx2DMappingProjector *p);
 
         void						addProjector(float w, float h);
-        ofx2DMappingProjector*                  getProjector(int id);
+        ofx2DMappingProjector*      getProjector(int id);
 
         ofPoint                     getPointInMappedArea(ofPoint last_p,ofPoint next_p);
         ofPoint                     intersectionPointPolyline(ofPoint last_p, ofPoint next_p, ofPolyline polyline);
@@ -46,19 +46,12 @@ class ofx2DMappingController {
         ofParameter<float>          &getCalBorder();
         ofParameter<int>            &getCalGrey();
 
-        float						contentWidth();
-        float						contentHeight();
-        float						controlWidth();
-        float						controlHeight();
-        float						vidMaxWidth();
-        float						vidMaxHeight();
-
-        void						setContentWidth(float val);
-        void						setContentHeight(float val);
-        void						setControlWidth(float val);
-        void						setControlHeight(float val);
-        void						setVidMaxWidth(float val);
-        void						setVidMaxHeight(float val);
+        ofParameter<float> & contentWidth();
+        ofParameter<float> & contentHeight();
+        ofParameter<float> & controlWidth();
+        ofParameter<float> & controlHeight();
+        ofParameter<float> & vidMaxWidth();
+        ofParameter<float> & vidMaxHeight();
 
         ofFbo_ptr &getOutput();
         ofFbo_ptr					getArea();
@@ -76,6 +69,7 @@ class ofx2DMappingController {
         void                        saveMappingAsPng();
         void                        saveMappingAsSvg();
         void                        importSvg();
+        void                        importSvg(const std::string path);
 
         void addTemplate(ofPtr<ofx2DMappingObject> obj);
         template <class T>
@@ -88,8 +82,8 @@ class ofx2DMappingController {
 
         vector<ofPtr<ofx2DMappingObject>> getOptions();
 
-        ofRectangle                 getOutputRectangle();
-        void                        setOutputRectangle(ofRectangle r);
+        ofRectangle    getOutputRectangle();
+        void           setOutputRectangle(ofRectangle r);
 
     protected:
 
@@ -99,9 +93,9 @@ class ofx2DMappingController {
 
         string xml_mapping, svg_mapping, png_mapping;
 
-        float content_w, content_h;
-        float control_w, control_h;
-        float vid_max_w, vid_max_h;
+        ofParameter<float> content_w, content_h;
+        ofParameter<float> control_w, control_h;
+        ofParameter<float> vid_max_w, vid_max_h;
 
         vector<ofx2DMappingProjector>			projectors;
         GLfloat						matrix[16];

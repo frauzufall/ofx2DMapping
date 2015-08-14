@@ -11,6 +11,12 @@ ofx2DMappingProjector::ofx2DMappingProjector(float w, float h) {
     plane[2] = ofPoint(1, 1, 0);
     plane[3] = ofPoint(0, 1, 0);
 
+    camera[0] = ofPoint(0, 0, 0);
+    camera[1] = ofPoint(1, 0, 0);
+    camera[2] = ofPoint(1, 1, 0);
+    camera[3] = ofPoint(0, 1, 0);
+    camera_homography.makeIdentityMatrix();
+
     _svg = ofPtr<ofxSVG>(new ofxSVG());
     _outlines = ofPolylines_ptr(new vector<ofPolyline>());
     _outlines_raw = ofPolylines_ptr(new vector<ofPolyline>());
@@ -19,12 +25,13 @@ ofx2DMappingProjector::ofx2DMappingProjector(float w, float h) {
     _outlines_raw->clear();
     _paths->clear();
 
-    output_w = w;
-    output_h = h;
+    output_w.set("output width", w);
+    output_h.set("output height", h);
 
     RegisterInFactory<ofx2DMappingObject, ofx2DMappingFbo> register1(ofx2DMappingFbo().nature);
     RegisterInFactory<ofx2DMappingObject, ofx2DMappingColorShape> register2(ofx2DMappingColorShape().nature);
     RegisterInFactory<ofx2DMappingObject, ofx2DMappingImage> register3(ofx2DMappingImage().nature);
+    RegisterInFactory<ofx2DMappingObject, ofx2DMappingPoint> register4(ofx2DMappingPoint().nature);
 
 }
 
@@ -55,6 +62,18 @@ void ofx2DMappingProjector::update() {
 
 ofPoint ofx2DMappingProjector::relative(ofPoint orig) {
     return orig*getMatrixOfImageAtPoint(orig);
+}
+
+ofPoint ofx2DMappingProjector::inOutput(ofPoint orig) {
+    ofPoint res = orig;
+    res.x*=outputWidth();
+    res.y*=outputHeight();
+    return res;
+}
+
+ofPoint ofx2DMappingProjector::inCameraView(ofPoint orig) {
+    ofPoint res = orig*camera_homography;
+    return res;
 }
 
 ofPtr<ofx2DMappingObject> ofx2DMappingProjector::addShape(ofPtr<ofx2DMappingObject> obj, bool swap) {
@@ -162,20 +181,6 @@ ofPtr<ofx2DMappingObject> ofx2DMappingProjector::getFirstImageShape() {
     }
     return mq_res;
 }
-
-//template <class T>
-//vector<ofPtr<T>> Projector::getShapesByClass() {
-//    vector<ofPtr<T>> res;
-//    res.clear();
-//    ofPtr<T> mo;
-//    for(uint i = 0; i < shapeCount(); i++) {
-//        mo = dynamic_pointer_cast<T>(getShape(i));
-//        if(mo) {
-//            res.push_back(mo);
-//        }
-//    }
-//    return res;
-//}
 
 ofMatrix4x4 ofx2DMappingProjector::getMatrixOfImageAtPoint(ofPoint p) {
     vector<ofPtr<ofx2DMappingContentShape>> images = getShapesByClass<ofx2DMappingContentShape>();
@@ -492,11 +497,26 @@ void ofx2DMappingProjector::exportSvg(string path) {
     xml.saveFile(path);
 }
 
-ofParameter<float> ofx2DMappingProjector::outputWidth() {
+ofParameter<float> &ofx2DMappingProjector::outputWidth() {
     return output_w;
 }
 
-ofParameter<float> ofx2DMappingProjector::outputHeight() {
+ofParameter<float> &ofx2DMappingProjector::outputHeight() {
     return output_h;
 }
 
+ofParameter<bool>& ofx2DMappingProjector::getUsingCam() {
+    return use_cam;
+}
+ofPoint (&ofx2DMappingProjector::getCamera())[4] {
+   return camera;
+}
+
+void ofx2DMappingProjector::setCamera(ofPoint (&arr)[4]){
+    camera[0] = arr[0];
+    camera[1] = arr[1];
+    camera[2] = arr[2];
+    camera[3] = arr[3];
+    //TODO check width and height parameters
+    ofx2DMappingObject::findHomography(camera,plane, (GLfloat*)camera_homography.getPtr(),true, outputWidth(), outputHeight());
+}

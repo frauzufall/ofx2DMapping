@@ -4,14 +4,11 @@
 #include "ofxSortableList.h"
 #include "ofx2DFormMapping.h"
 
-class ofx2DMappingView {
+class ofx2DMappingView : public ofxGuiPage {
 
 public:
     ofx2DMappingView();
     void setup(float x, float y, float w, float h);
-    void update();
-    void draw();
-    void draw(ofPoint pos);
     void setMappingBackground(ofFbo_ptr fbo);
     void showSource(bool show);
     void setEditMode(bool &direct_edit);
@@ -22,8 +19,9 @@ public:
 
     ofx2DFormMapping* getFormMapping();
 
-    void setShape(ofRectangle shape);
-    ofRectangle getShape();
+    virtual void setSize(float width, float height);
+    virtual void setShape(ofRectangle shape);
+    virtual void setShape(float x, float y, float width, float height);
 
 protected:
 
@@ -37,9 +35,7 @@ protected:
 
     void addedObject(bool&clickstart);
 
-    bool show_source, direct_edit;
-
-    ofRectangle control_rect;
+    bool direct_edit;
 
     ofxSortableList object_list;
 

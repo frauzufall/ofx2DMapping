@@ -30,11 +30,18 @@ ofx2DMappingController::ofx2DMappingController() {
 
     available_shapes.clear();
 
+    output_rectangle.x = 0;
+    output_rectangle.y = 0;
+    output_rectangle.width = ofGetWindowWidth();
+    output_rectangle.height = ofGetWindowHeight();
+
     ofRegisterKeyEvents(this);
 
 }
 
 void ofx2DMappingController::setup(string xml_path) {
+
+    cout << xml_path << endl;
 
     xml_mapping = xml_path;
     ofFile xml = ofFile(xml_path);
@@ -72,21 +79,21 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
         xml->pushTag("content", 0);
 
-        content_w		= xml->getValue("width", 640.);
-        content_h		= xml->getValue("height", 480.);
+        content_w.set(xml->getValue("width", 640.));
+        content_h.set(xml->getValue("height", 480.));
 
         xml->popTag();
 
         xml->pushTag("control", 0);
 
-        control_w		= xml->getValue("width", 1024.);
-        control_h		= xml->getValue("height", 768.);
+        control_w.set(xml->getValue("width", 1024.));
+        control_h.set(xml->getValue("height", 768.));
 
         xml->popTag();
         xml->pushTag("video", 0);
 
-        vid_max_w		= xml->getValue("max_width", 640.);
-        vid_max_h		= xml->getValue("max_height", 480.);
+        vid_max_w.set(xml->getValue("max_width", 640.));
+        vid_max_h.set(xml->getValue("max_height", 480.));
 
         xml->popTag();
 
@@ -318,114 +325,114 @@ ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint nex
     ofPoint res_norm;
     ofPoint res = next_p;
     //TODO rewrite to fit new model
-//    if(next_p.x < 0 || next_p.y < 0)
-//        res = last_p;
-//    if(next_p.x > output_w || next_p.y > output_h)
-//        res = last_p;
+    if(next_p.x < 0 || next_p.y < 0)
+        res = last_p;
+    if(next_p.x > p->outputWidth() || next_p.y > p->outputHeight())
+        res = last_p;
 
-//    vector<MappingShape_ptr> windows_next_inside;
-//    vector<MappingShape_ptr> paintings_next_inside;
-//    vector<MappingShape_ptr> paintings_last_inside;
+    vector<ofPtr<ofx2DMappingShape>> windows_next_inside;
+    vector<ofPtr<ofx2DMappingShape>> paintings_next_inside;
+    vector<ofPtr<ofx2DMappingShape>> paintings_last_inside;
 
-//    windows_next_inside.clear();
-//    paintings_next_inside.clear();
-//    paintings_last_inside.clear();
+    windows_next_inside.clear();
+    paintings_next_inside.clear();
+    paintings_last_inside.clear();
 
-//    res_norm.x = res.x/output_w;
-//    res_norm.y = res.y/output_h;
+    res_norm.x = res.x/p->outputWidth();
+    res_norm.y = res.y/p->outputHeight();
 
-//    for(uint i = 0; i < getProjector(0)->shapeCount(); i++) {
+    for(uint i = 0; i < getProjector(0)->shapeCount(); i++) {
 
-//        MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(getProjector(0)->getShape(i));
+        ofPtr<ofx2DMappingShape> shape = std::dynamic_pointer_cast<ofx2DMappingShape>(getProjector(0)->getMappingObject(i));
 
-//        if(shape) {
+        if(shape) {
 
-//            vector<ofPoint> polyline = shape->polyline.getVertices();
+            vector<ofPoint> polyline = shape->polyline.getVertices();
 
-//            if(shape->triangle.isPointInsidePolygon(&polyline[0],polyline.size(),res_norm)) {
+            if(shape->triangle.isPointInsidePolygon(&polyline[0],polyline.size(),res_norm)) {
 
-//                if(shape->nature == COLOR_SHAPE)
-//                    windows_next_inside.push_back(shape);
+                if(shape->nature == "window")
+                    windows_next_inside.push_back(shape);
 
-//                if(shape->nature == CONTENT_SHAPE)
-//                    paintings_next_inside.push_back(shape);
-//            }
+                if(shape->nature == "drawing area")
+                    paintings_next_inside.push_back(shape);
+            }
 
-//            if(shape->nature == CONTENT_SHAPE) {
-//                if(shape->triangle.isPointInsidePolygon(&polyline[0],polyline.size(),last_p_norm)) {
-//                    paintings_last_inside.push_back(shape);
-//                }
-//            }
-//        }
-//    }
+            if(shape->nature == "drawing area") {
+                if(shape->triangle.isPointInsidePolygon(&polyline[0],polyline.size(),last_p_norm)) {
+                    paintings_last_inside.push_back(shape);
+                }
+            }
+        }
+    }
 
-//    if(paintings_next_inside.size() == 0) {
+    if(paintings_next_inside.size() == 0) {
 
-//        //next point is outside of mapped area
-//        //find point between last and next point on the edge of the mapped area
+        //next point is outside of mapped area
+        //find point between last and next point on the edge of the mapped area
 
-//        //1. find intersections between last and next point on the paintings the last point is in
-//        //2. chose intersection that is nearest to the next point
+        //1. find intersections between last and next point on the paintings the last point is in
+        //2. chose intersection that is nearest to the next point
 
-//        float dist_res_nextp = 1000000;
+        float dist_res_nextp = 1000000;
 
-//        if(paintings_last_inside.size() == 0) {
-//            cout << "next and last point are in no paintings" << endl;
-//            vector<MappingPoint_ptr> pts = getProjector(0)->getShapesByClass<MappingPoint>();
-//            if(pts.size() > 0) {
-//                res = getProjector(0)->getShapesByClass<MappingPoint>()[0]->pos;
-//            }
-//            else {
-//                res.x = output_w/2;
-//                res.y = output_h/2;
-//            }
-//        }
+        if(paintings_last_inside.size() == 0) {
+            cout << "next and last point are in no paintings" << endl;
+            vector<ofPtr<ofx2DMappingPoint>> pts = getProjector(0)->getShapesByClass<ofx2DMappingPoint>();
+            if(pts.size() > 0) {
+                res = getProjector(0)->getShapesByClass<ofx2DMappingPoint>()[0]->pos;
+            }
+            else {
+                res.x = p->outputWidth()/2;
+                res.y = p->outputHeight()/2;
+            }
+        }
 
-//        for(uint i = 0; i < paintings_last_inside.size(); i++) {
+        for(uint i = 0; i < paintings_last_inside.size(); i++) {
 
-//            MappingShape_ptr shape = paintings_last_inside.at(i);
+            ofPtr<ofx2DMappingShape> shape = paintings_last_inside.at(i);
 
-//            res_norm.x = res.x/output_w;
-//            res_norm.y = res.y/output_h;
+            res_norm.x = res.x/p->outputWidth();
+            res_norm.y = res.y/p->outputHeight();
 
-//            ofPoint corrected_norm = intersectionPointPolyline(last_p_norm, res_norm, shape->polyline);
-//            ofPoint corrected(corrected_norm.x*output_w, corrected_norm.y*output_h);
-//            float dist = ofDist(next_p.x, next_p.y, corrected.x, corrected.y);
-//            if(dist<dist_res_nextp) {
-//                dist_res_nextp = dist;
-//                res = corrected;
-//            }
+            ofPoint corrected_norm = intersectionPointPolyline(last_p_norm, res_norm, shape->polyline);
+            ofPoint corrected(corrected_norm.x*p->outputWidth(), corrected_norm.y*p->outputHeight());
+            float dist = ofDist(next_p.x, next_p.y, corrected.x, corrected.y);
+            if(dist<dist_res_nextp) {
+                dist_res_nextp = dist;
+                res = corrected;
+            }
 
-//        }
+        }
 
 
-//    }
-//    if(windows_next_inside.size()>0) {
-//        //next point is in a window area where it is not allowed
-//        //find point between last and next point on the edge of the window
+    }
+    if(windows_next_inside.size()>0) {
+        //next point is in a window area where it is not allowed
+        //find point between last and next point on the edge of the window
 
-//        //1. find intersections between last and next point windows the next point is in
-//        //2. chose intersection that is nearest to the next point
+        //1. find intersections between last and next point windows the next point is in
+        //2. chose intersection that is nearest to the next point
 
-//        float dist_res_nextp = 1000000;
+        float dist_res_nextp = 1000000;
 
-//        for(uint i = 0; i < windows_next_inside.size(); i++) {
+        for(uint i = 0; i < windows_next_inside.size(); i++) {
 
-//            MappingShape_ptr shape = windows_next_inside.at(i);
+            ofPtr<ofx2DMappingShape> shape = windows_next_inside.at(i);
 
-//            res_norm.x = res.x/output_w;
-//            res_norm.y = res.y/output_h;
+            res_norm.x = res.x/p->outputWidth();
+            res_norm.y = res.y/p->outputHeight();
 
-//            ofPoint corrected_norm = intersectionPointPolyline(last_p_norm, res_norm, shape->polyline);
-//            ofPoint corrected(corrected_norm.x*output_w, corrected_norm.y*output_h);
-//            float dist = ofDist(next_p.x, next_p.y, corrected.x, corrected.y);
-//            if(dist<dist_res_nextp) {
-//                dist_res_nextp = dist;
-//                res = corrected;
-//            }
+            ofPoint corrected_norm = intersectionPointPolyline(last_p_norm, res_norm, shape->polyline);
+            ofPoint corrected(corrected_norm.x*p->outputWidth(), corrected_norm.y*p->outputHeight());
+            float dist = ofDist(next_p.x, next_p.y, corrected.x, corrected.y);
+            if(dist<dist_res_nextp) {
+                dist_res_nextp = dist;
+                res = corrected;
+            }
 
-//        }
-//    }
+        }
+    }
 
     //TODO: check that there is only mapped area between last and next point when they are not in the same polyline
 
@@ -611,6 +618,10 @@ void ofx2DMappingController::saveMappingAsSvg() {
     getProjector(0)->exportSvg(svg_mapping);
 }
 
+void ofx2DMappingController::importSvg(const std::string path) {
+    getProjector(0)->importSvg(path);
+}
+
 void ofx2DMappingController::importSvg() {
     getProjector(0)->importSvg(svg_mapping);
 }
@@ -630,36 +641,28 @@ void ofx2DMappingController::keyReleased(ofKeyEventArgs &args){
 
 }
 
-float ofx2DMappingController::contentWidth() {
+ofParameter<float> &ofx2DMappingController::contentWidth() {
     return content_w;
 }
 
-float ofx2DMappingController::contentHeight() {
+ofParameter<float> &ofx2DMappingController::contentHeight() {
     return content_h;
 }
 
-float ofx2DMappingController::controlWidth() {
+ofParameter<float> &ofx2DMappingController::controlWidth() {
     return control_w;
 }
 
-float ofx2DMappingController::controlHeight() {
+ofParameter<float> &ofx2DMappingController::controlHeight() {
     return control_h;
 }
 
-float ofx2DMappingController::vidMaxWidth() {
+ofParameter<float> &ofx2DMappingController::vidMaxWidth() {
     return vid_max_w;
 }
 
-float ofx2DMappingController::vidMaxHeight() {
+ofParameter<float> &ofx2DMappingController::vidMaxHeight() {
     return vid_max_h;
-}
-
-void ofx2DMappingController::setControlWidth(float val) {
-    control_w = val;
-}
-
-void ofx2DMappingController::setControlHeight(float val) {
-    control_h = val;
 }
 
 void ofx2DMappingController::addTemplate(ofPtr<ofx2DMappingObject> obj) {
@@ -670,10 +673,10 @@ vector<ofPtr<ofx2DMappingObject>> ofx2DMappingController::getOptions() {
     return available_shapes;
 }
 
-void ofx2DMappingController::setOutputRectangle(ofRectangle r) {
-    output_rectangle = r;
-}
-
 ofRectangle ofx2DMappingController::getOutputRectangle() {
     return output_rectangle;
+}
+
+void ofx2DMappingController::setOutputRectangle(ofRectangle r){
+    output_rectangle = r;
 }
