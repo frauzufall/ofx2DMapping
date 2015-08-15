@@ -25,8 +25,8 @@ ofx2DMappingProjector::ofx2DMappingProjector(float w, float h) {
     _outlines_raw->clear();
     _paths->clear();
 
-    output_w.set("output width", w);
-    output_h.set("output height", h);
+    output_w = w;
+    output_h = h;
 
     RegisterInFactory<ofx2DMappingObject, ofx2DMappingFbo> register1(ofx2DMappingFbo().nature);
     RegisterInFactory<ofx2DMappingObject, ofx2DMappingColorShape> register2(ofx2DMappingColorShape().nature);
@@ -497,12 +497,17 @@ void ofx2DMappingProjector::exportSvg(string path) {
     xml.saveFile(path);
 }
 
-ofParameter<float> &ofx2DMappingProjector::outputWidth() {
+float ofx2DMappingProjector::outputWidth() {
     return output_w;
 }
 
-ofParameter<float> &ofx2DMappingProjector::outputHeight() {
+float ofx2DMappingProjector::outputHeight() {
     return output_h;
+}
+
+void ofx2DMappingProjector::setOutputSize(float w, float h){
+    output_w = w;
+    output_h = h;
 }
 
 ofParameter<bool>& ofx2DMappingProjector::getUsingCam() {

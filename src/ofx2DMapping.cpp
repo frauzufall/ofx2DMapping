@@ -38,7 +38,7 @@ void ofx2DMapping::draw() {
 
 void ofx2DMapping::setOutputShape(float x, float y, float width, float height) {
     ctrl.setOutputShape(ofRectangle(x,y,width,height));
-//    view.getFormMapping()->setOutputForm(x,y,width,height);
+    view.getFormMapping()->setOutputForm(x,y,width,height);
 }
 
 void ofx2DMapping::setControlShape(float x, float y, float width, float height) {

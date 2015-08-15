@@ -91,7 +91,7 @@ private:
     ofPoint addZoomRelativeOfDstRect(ofPoint p);
     ofPoint removeZoomRelativeOfDstRect(ofPoint p);
 
-    bool direct_edit;
+    ofParameter<bool> direct_edit;
 
     vector<mappableShape> shapes;
     ofRectangle control_rect, control_rect_backup;

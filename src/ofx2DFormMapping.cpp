@@ -8,6 +8,7 @@ ofx2DFormMapping::ofx2DFormMapping(): ofxPanel() {
     dragging_dst = false;
     mapping_margin = 10;
     show_source.set("show source", true);
+    direct_edit.set("direct edit", false);
     parent_projector = nullptr;
     source_empty_bg.setFillColor(ofColor(0,0,0,100));
     source_empty_bg.setFilled(true);
@@ -19,12 +20,14 @@ void ofx2DFormMapping::setup(string title, ofx2DMappingProjector *parent_project
     ofxPanel::setSize(w, h);
     this->parent_projector = parent_projector;
     this->parent_list = parent_list;
+    rebuild();
 }
 
 void ofx2DFormMapping::setMappingRects() {
 
     int margin = 10;
     int header = 20;
+    float amount_dst = 2./3.;
 
     if(parent_projector){
         if(direct_edit) {
@@ -43,29 +46,22 @@ void ofx2DFormMapping::setMappingRects() {
 //            ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
         }
         else {
+
+            float output_ratio = parent_projector->outputWidth()/parent_projector->outputHeight();
+            float output_ratio_inv = parent_projector->outputHeight()/parent_projector->outputWidth();
+
             mapping_rect_dst.x = this->getPosition().x+margin;
             mapping_rect_dst.y = this->getPosition().y+margin+header;
 
-            mapping_rect_dst.height = this->getHeight()-margin-header;
-            float output_ratio = parent_projector->outputWidth()/parent_projector->outputHeight();
-            float output_ratio_inv = parent_projector->outputHeight()/parent_projector->outputWidth();
+            mapping_rect_dst.height = (this->getHeight()-margin*3-header)*amount_dst;
             mapping_rect_dst.width = mapping_rect_dst.height*output_ratio;
             if(mapping_rect_dst.width > this->getWidth()-2*margin) {
                 mapping_rect_dst.width = this->getWidth()-2*margin;
                 mapping_rect_dst.height = mapping_rect_dst.width*output_ratio_inv;
             }
 
-            mapping_rect_src.x = mapping_rect_dst.x;
-            mapping_rect_src.y = mapping_rect_dst.y+mapping_rect_dst.height+13;
-            mapping_rect_src.width = mapping_rect_dst.width/2;
-            float content_ratio = output_ratio_inv;
-        //    float content_ratio = (float)Visuals::get().contentHeight()/(float)Visuals::get().contentWidth();
-        //    float content_ratio_inv = (float)Visuals::get().contentWidth()/(float)Visuals::get().contentHeight();
-            mapping_rect_src.height = mapping_rect_src.width*content_ratio;
-        //    if(mapping_rect_src.height > this->getHeight()*0.8-mapping_rect_dst.height) {
-        //        mapping_rect_src.height = this->getHeight()*0.8-mapping_rect_dst.height;
-        //        mapping_rect_src.width = mapping_rect_src.height*content_ratio_inv;
-        //    }
+            mapping_rect_src.setSize(mapping_rect_dst.width/2.,mapping_rect_dst.height/2.);
+            mapping_rect_src.setPosition(mapping_rect_dst.getPosition()+ofPoint(0,mapping_rect_dst.height+margin));
 
 //            ofxPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
 
@@ -646,9 +642,6 @@ void ofx2DFormMapping::setOutputForm(float x, float y, float w, float h) {
             || h != mapping_rect_output.height) {
         mapping_rect_output = ofRectangle(x,y,w,h);
         rebuild();
-    }
-    else {
-        mapping_rect_output = ofRectangle(x,y,w,h);
     }
 }
 

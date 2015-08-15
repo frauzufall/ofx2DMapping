@@ -65,8 +65,9 @@ public:
     void                        importSvg(string file);
     void                        reloadLinesFromRaw();
 
-    ofParameter<float>&			outputWidth();
-    ofParameter<float>&			outputHeight();
+    float			outputWidth();
+    float			outputHeight();
+    void setOutputSize(float w, float h);
 
     ofPoint inOutput(ofPoint orig);
 
@@ -77,7 +78,7 @@ public:
 
 private:
 
-    ofParameter<float> output_w, output_h;
+    float output_w, output_h;
 
     ofPtr<ofxSVG>                  _svg;
     ofPaths_ptr                 _paths;

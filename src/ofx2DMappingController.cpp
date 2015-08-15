@@ -38,8 +38,8 @@ ofx2DMappingController::ofx2DMappingController() {
 }
 
 ofx2DMappingController::~ofx2DMappingController(){
-    getProjector()->outputWidth().removeListener(this, &ofx2DMappingController::outputSizeChanged);
-    getProjector()->outputHeight().removeListener(this, &ofx2DMappingController::outputSizeChanged);
+//    getProjector()->outputWidth().removeListener(this, &ofx2DMappingController::outputSizeChanged);
+//    getProjector()->outputHeight().removeListener(this, &ofx2DMappingController::outputSizeChanged);
 }
 
 void ofx2DMappingController::setup(string xml_path) {
@@ -55,8 +55,8 @@ void ofx2DMappingController::setup(string xml_path) {
 
     output_rectangle.setWidth(getProjector()->outputWidth());
     output_rectangle.setHeight(getProjector()->outputHeight());
-    getProjector()->outputWidth().addListener(this, &ofx2DMappingController::outputSizeChanged);
-    getProjector()->outputHeight().addListener(this, &ofx2DMappingController::outputSizeChanged);
+//    getProjector()->outputWidth().addListener(this, &ofx2DMappingController::outputSizeChanged);
+//    getProjector()->outputHeight().addListener(this, &ofx2DMappingController::outputSizeChanged);
 
     mapped_content_fbo = ofFbo_ptr(new ofFbo());
     mapped_content_fbo->allocate(getProjector()->outputWidth(), getProjector()->outputHeight(), GL_RGBA);
@@ -660,8 +660,13 @@ ofRectangle ofx2DMappingController::getOutputShape() {
 
 void ofx2DMappingController::setOutputShape(ofRectangle r){
     output_rectangle = r;
-    getProjector()->outputWidth().set(r.width);
-    getProjector()->outputHeight().set(r.height);
+    mapped_content_fbo->clear();
+    mapped_area_fbo->clear();
+    mapped_content_fbo->allocate(r.width, r.height, GL_RGBA);
+    mapped_area_fbo->allocate(r.width, r.height, GL_RGBA);
+    getProjector()->setOutputSize(r.width,r.height);
+//    getProjector()->outputWidth().set(r.width);
+//    getProjector()->outputHeight().set(r.height);
 }
 
 void ofx2DMappingController::setOutputPosition(float x, float y){
@@ -669,7 +674,11 @@ void ofx2DMappingController::setOutputPosition(float x, float y){
     output_rectangle.y = y;
 }
 
-void ofx2DMappingController::outputSizeChanged(float &){
+void ofx2DMappingController::outputSizeChanged(){
+    mapped_content_fbo->clear();
+    mapped_area_fbo->clear();
+    mapped_content_fbo->allocate(getProjector()->outputWidth(), getProjector()->outputHeight(), GL_RGBA);
+    mapped_area_fbo->allocate(getProjector()->outputWidth(), getProjector()->outputHeight(), GL_RGBA);
     output_rectangle.setWidth(getProjector()->outputWidth());
     output_rectangle.setHeight(getProjector()->outputHeight());
 }
