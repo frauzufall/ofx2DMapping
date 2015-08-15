@@ -15,7 +15,7 @@ void ofx2DMappingView::setControl(ofx2DMappingController *ctrl) {
 void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     //MAPPING RECT PANEL
-    mapping_forms.setup("MAPPING FORMS", ctrl->getProjector(0), &object_list, w, h);
+    mapping_forms.setup("MAPPING FORMS", ctrl->getProjector(), &object_list, w, h);
     mapping_forms.rebuild();
     mapping_forms.setMappingBackground(ctrl->getOutput());
 
@@ -118,7 +118,7 @@ void ofx2DMappingView::updateObjectList() {
 
     object_list.clear();
 
-    ofx2DMappingProjector *p = ctrl->getProjector(0);
+    ofx2DMappingProjector *p = ctrl->getProjector();
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
@@ -146,7 +146,7 @@ void ofx2DMappingView::importSvg() {
 
 void ofx2DMappingView::removeForm(RemovedElementData &data) {
 
-    ofx2DMappingProjector *p = ctrl->getProjector(0);
+    ofx2DMappingProjector *p = ctrl->getProjector();
     int index = p->shapeCount()-1-data.index;
     if(p->removeShape(index)) {
         p->updateOutlines();
@@ -157,7 +157,7 @@ void ofx2DMappingView::removeForm(RemovedElementData &data) {
 
 void ofx2DMappingView::reorderForm(MovingElementData &data) {
 
-    ofx2DMappingProjector *p = ctrl->getProjector(0);
+    ofx2DMappingProjector *p = ctrl->getProjector();
 
     int index1 = p->shapeCount()-1-data.old_index;
     int index2 = p->shapeCount()-1-data.new_index;
@@ -172,6 +172,10 @@ void ofx2DMappingView::reorderForm(MovingElementData &data) {
 void ofx2DMappingView::setSubpanelPositions() {
     float margin = 10;
     ofPoint pos = this->getPosition();
+    pos.y += spacing;
+    if(bShowHeader){
+        pos.y += header += spacingFirstElement;
+    }
     main_panel.sizeChangedE.disable();
     list_panel.sizeChangedE.disable();
     mapping_forms.sizeChangedE.disable();
@@ -180,7 +184,7 @@ void ofx2DMappingView::setSubpanelPositions() {
                 pos.y+margin);
     list_panel.setPosition(
                 pos.x+margin,
-                pos.y+margin+main_panel.getHeight()+margin*2);
+                pos.y+margin+main_panel.getHeight()+margin);
     mapping_forms.setPosition(
                 main_panel.getPosition().x + main_panel.getWidth()+margin,
                 pos.y+margin);
@@ -209,20 +213,20 @@ ofx2DFormMapping *ofx2DMappingView::getFormMapping() {
 }
 
 void ofx2DMappingView::selectAllObjects() {
-    for(uint i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
-        ctrl->getProjector(0)->getMappingObject(i)->editable = true;
+    for(uint i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
+        ctrl->getProjector()->getMappingObject(i)->editable = true;
     }
 }
 
 void ofx2DMappingView::deselectAllObjects() {
-    for(uint i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
-        ctrl->getProjector(0)->getMappingObject(i)->editable = false;
+    for(uint i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
+        ctrl->getProjector()->getMappingObject(i)->editable = false;
     }
 }
 
 void ofx2DMappingView::removeAllObjects() {
-    ctrl->getProjector(0)->removeAllShapes();
-    ctrl->getProjector(0)->updateOutlines();
+    ctrl->getProjector()->removeAllShapes();
+    ctrl->getProjector()->updateOutlines();
     mapping_forms.updateForms();
     updateObjectList();
 }

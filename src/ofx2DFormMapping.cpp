@@ -40,7 +40,7 @@ void ofx2DFormMapping::setMappingRects() {
                 mapping_rect_src.height = mapping_rect_src.width*output_ratio_inv;
             }
 
-            ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
+//            ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
         }
         else {
             mapping_rect_dst.x = this->getPosition().x+margin;
@@ -67,7 +67,7 @@ void ofx2DFormMapping::setMappingRects() {
         //        mapping_rect_src.width = mapping_rect_src.height*content_ratio_inv;
         //    }
 
-            ofxPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
+//            ofxPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
 
             mapping_front.clear();
             mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
@@ -706,7 +706,8 @@ ofPoint ofx2DFormMapping::removeZoom(ofPoint p) {
 }
 
 void ofx2DFormMapping::setPosition(float x, float y) {
-    setShape(x, y, this->getWidth(), this->getHeight());
+    ofxPanel::setPosition(x, y);
+    rebuild();
 }
 
 void ofx2DFormMapping::setSize(float w, float h) {

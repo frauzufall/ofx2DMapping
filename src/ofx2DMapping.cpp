@@ -28,7 +28,7 @@ ofx2DMappingView* ofx2DMapping::getControlView() {
 }
 
 void ofx2DMapping::draw() {
-    ctrl.getOutput()->draw(ctrl.getOutputRectangle());
+    ctrl.getOutput()->draw(ctrl.getOutputShape());
 
     if(show_controls) {
         //draw the control panel
@@ -37,7 +37,7 @@ void ofx2DMapping::draw() {
 }
 
 void ofx2DMapping::setOutputShape(float x, float y, float width, float height) {
-    ctrl.setOutputRectangle(ofRectangle(x,y,width,height));
+    ctrl.setOutputShape(ofRectangle(x,y,width,height));
 //    view.getFormMapping()->setOutputForm(x,y,width,height);
 }
 

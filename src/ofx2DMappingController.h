@@ -14,9 +14,7 @@ class ofx2DMappingController {
     public:
 
         ofx2DMappingController();
-        ~ofx2DMappingController() {
-            projectors.clear();
-        }
+        ~ofx2DMappingController();
 
         void						setup(string xml_path);
         void						update();
@@ -32,7 +30,7 @@ class ofx2DMappingController {
         void                        drawCalibration(ofx2DMappingProjector *p);
 
         void						addProjector(float w, float h);
-        ofx2DMappingProjector*      getProjector(int id);
+        ofx2DMappingProjector*      getProjector(int id = 0);
 
         ofPoint                     getPointInMappedArea(ofPoint last_p,ofPoint next_p);
         ofPoint                     intersectionPointPolyline(ofPoint last_p, ofPoint next_p, ofPolyline polyline);
@@ -46,12 +44,8 @@ class ofx2DMappingController {
         ofParameter<float>          &getCalBorder();
         ofParameter<int>            &getCalGrey();
 
-        ofParameter<float> & contentWidth();
-        ofParameter<float> & contentHeight();
         ofParameter<float> & controlWidth();
         ofParameter<float> & controlHeight();
-        ofParameter<float> & vidMaxWidth();
-        ofParameter<float> & vidMaxHeight();
 
         ofFbo_ptr &getOutput();
         ofFbo_ptr					getArea();
@@ -82,8 +76,11 @@ class ofx2DMappingController {
 
         vector<ofPtr<ofx2DMappingObject>> getOptions();
 
-        ofRectangle    getOutputRectangle();
-        void           setOutputRectangle(ofRectangle r);
+        ofRectangle getOutputShape();
+        void        setOutputShape(ofRectangle r);
+        void        setOutputPosition(float x, float y);
+
+        void        outputSizeChanged(float&);
 
     protected:
 
@@ -93,9 +90,7 @@ class ofx2DMappingController {
 
         string xml_mapping, svg_mapping, png_mapping;
 
-        ofParameter<float> content_w, content_h;
         ofParameter<float> control_w, control_h;
-        ofParameter<float> vid_max_w, vid_max_h;
 
         vector<ofx2DMappingProjector>			projectors;
         GLfloat						matrix[16];
