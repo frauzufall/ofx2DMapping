@@ -232,7 +232,7 @@ void ofx2DMappingView::removeAllObjects() {
 }
 
 void ofx2DMappingView::setSize(float width, float height) {
-    setShape(this->getPosition().y, this->getPosition().y, width, height);
+    setShape(this->getPosition().x, this->getPosition().y, width, height);
 }
 
 void ofx2DMappingView::setShape(ofRectangle shape) {
