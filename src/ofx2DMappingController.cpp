@@ -354,19 +354,17 @@ ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint nex
 
         if(shape) {
 
-            vector<ofPoint> polyline = shape->polyline.getVertices();
+            if(shape->polyline.inside(res_norm)){
 
-            if(shape->triangle.isPointInsidePolygon(&polyline[0],polyline.size(),res_norm)) {
-
-                if(shape->nature == "window")
+                if(shape->name == "window")
                     windows_next_inside.push_back(shape);
 
-                if(shape->nature == "drawing area")
+                if(shape->name == "drawing area")
                     paintings_next_inside.push_back(shape);
             }
 
-            if(shape->nature == "drawing area") {
-                if(shape->triangle.isPointInsidePolygon(&polyline[0],polyline.size(),last_p_norm)) {
+            if(shape->name == "drawing area") {
+                if(shape->polyline.inside(last_p_norm)){
                     paintings_last_inside.push_back(shape);
                 }
             }
@@ -384,15 +382,9 @@ ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint nex
         float dist_res_nextp = 1000000;
 
         if(paintings_last_inside.size() == 0) {
-            cout << "next and last point are in no paintings" << endl;
-            vector<ofPtr<ofx2DMappingPoint>> pts = getProjector()->getShapesByClass<ofx2DMappingPoint>();
-            if(pts.size() > 0) {
-                res = getProjector()->getShapesByClass<ofx2DMappingPoint>()[0]->pos;
-            }
-            else {
-                res.x = p->outputWidth()/2;
-                res.y = p->outputHeight()/2;
-            }
+            cout << "next and last point are in no drawing area" << endl;
+            res.x = p->outputWidth()/2;
+            res.y = p->outputHeight()/2;
         }
 
         for(uint i = 0; i < paintings_last_inside.size(); i++) {

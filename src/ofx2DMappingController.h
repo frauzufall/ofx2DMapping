@@ -91,7 +91,6 @@ class ofx2DMappingController {
         string xml_mapping, svg_mapping, png_mapping;
 
         ofParameter<float> control_w, control_h;
-        ofParameter<float> output_w, output_h;
 
         vector<ofx2DMappingProjector>			projectors;
         GLfloat						matrix[16];
