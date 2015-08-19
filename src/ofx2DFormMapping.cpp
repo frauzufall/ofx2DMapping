@@ -34,7 +34,7 @@ void ofx2DFormMapping::setMappingRects() {
             mapping_rect_dst = mapping_rect_output;
             mapping_rect_src.x = this->getPosition().x+margin;
             mapping_rect_src.y = this->getPosition().y+margin+header;
-            mapping_rect_src.height = this->getHeight()-margin-header;
+            mapping_rect_src.height = this->getHeight()-margin*2-header;
             float output_ratio = parent_projector->outputWidth()/parent_projector->outputHeight();
             float output_ratio_inv = parent_projector->outputHeight()/parent_projector->outputWidth();
             mapping_rect_src.width = mapping_rect_src.height*output_ratio;
