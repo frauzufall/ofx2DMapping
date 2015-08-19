@@ -279,7 +279,7 @@ void ofx2DMappingProjector::updateOutlines() {
 
 void ofx2DMappingProjector::updateOutline(int shape_id) {
 
-    if(_outlines->size() > shape_id) {
+    if((int)_outlines->size() > shape_id) {
         _outlines->at(shape_id).clear();
         _outlines_raw->at(shape_id).clear();
         _paths->at(shape_id)->clear();
