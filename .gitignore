@@ -21,7 +21,7 @@ Makefile
 *.files
 *.includes
 *.creator
-*.creator.user
+*.creator.user*
 bin/libs
 bin/data/*
 
