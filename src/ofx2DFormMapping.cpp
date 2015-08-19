@@ -1,6 +1,6 @@
 #include "ofx2DFormMapping.h"
 
-ofx2DFormMapping::ofx2DFormMapping(): ofxPanel() {
+ofx2DFormMapping::ofx2DFormMapping(): ofxGuiGroup() {
 
     shapes.clear();
     zoom_factor = 0;
@@ -16,8 +16,24 @@ ofx2DFormMapping::ofx2DFormMapping(): ofxPanel() {
 }
 
 void ofx2DFormMapping::setup(string title, ofx2DMappingProjector *parent_projector, ofxSortableList *parent_list, float w, float h) {
-    ofxPanel::setup(title);
-    ofxPanel::setSize(w, h);
+    b.width = w;
+    b.height = h;
+    spacing = Config().spacing;
+    spacingNextElement = Config().spacingNextElement;
+    spacingFirstElement = Config().spacingFirstElement;
+    header = Config().header;
+    minimized = Config().minimized;
+    bShowHeader = Config().showHeader;
+    b.width = defaultWidth;
+    layout = Config().layout;
+    clear();
+    filename = Config().filename;
+    bGuiActive = false;
+    setName(title);
+
+    registerMouseEvents(-2);
+    setNeedsRedraw();
+
     this->parent_projector = parent_projector;
     this->parent_list = parent_list;
     rebuild();
@@ -43,7 +59,7 @@ void ofx2DFormMapping::setMappingRects() {
                 mapping_rect_src.height = mapping_rect_src.width*output_ratio_inv;
             }
 
-//            ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
+//            ofxGuiGroup::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
         }
         else {
 
@@ -63,7 +79,7 @@ void ofx2DFormMapping::setMappingRects() {
             mapping_rect_src.setSize(mapping_rect_dst.width/2.,mapping_rect_dst.height/2.);
             mapping_rect_src.setPosition(mapping_rect_dst.getPosition()+ofPoint(0,mapping_rect_dst.height+margin));
 
-//            ofxPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
+//            ofxGuiGroup::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
 
             mapping_front.clear();
             mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
@@ -167,7 +183,7 @@ void ofx2DFormMapping::rebuild() {
 
 void ofx2DFormMapping::generateDraw(){
 
-    ofxPanel::generateDraw();
+    ofxGuiGroup::generateDraw();
 
     updateSourceBackground();
     source_empty_bg.clear();
@@ -268,7 +284,7 @@ void ofx2DFormMapping::generateDraw(){
 
 void ofx2DFormMapping::render() {
 
-    ofxPanel::render();
+    ofxGuiGroup::render();
 
     ofEnableAlphaBlending();
 
@@ -293,6 +309,8 @@ void ofx2DFormMapping::render() {
                     addZoom(mapping_rect_dst.height));
 
     }
+
+    ofSetColor(255);
 
     for (uint i = 0; i < shapes.size(); i++) {
 
@@ -390,7 +408,7 @@ bool ofx2DFormMapping::mouseMoved(ofMouseEventArgs& args) {
         }
     }
 
-    return ofxPanel::mouseMoved(args);
+    return ofxGuiGroup::mouseMoved(args);
 }
 
 
@@ -470,6 +488,7 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
                 ofColor c = parent_list->getControl(shapes.size()-1-i)->getFillColor();
                 parent_list->getControl(shapes.size()-1-i)->setBackgroundColor(c);
                 setNeedsRedraw();
+                break;
             }
         }
 
@@ -546,7 +565,7 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
         setNeedsRedraw();
     }
 
-    return ofxPanel::mouseDragged(args);
+    return ofxGuiGroup::mouseDragged(args);
 }
 
 bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
@@ -592,7 +611,7 @@ bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
         last_mouse = mouse;
     }
 
-    return ofxPanel::mousePressed(args);
+    return ofxGuiGroup::mousePressed(args);
 }
 
 bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
@@ -610,7 +629,7 @@ bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
 
     dragging_dst = false;
 
-    return ofxPanel::mouseReleased(args);
+    return ofxGuiGroup::mouseReleased(args);
 }
 
 bool ofx2DFormMapping::mouseScrolled(ofMouseEventArgs &args) {
@@ -620,7 +639,7 @@ bool ofx2DFormMapping::mouseScrolled(ofMouseEventArgs &args) {
         setNeedsRedraw();
     }
 
-    return ofxPanel::mouseScrolled(args);
+    return ofxGuiGroup::mouseScrolled(args);
 }
 
 void ofx2DFormMapping::setMappingBackground(ofFbo_ptr &fbo) {
@@ -699,7 +718,7 @@ ofPoint ofx2DFormMapping::removeZoom(ofPoint p) {
 }
 
 void ofx2DFormMapping::setPosition(float x, float y) {
-    ofxPanel::setPosition(x, y);
+    ofxGuiGroup::setPosition(x, y);
     rebuild();
 }
 
@@ -719,4 +738,8 @@ void ofx2DFormMapping::setShape(float x, float y, float w, float h) {
 
 ofParameter<bool>& ofx2DFormMapping::getShowSource(){
     return show_source;
+}
+
+ofx2DFormMapping::~ofx2DFormMapping(){
+    unregisterMouseEvents(-2);
 }

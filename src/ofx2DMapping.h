@@ -10,7 +10,7 @@ public:
     ~ofx2DMapping();
 
     void setup();
-    void setup(string mapping_path);
+    void setup(string mapping_path, bool setup_view = true);
     void update();
     void draw();
 

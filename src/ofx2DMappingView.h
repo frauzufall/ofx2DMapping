@@ -11,7 +11,7 @@ public:
     void setup(float x, float y, float w, float h);
     void setMappingBackground(ofFbo_ptr fbo);
     void showSource(bool show);
-    void setEditMode(bool &direct_edit);
+    void setEditMode(bool &);
 
     void setControl(ofx2DMappingController* ctrl);
 
@@ -23,7 +23,19 @@ public:
     virtual void setShape(ofRectangle shape);
     virtual void setShape(float x, float y, float width, float height);
 
+    void setGroupConfig(const ofxGuiGroup::Config & config);
+    void setSliderConfig(const ofxFloatSlider::Config & config);
+    void setLabelConfig(const ofxLabel::Config & config);
+    void setToggleConfig(const ofxToggle::Config & config);
+
 protected:
+
+    bool setup_done;
+    ofxFloatSlider::Config slider_config;
+    ofxToggle::Config toggle_config;
+    ofxToggle::Config toggle_auto_width_config;
+    ofxLabel::Config label_config;
+    ofxGuiGroup::Config group_config;
 
     ofx2DMappingController* ctrl;
 
@@ -35,7 +47,7 @@ protected:
 
     void addedObject(bool&clickstart);
 
-    bool direct_edit;
+    ofParameter<bool> direct_edit;
 
     ofxSortableList object_list;
 
@@ -43,7 +55,7 @@ protected:
 
     ofxGuiGroup add_buttons_panel;
     ofx2DFormMapping mapping_forms;
-    ofxPanel main_panel, list_panel;
+    ofxGuiGroup main_panel, list_panel;
     ofxGuiGroup calibration_options, list_options;
 
     void removeForm(RemovedElementData& data);

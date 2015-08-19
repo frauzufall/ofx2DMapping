@@ -4,7 +4,8 @@ ofx2DMappingView::ofx2DMappingView():ofxGuiPage() {
 
     zoom = 1;
     zoom_pos = ofPoint(0.5,0.5);
-    direct_edit = false;
+    direct_edit.set("direct edit", false);
+    setup_done = false;
 
 }
 
@@ -14,45 +15,51 @@ void ofx2DMappingView::setControl(ofx2DMappingController *ctrl) {
 
 void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
+    setup_done = true;
+
     //MAPPING RECT PANEL
     mapping_forms.setup("MAPPING FORMS", ctrl->getProjector(), &object_list, w, h);
     mapping_forms.setMappingBackground(ctrl->getOutput());
+    mapping_forms.setHeaderBackgroundColor(group_config.headerBackgroundColor);
+    mapping_forms.setShowHeader(group_config.showHeader);
+    mapping_forms.setBorderColor(group_config.borderColor);
+    mapping_forms.setTextColor(group_config.textColor);
 
     //MAIN OPTIONS PANEL
 
-    main_panel.setup("MAPPING");
+    main_panel.setup("MAPPING", group_config);
 
-    save_btn.setup("save");
+    save_btn.setup("save", toggle_config);
     save_btn.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
     main_panel.add(save_btn);
 
-    import_btn.setup("import svg");
+    import_btn.setup("import svg", toggle_config);
     import_btn.addListener(this, &ofx2DMappingView::importSvg);
     main_panel.add(import_btn);
 
-    edit_mode_btn.setup("direct edit", direct_edit);
+    edit_mode_btn.setup(direct_edit, toggle_config);
     edit_mode_btn.addListener(this, &ofx2DMappingView::setEditMode);
     main_panel.add(edit_mode_btn);
 
     //CALIBRATION OPTIONS
 
-    calibration_options.setup("CALIBRATION OPTIONS");
+    calibration_options.setup("CALIBRATION OPTIONS", group_config);
 
-    calibration_options.add(ctrl->getCalibrating());
-    calibration_options.add(ctrl->getCalBorder());
-    calibration_options.add(ctrl->getCalGrey());
+    calibration_options.add(ctrl->getCalibrating(), toggle_config);
+    calibration_options.add(ctrl->getCalBorder(), slider_config);
+    calibration_options.add(ctrl->getCalGrey(), slider_config);
 
     main_panel.add(calibration_options);
 
     //OBJECT LIST PANEL
 
-    list_panel.setup("MAPPING OBJECTS");
+    list_panel.setup("MAPPING OBJECTS", group_config);
 
-    add_buttons_panel.setup("ADD MAPPING OBJECTS");
+    add_buttons_panel.setup("ADD MAPPING OBJECTS", group_config);
 
     vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
     for(uint i = 0; i < options.size(); i++) {
-        ofxToggle::Config config;
+        ofxToggle::Config config = toggle_config;
         ofColor c = options.at(i)->color;
         if(c.getBrightness() < 200){
             c.setBrightness(200);
@@ -66,17 +73,17 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     //LIST MANIPULATION OPTIONS
 
-    list_options.setup("OBJECT MANIPULATION");
+    list_options.setup("OBJECT MANIPULATION", group_config);
 
-    select_all_btn.setup("select all");
+    select_all_btn.setup("select all", toggle_config);
     select_all_btn.addListener(this, &ofx2DMappingView::selectAllObjects);
     list_options.add(select_all_btn);
 
-    deselect_all_btn.setup("deselect all");
+    deselect_all_btn.setup("deselect all", toggle_config);
     deselect_all_btn.addListener(this, &ofx2DMappingView::deselectAllObjects);
     list_options.add(deselect_all_btn);
 
-    delete_all_btn.setup("delete all");
+    delete_all_btn.setup("delete all", toggle_config);
     delete_all_btn.addListener(this, &ofx2DMappingView::removeAllObjects);
     list_options.add(delete_all_btn);
 
@@ -84,13 +91,15 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     //OBJECT LIST
 
-    object_list.setup("MAPPING OBJECT LIST");
+    ofxGuiGroup::Config object_list_config = group_config;
+    object_list_config.spacing = 1;
+    object_list.setup("MAPPING OBJECT LIST", object_list_config);
     ofAddListener(object_list.elementRemoved, this, &ofx2DMappingView::removeForm);
     ofAddListener(object_list.elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
 
     list_panel.add(object_list);
 
-    ofxGuiPage::setup("Mapping");
+    ofxGuiGroup::setup("Mapping", group_config);
     setShowHeader(false);
     add(main_panel);
     add(list_panel);
@@ -129,7 +138,7 @@ void ofx2DMappingView::updateObjectList() {
             if(c.getBrightness() < 200){
                 c.setBrightness(200);
             }
-            ofxToggle::Config config;
+            ofxToggle::Config config = toggle_config;
             config.textColor = c;
             object_list.add(mq->editable, config, false);
         }
@@ -200,8 +209,7 @@ void ofx2DMappingView::showSource(bool show) {
     mapping_forms.getShowSource().set(show);
 }
 
-void ofx2DMappingView::setEditMode(bool &direct_edit) {
-    this->direct_edit = direct_edit;
+void ofx2DMappingView::setEditMode(bool &) {
     mapping_forms.setEditMode(direct_edit);
     setSubpanelPositions();
     //TODO trigger button
@@ -241,8 +249,41 @@ void ofx2DMappingView::setShape(ofRectangle shape) {
 void ofx2DMappingView::setShape(float x, float y, float width, float height) {
     int margin = 10;
     mapping_forms.sizeChangedE.disable();
-    mapping_forms.setSize(width-object_list.getWidth()-margin*3, height-main_panel.getHeight()-margin*3);
+    mapping_forms.setSize(width-object_list.getWidth()-margin*3, height-margin*3);
     mapping_forms.sizeChangedE.enable();
     setSubpanelPositions();
     ofxGuiPage::setShape(x,y,width,height);
+}
+
+void ofx2DMappingView::setGroupConfig(const ofxGuiGroup::Config &config){
+    if(!setup_done){
+        group_config = config;
+    }else{
+        ofLogError("ofx2DMappingView: setGroupConfig()", "config must be set before ofx2DMappingView::setup()");
+    }
+
+}
+
+void ofx2DMappingView::setSliderConfig(const ofxFloatSlider::Config &config){
+    if(!setup_done){
+        slider_config = config;
+    }else{
+        ofLogError("ofx2DMappingView: setSliderConfig()", "config must be set before ofx2DMappingView::setup()");
+    }
+}
+
+void ofx2DMappingView::setToggleConfig(const ofxToggle::Config &config){
+    if(!setup_done){
+        toggle_config = config;
+    }else{
+        ofLogError("ofx2DMappingView: setToggleConfig()", "config must be set before ofx2DMappingView::setup()");
+    }
+}
+
+void ofx2DMappingView::setLabelConfig(const ofxLabel::Config &config){
+    if(!setup_done){
+        label_config = config;
+    }else{
+        ofLogError("ofx2DMappingView: setLabelConfig()", "config must be set before ofx2DMappingView::setup()");
+    }
 }

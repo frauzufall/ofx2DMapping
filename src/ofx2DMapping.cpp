@@ -9,10 +9,12 @@ void ofx2DMapping::setup() {
 
 }
 
-void ofx2DMapping::setup(string mapping_path) {
+void ofx2DMapping::setup(string mapping_path, bool setup_view) {
     ctrl.setup(mapping_path);
     view.setControl(&ctrl);
-    view.setup(0,0,800,600);
+    if(setup_view){
+        view.setup(0,0,800,600);
+    }
 }
 
 void ofx2DMapping::update() {

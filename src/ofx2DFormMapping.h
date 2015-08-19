@@ -45,10 +45,11 @@ struct mappableShape {
 };
 
 
-class ofx2DFormMapping : public ofxPanel {
+class ofx2DFormMapping : public ofxGuiGroup {
 
 public:
     ofx2DFormMapping();
+    ~ofx2DFormMapping();
 
     bool mouseMoved(ofMouseEventArgs &args);
     bool mouseDragged(ofMouseEventArgs &args);

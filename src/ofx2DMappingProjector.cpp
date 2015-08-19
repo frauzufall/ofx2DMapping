@@ -50,7 +50,7 @@ void ofx2DMappingProjector::update() {
                     updateOutline(i);
                 }
                 else {
-//                    updateOutlines();
+                    updateOutlines();
                 }
             }
             mq->update(output_w, output_h);
