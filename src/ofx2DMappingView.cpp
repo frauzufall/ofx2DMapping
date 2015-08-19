@@ -16,23 +16,22 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     //MAPPING RECT PANEL
     mapping_forms.setup("MAPPING FORMS", ctrl->getProjector(), &object_list, w, h);
-    mapping_forms.rebuild();
     mapping_forms.setMappingBackground(ctrl->getOutput());
 
     //MAIN OPTIONS PANEL
 
     main_panel.setup("MAPPING");
 
-    save_btn.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
     save_btn.setup("save");
+    save_btn.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
     main_panel.add(save_btn);
 
-    import_btn.addListener(this, &ofx2DMappingView::importSvg);
     import_btn.setup("import svg");
+    import_btn.addListener(this, &ofx2DMappingView::importSvg);
     main_panel.add(import_btn);
 
-    edit_mode_btn.addListener(this, &ofx2DMappingView::setEditMode);
     edit_mode_btn.setup("direct edit", direct_edit);
+    edit_mode_btn.addListener(this, &ofx2DMappingView::setEditMode);
     main_panel.add(edit_mode_btn);
 
     //CALIBRATION OPTIONS
@@ -69,16 +68,16 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
     list_options.setup("OBJECT MANIPULATION");
 
-    select_all_btn.addListener(this, &ofx2DMappingView::selectAllObjects);
     select_all_btn.setup("select all");
+    select_all_btn.addListener(this, &ofx2DMappingView::selectAllObjects);
     list_options.add(select_all_btn);
 
-    deselect_all_btn.addListener(this, &ofx2DMappingView::deselectAllObjects);
     deselect_all_btn.setup("deselect all");
+    deselect_all_btn.addListener(this, &ofx2DMappingView::deselectAllObjects);
     list_options.add(deselect_all_btn);
 
-    delete_all_btn.addListener(this, &ofx2DMappingView::removeAllObjects);
     delete_all_btn.setup("delete all");
+    delete_all_btn.addListener(this, &ofx2DMappingView::removeAllObjects);
     list_options.add(delete_all_btn);
 
     list_panel.add(list_options);
