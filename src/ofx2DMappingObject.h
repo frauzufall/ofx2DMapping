@@ -32,6 +32,11 @@ public:
     }
 
     ofx2DMappingObject(const ofx2DMappingObject& obj) {
+        stringstream id_str;
+        id_str << IDGenerator::getInstance().next();
+        id = id_str.str();
+        newpos = true;
+        newitem = true;
         this->color = obj.color;
         this->name = obj.name;
         this->nature = obj.nature;

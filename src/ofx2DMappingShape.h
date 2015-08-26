@@ -8,6 +8,7 @@ public:
 
     ofPoint     dst[4];
     ofMatrix4x4 matrix_dst_norm;
+	ofMatrix4x4 matrix_norm_dst;
     ofxTriangle triangle;
     ofPolyline  polyline;
     ofPoint     plane[4];
@@ -38,6 +39,7 @@ public:
         this->plane[3] = ofPoint(0, 1, 0);
 
         this->matrix_dst_norm.makeIdentityMatrix();
+		this->matrix_norm_dst.makeIdentityMatrix();
     }
 
     ofx2DMappingShape(const ofx2DMappingShape& obj) : ofx2DMappingObject(obj) {
@@ -48,6 +50,7 @@ public:
         this->polyline = obj.polyline;
         this->triangle = obj.triangle;
         this->matrix_dst_norm = obj.matrix_dst_norm;
+		this->matrix_norm_dst = obj.matrix_norm_dst;
     }
 
     ofPtr<ofx2DMappingObject> clone() const {
@@ -123,6 +126,7 @@ public:
 
     void update(float w, float h) {
         this->findHomography(this->plane, this->dst, (GLfloat*) this->matrix_dst_norm.getPtr(), true, w, h);
+		this->findHomography(this->dst, this->plane, (GLfloat*) this->matrix_norm_dst.getPtr(), true, w, h);
         this->triangle.clear();
         this->triangle.triangulate(this->polyline.getVertices());
     }

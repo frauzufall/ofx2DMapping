@@ -61,7 +61,7 @@ void ofx2DMappingProjector::update() {
 }
 
 ofPoint ofx2DMappingProjector::relative(ofPoint orig) {
-    return orig*getMatrixOfImageAtPoint(orig);
+	return orig*getMatrixOfImageAtPoint(orig);
 }
 
 ofPoint ofx2DMappingProjector::inOutput(ofPoint orig) {
@@ -183,11 +183,13 @@ ofPtr<ofx2DMappingObject> ofx2DMappingProjector::getFirstImageShape() {
 }
 
 ofMatrix4x4 ofx2DMappingProjector::getMatrixOfImageAtPoint(ofPoint p) {
-    vector<ofPtr<ofx2DMappingContentShape>> images = getShapesByClass<ofx2DMappingContentShape>();
-    for(uint ii = 0; ii < images.size(); ii++) {
-        if( pointVisibleInShape(p,images.at(ii))) {
-            return images.at(ii)->matrix_src_dst;
-        }
+	vector<ofPtr<ofx2DMappingContentShape>> drawings = getShapesByClass<ofx2DMappingContentShape>();
+	for(auto drawing : drawings){
+		if(drawing->name == "drawing area"){
+			if( pointVisibleInShape(p,drawing)) {
+				return drawing->matrix_norm_dst;
+			}
+		}
     }
     return ofMatrix4x4::newIdentityMatrix();
 }
@@ -198,13 +200,17 @@ bool ofx2DMappingProjector::pointVisibleInShape(ofPoint p, ofPtr<ofx2DMappingCon
 
     uint i, j=3;
     ofPoint last_p = p;
-    ofPoint next_p(-100,100);
+	ofPoint next_p(-10000,10000);
     int intersections = 0;
 
-    for (i=0; i<4; i++) {
-        poly[i].x = mq->src[i].x * mq->src_width;
-        poly[i].y = mq->src[i].y * mq->src_height;
-    }
+//    for (i=0; i<4; i++) {
+//        poly[i].x = mq->src[i].x * mq->src_width;
+//        poly[i].y = mq->src[i].y * mq->src_height;
+//    }
+	for (i=0; i<4; i++) {
+		poly[i].x = mq->dst[i].x * outputWidth();
+		poly[i].y = mq->dst[i].y * outputHeight();
+	}
 
     for (i=0; i<4; i++) {
 
