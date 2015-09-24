@@ -15,7 +15,7 @@ ofx2DFormMapping::ofx2DFormMapping(): ofxGuiGroup() {
 
 }
 
-void ofx2DFormMapping::setup(string title, ofx2DMappingProjector *parent_projector, ofxSortableList *parent_list, float w, float h) {
+void ofx2DFormMapping::setup(string title, ofPtr<ofx2DMappingProjector> parent_projector, ofxSortableList *parent_list, float w, float h) {
     b.width = w;
     b.height = h;
     spacing = Config().spacing;
@@ -82,10 +82,11 @@ void ofx2DFormMapping::setMappingRects() {
 //            ofxGuiGroup::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
 
             mapping_front.clear();
-            mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
+            if(mapping_rect_dst.width > 0 && mapping_rect_dst.height > 0){
+                mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
+            }
         }
     }
-
 }
 
 void ofx2DFormMapping::updateForms() {

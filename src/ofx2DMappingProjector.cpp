@@ -5,12 +5,12 @@
 ofx2DMappingProjector::ofx2DMappingProjector(float w, float h) {
     shapes.clear();
     shapes.resize(0);
-    start_point = ofPoint(0,0);
     plane[0] = ofPoint(0, 0, 0);
     plane[1] = ofPoint(1, 0, 0);
     plane[2] = ofPoint(1, 1, 0);
     plane[3] = ofPoint(0, 1, 0);
 
+    camera.resize(4);
     camera[0] = ofPoint(0, 0, 0);
     camera[1] = ofPoint(1, 0, 0);
     camera[2] = ofPoint(1, 1, 0);
@@ -226,16 +226,6 @@ bool ofx2DMappingProjector::pointVisibleInShape(ofPoint p, ofPtr<ofx2DMappingCon
 
 bool ofx2DMappingProjector::isLeft(ofPoint a, ofPoint b, ofPoint c){
      return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
-}
-
-
-
-ofPoint ofx2DMappingProjector::getStartPoint() {
-    return start_point;
-}
-
-void ofx2DMappingProjector::setStartPoint(ofPoint p) {
-    start_point = p;
 }
 
 ofPtr<ofxSVG> ofx2DMappingProjector::svg() {
@@ -503,11 +493,11 @@ void ofx2DMappingProjector::exportSvg(string path) {
     xml.saveFile(path);
 }
 
-float ofx2DMappingProjector::outputWidth() {
+ofParameter<float> &ofx2DMappingProjector::outputWidth() {
     return output_w;
 }
 
-float ofx2DMappingProjector::outputHeight() {
+ofParameter<float> &ofx2DMappingProjector::outputHeight() {
     return output_h;
 }
 
@@ -519,15 +509,16 @@ void ofx2DMappingProjector::setOutputSize(float w, float h){
 ofParameter<bool>& ofx2DMappingProjector::getUsingCam() {
     return use_cam;
 }
-ofPoint (&ofx2DMappingProjector::getCamera())[4] {
+
+ofPolyline& ofx2DMappingProjector::getCamera() {
    return camera;
 }
 
-void ofx2DMappingProjector::setCamera(ofPoint (&arr)[4]){
-    camera[0] = arr[0];
-    camera[1] = arr[1];
-    camera[2] = arr[2];
-    camera[3] = arr[3];
+void ofx2DMappingProjector::setCamera(ofPolyline p){
+    camera[0] = p[0];
+    camera[1] = p[1];
+    camera[2] = p[2];
+    camera[3] = p[3];
     //TODO check width and height parameters
     ofx2DMappingObject::findHomography(camera,plane, (GLfloat*)camera_homography.getPtr(),true, outputWidth(), outputHeight());
 }

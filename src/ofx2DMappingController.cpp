@@ -154,7 +154,7 @@ void ofx2DMappingController::reloadMapping(ofxXmlSettings_ptr xml) {
 
 }
 
-ofPtr<ofx2DMappingObject> ofx2DMappingController::createShape(ofx2DMappingProjector* projector, string type, string name) {
+ofPtr<ofx2DMappingObject> ofx2DMappingController::createShape(ofPtr<ofx2DMappingProjector> projector, string type, string name) {
 
     ofPtr<ofx2DMappingObject> res;
 
@@ -184,7 +184,7 @@ void ofx2DMappingController::update() {
     }
 
     for(uint i = 0; i < projectors.size(); i++) {
-        projectors[i].update();
+        projectors[i]->update();
     }
 
     updateFbo(0);
@@ -201,9 +201,7 @@ void ofx2DMappingController::updateFbo(int projector_id) {
 
     if(projector_id < (int)projectors.size()) {
 
-        ofx2DMappingProjector* p = &(projectors[projector_id]);
-
-        mappedContentToFbo(p);
+        mappedContentToFbo(projectors[projector_id]);
 
     }
     else {
@@ -220,7 +218,7 @@ void ofx2DMappingController::updateAreaFbo(int projector_id) {
 
     if(projector_id < (int)projectors.size()) {
 
-        ofx2DMappingProjector* p = &(projectors[projector_id]);
+        ofPtr<ofx2DMappingProjector> p = projectors[projector_id];
 
         mappedAreaToFbo(p);
 
@@ -231,7 +229,7 @@ void ofx2DMappingController::updateAreaFbo(int projector_id) {
 }
 
 
-void ofx2DMappingController::mappedContentToFbo(ofx2DMappingProjector *p) {
+void ofx2DMappingController::mappedContentToFbo(ofPtr<ofx2DMappingProjector> p) {
 
     ofEnableAlphaBlending();
     glEnable (GL_LINE_SMOOTH);
@@ -253,7 +251,7 @@ void ofx2DMappingController::mappedContentToFbo(ofx2DMappingProjector *p) {
 
 }
 
-void ofx2DMappingController::mappedAreaToFbo(ofx2DMappingProjector *p) {
+void ofx2DMappingController::mappedAreaToFbo(ofPtr<ofx2DMappingProjector> p) {
 
     mapped_area_fbo->begin();
     ofClear(0, 0, 0, 255);
@@ -267,7 +265,7 @@ void ofx2DMappingController::mappedAreaToFbo(ofx2DMappingProjector *p) {
 
 }
 
-void ofx2DMappingController::drawCalibration(ofx2DMappingProjector* p) {
+void ofx2DMappingController::drawCalibration(ofPtr<ofx2DMappingProjector> p) {
 
     ofEnableAlphaBlending();
 
@@ -311,23 +309,23 @@ ofParameter<int>& ofx2DMappingController::getCalGrey() {
 
 void ofx2DMappingController::addProjector(float w, float h) {
 
-    projectors.push_back(ofx2DMappingProjector(w,h));
+    projectors.push_back(ofPtr<ofx2DMappingProjector>(new ofx2DMappingProjector(w,h)));
 
 }
 
-ofx2DMappingProjector* ofx2DMappingController::getProjector(int id) {
+ofPtr<ofx2DMappingProjector> ofx2DMappingController::getProjector(int id) {
     if(id < (int)projectors.size()) {
-        return &(projectors[id]);
+        return projectors[id];
     }
     else {
         ofLogError("ofx2DMappingController: getProjector()", "trying to get projector " + ofToString(id) + " but projectors size is " + ofToString(projectors.size()));
-        return 0;
+        return nullptr;
     }
 }
 
 ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint next_p) {
 
-    ofx2DMappingProjector *p = getProjector();
+    ofPtr<ofx2DMappingProjector> p = getProjector();
     ofPoint last_p_norm(last_p.x/p->outputWidth(), last_p.y/p->outputHeight());
     ofPoint res_norm;
     ofPoint res = next_p;
@@ -657,8 +655,8 @@ void ofx2DMappingController::setOutputShape(ofRectangle r){
     mapped_content_fbo->allocate(r.width, r.height, GL_RGBA);
     mapped_area_fbo->allocate(r.width, r.height, GL_RGBA);
     getProjector()->setOutputSize(r.width,r.height);
-//    getProjector()->outputWidth().set(r.width);
-//    getProjector()->outputHeight().set(r.height);
+    //getProjector()->outputWidth().set(r.width);
+    //getProjector()->outputHeight().set(r.height);
 }
 
 void ofx2DMappingController::setOutputPosition(float x, float y){

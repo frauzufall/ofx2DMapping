@@ -57,7 +57,7 @@ public:
     bool mouseReleased(ofMouseEventArgs &args);
     bool mouseScrolled(ofMouseEventArgs &args);
 
-    void setup(string title, ofx2DMappingProjector* parent_projector, ofxSortableList* parent_list, float w, float h);
+    void setup(string title, ofPtr<ofx2DMappingProjector> parent_projector, ofxSortableList* parent_list, float w, float h);
 
     void rebuild();
     void updateForms();
@@ -100,7 +100,7 @@ private:
 
     ofParameter<string> explanation;
 
-    ofx2DMappingProjector* parent_projector;
+    ofPtr<ofx2DMappingProjector> parent_projector;
     ofxSortableList* parent_list;
 
     int zoom_factor;

@@ -134,6 +134,16 @@ public:
         }
     }
 
+    static void findHomography(ofPolyline& line, ofPoint dst_norm[4], float homography[16], bool points_normalized, float w, float h){
+        ofPoint src_norm[4];
+        src_norm[0] = line[0];
+        src_norm[1] = line[1];
+        src_norm[2] = line[2];
+        src_norm[3] = line[3];
+        findHomography(src_norm, dst_norm, homography, points_normalized, w, h);
+
+    }
+
     static void findHomography(ofPoint src_norm[4], ofPoint dst_norm[4], float homography[16], bool points_normalized, float w, float h)
     {
 

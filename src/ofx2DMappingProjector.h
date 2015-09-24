@@ -50,10 +50,6 @@ public:
 
     bool isLeft(ofPoint a, ofPoint b, ofPoint c);
 
-    ofPoint getStartPoint();
-
-    void setStartPoint(ofPoint p);
-
     void                        exportSvg(string path);
 
     ofPtr<ofxSVG>                  svg();
@@ -65,20 +61,18 @@ public:
     void                        importSvg(string file);
     void                        reloadLinesFromRaw();
 
-    float			outputWidth();
-    float			outputHeight();
+    ofParameter<float>& outputWidth();
+    ofParameter<float>&	outputHeight();
     void setOutputSize(float w, float h);
 
     ofPoint inOutput(ofPoint orig);
 
     ofParameter<bool> &getUsingCam();
     ofPoint inCameraView(ofPoint orig);
-    ofPoint (&getCamera())[4];
-    void setCamera(ofPoint (&arr)[4]);
+    ofPolyline& getCamera();
+    void setCamera(ofPolyline p);
 
 private:
-
-    float output_w, output_h;
 
     ofPtr<ofxSVG>                  _svg;
     ofPaths_ptr                 _paths;
@@ -86,15 +80,14 @@ private:
     ofPolylines_ptr             _outlines_raw;
 
     vector<ofPtr<ofx2DMappingObject>> shapes;
-    ofPoint                 start_point;
     ofPoint                 plane[4];
 
-    ofFbo_ptr               input_fbo;
-
-    ofPoint                 camera[4];
+    ofPolyline camera;
     ofMatrix4x4             camera_homography;
 
     ofParameter<bool>           use_cam;
+
+    ofParameter<float> output_w, output_h;
 
 };
 

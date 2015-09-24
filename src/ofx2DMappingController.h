@@ -27,10 +27,10 @@ class ofx2DMappingController {
         ofPoint                     getPoint(ofxXmlSettings_ptr xml);
         ofPolyline                  getPolyline(ofxXmlSettings_ptr xml);
 
-        void                        drawCalibration(ofx2DMappingProjector *p);
+        void                        drawCalibration(ofPtr<ofx2DMappingProjector> p);
 
         void						addProjector(float w, float h);
-        ofx2DMappingProjector*      getProjector(int id = 0);
+        ofPtr<ofx2DMappingProjector> getProjector(int id = 0);
 
         ofPoint                     getPointInMappedArea(ofPoint last_p,ofPoint next_p);
         ofPoint                     intersectionPointPolyline(ofPoint last_p, ofPoint next_p, ofPolyline polyline);
@@ -84,7 +84,7 @@ class ofx2DMappingController {
 
     protected:
 
-        ofPtr<ofx2DMappingObject> createShape(ofx2DMappingProjector* projector, string type, string name);
+        ofPtr<ofx2DMappingObject> createShape(ofPtr<ofx2DMappingProjector> projector, string type, string name);
 
         bool use_mapping;
 
@@ -92,7 +92,7 @@ class ofx2DMappingController {
 
         ofParameter<float> control_w, control_h;
 
-        vector<ofx2DMappingProjector>			projectors;
+        vector<ofPtr<ofx2DMappingProjector>> projectors;
         GLfloat						matrix[16];
         ofPoint						plane[4];
 
@@ -103,8 +103,8 @@ class ofx2DMappingController {
         ofFbo_ptr           		mapped_content_fbo;
         ofFbo_ptr                   mapped_area_fbo;
 
-        void                        mappedContentToFbo(ofx2DMappingProjector *p);
-        void                        mappedAreaToFbo(ofx2DMappingProjector *p);
+        void                        mappedContentToFbo(ofPtr<ofx2DMappingProjector> p);
+        void                        mappedAreaToFbo(ofPtr<ofx2DMappingProjector> p);
 
         vector<ofPtr<ofx2DMappingObject>>   available_shapes;
 

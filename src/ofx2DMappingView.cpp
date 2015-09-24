@@ -126,7 +126,7 @@ void ofx2DMappingView::updateObjectList() {
 
     object_list.clear();
 
-    ofx2DMappingProjector *p = ctrl->getProjector();
+    ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
 
     for(uint i = 0; i < p->shapeCount(); i++) {
 
@@ -154,7 +154,7 @@ void ofx2DMappingView::importSvg() {
 
 void ofx2DMappingView::removeForm(RemovedElementData &data) {
 
-    ofx2DMappingProjector *p = ctrl->getProjector();
+    ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
     int index = p->shapeCount()-1-data.index;
     if(p->removeShape(index)) {
         p->updateOutlines();
@@ -165,7 +165,7 @@ void ofx2DMappingView::removeForm(RemovedElementData &data) {
 
 void ofx2DMappingView::reorderForm(MovingElementData &data) {
 
-    ofx2DMappingProjector *p = ctrl->getProjector();
+    ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
 
     int index1 = p->shapeCount()-1-data.old_index;
     int index2 = p->shapeCount()-1-data.new_index;
