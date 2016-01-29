@@ -8,118 +8,108 @@ typedef ofPtr<ofxXmlSettings> ofxXmlSettings_ptr;
 typedef ofPtr<ofFbo> ofFbo_ptr;
 typedef ofPtr<ofImage> ofImage_ptr;
 typedef ofPtr<ofTexture> ofTexture_ptr;
-	
+
 class ofx2DMappingController {
 
-    public:
+	public:
 
-        ofx2DMappingController();
-        ~ofx2DMappingController() {
-            projectors.clear();
-        }
+		ofx2DMappingController();
+		~ofx2DMappingController() {
+			projectors.clear();
+		}
 
-        void						setup(string xml_path);
-        void						update();
-        void                        updateFbo(int projector_id);
-        void                        updateAreaFbo(int projector_id);
+		void						setup(string xml_path);
+		void						update();
+		void                        updateFbo(int projector_id);
+		void                        updateAreaFbo(int projector_id);
 
-        void						setupMapping();
-        void						reloadMapping(ofxXmlSettings_ptr xml);
-        void                        setRectangle(ofxXmlSettings_ptr xml, ofPoint* rectangle);
-        ofPoint                     getPoint(ofxXmlSettings_ptr xml);
-        ofPolyline                  getPolyline(ofxXmlSettings_ptr xml);
+		void						setupMapping();
+		void						reloadMapping(ofxXmlSettings_ptr xml);
+		void                        setRectangle(ofxXmlSettings_ptr xml, ofPoint* rectangle);
+		ofPoint                     getPoint(ofxXmlSettings_ptr xml);
+		ofPolyline                  getPolyline(ofxXmlSettings_ptr xml);
 
-        void                        drawCalibration(ofx2DMappingProjector *p);
+		void                        drawCalibration(ofx2DMappingProjector *p);
 
-        void						addProjector(float w, float h);
-        ofx2DMappingProjector*                  getProjector(int id);
+		void						addProjector(float w, float h);
+		ofx2DMappingProjector*                  getProjector(int id);
 
-        ofPoint                     getPointInMappedArea(ofPoint last_p,ofPoint next_p);
-        ofPoint                     intersectionPointPolyline(ofPoint last_p, ofPoint next_p, ofPolyline polyline);
+		ofPoint                     getPointInMappedArea(ofPoint last_p,ofPoint next_p);
+		ofPoint                     intersectionPointPolyline(ofPoint last_p, ofPoint next_p, ofPolyline polyline);
 
-        ofPoint                     getIntersection(ofPoint p1, ofPoint p2, ofPoint p3, ofPoint p4);
-        bool                        isLeft(ofPoint p1, ofPoint p2, ofPoint p_test);
-        bool                        isOnLine(ofPoint p1, ofPoint p2, ofPoint p_test);
+		ofPoint                     getIntersection(ofPoint p1, ofPoint p2, ofPoint p3, ofPoint p4);
+		bool                        isLeft(ofPoint p1, ofPoint p2, ofPoint p_test);
+		bool                        isOnLine(ofPoint p1, ofPoint p2, ofPoint p_test);
 
-        ofParameter<bool>           &getCalibrating();
+		ofParameter<bool>           &getCalibrating();
 
-        ofParameter<float>          &getCalBorder();
-        ofParameter<int>            &getCalGrey();
+		ofParameter<float>          &getCalBorder();
+		ofParameter<int>            &getCalGrey();
 
-        float						contentWidth();
-        float						contentHeight();
-        float						controlWidth();
-        float						controlHeight();
-        float						vidMaxWidth();
-        float						vidMaxHeight();
+		float						controlWidth();
+		float						controlHeight();
 
-        void						setContentWidth(float val);
-        void						setContentHeight(float val);
-        void						setControlWidth(float val);
-        void						setControlHeight(float val);
-        void						setVidMaxWidth(float val);
-        void						setVidMaxHeight(float val);
+		void						setControlWidth(float val);
+		void						setControlHeight(float val);
 
-        ofFbo_ptr &getOutput();
-        ofFbo_ptr					getArea();
+		ofFbo_ptr &getOutput();
+		ofFbo_ptr					getArea();
 
-        ofPoint                     controlpoint;
+		ofPoint                     controlpoint;
 
-        void keyPressed  (ofKeyEventArgs &args);
-        void keyReleased(ofKeyEventArgs &args);
+		void keyPressed  (ofKeyEventArgs &args);
+		void keyReleased(ofKeyEventArgs &args);
 
-        void saveOutputImage();
+		void saveOutputImage();
 
-        void                        saveMapping(string path, string path_svg, string path_png);
-        void                        saveMappingDefault();
-        void                        saveMappingAsPng(string path);
-        void                        saveMappingAsPng();
-        void                        saveMappingAsSvg();
-        void                        importSvg();
+		void                        saveMapping(string path, string path_svg, string path_png);
+		void                        saveMappingDefault();
+		void                        saveMappingAsPng(string path);
+		void                        saveMappingAsPng();
+		void                        saveMappingAsSvg();
+		void                        importSvg();
 
-        void addTemplate(ofPtr<ofx2DMappingObject> obj);
-        template <class T>
-        ofPtr<T> addTemplate(string name) {
-            ofPtr<T> obj  = ofPtr<T>(new T());
-            addTemplate(obj);
-            obj->name = name;
-            return obj;
-        }
+		void addTemplate(ofPtr<ofx2DMappingObject> obj);
+		template <class T>
+		ofPtr<T> addTemplate(string name) {
+			ofPtr<T> obj  = ofPtr<T>(new T());
+			addTemplate(obj);
+			obj->name = name;
+			return obj;
+		}
 
-        vector<ofPtr<ofx2DMappingObject>> getOptions();
+		vector<ofPtr<ofx2DMappingObject>> getOptions();
 
-        ofRectangle                 getOutputRectangle();
-        void                        setOutputRectangle(ofRectangle r);
+		ofRectangle                 getOutputRectangle();
+		void                        setOutputRectangle(ofRectangle r);
 
-    private:
+	private:
 
-        ofPtr<ofx2DMappingObject> createShape(ofx2DMappingProjector* projector, string type, string name);
+		ofPtr<ofx2DMappingObject> createShape(ofx2DMappingProjector* projector, string type, string name);
 
-        bool use_mapping;
+		bool use_mapping;
 
-        string xml_mapping, svg_mapping, png_mapping;
+		string xml_mapping, svg_mapping, png_mapping;
 
-        float content_w, content_h;
-        float control_w, control_h;
-        float vid_max_w, vid_max_h;
+		float control_w, control_h;
 
-        vector<ofx2DMappingProjector>			projectors;
-        GLfloat						matrix[16];
-        ofPoint						plane[4];
+		vector<ofx2DMappingProjector>			projectors;
+		GLfloat						matrix[16];
+		ofPoint						plane[4];
 
-        ofParameter<bool>           is_cal;
-        ofParameter<float>          cal_border;
-        ofParameter<int>            cal_grey;
+		ofParameter<bool>           is_cal;
+		ofParameter<float>          cal_border;
+		ofParameter<int>            cal_grey;
 
-        ofFbo_ptr           		mapped_content_fbo;
-        ofFbo_ptr                   mapped_area_fbo;
+		ofFbo_ptr           		mapped_content_fbo;
+		ofFbo_ptr                   mapped_area_fbo;
 
-        void                        mappedContentToFbo(ofx2DMappingProjector *p);
-        void                        mappedAreaToFbo(ofx2DMappingProjector *p);
+		void                        mappedContentToFbo(ofx2DMappingProjector *p);
+		void                        mappedAreaToFbo(ofx2DMappingProjector *p);
 
-        vector<ofPtr<ofx2DMappingObject>>   available_shapes;
+		vector<ofPtr<ofx2DMappingObject>>   available_shapes;
 
-        ofRectangle                 output_rectangle;
+		ofRectangle                 output_rectangle;
 
 };
 
