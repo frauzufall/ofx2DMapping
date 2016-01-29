@@ -433,10 +433,10 @@ ofPoint ofx2DMappingController::intersectionPointPolyline(ofPoint last_p, ofPoin
 
 	uint i, j=polyline.size()-1;
 
-	ofPoint poly[polyline.size()];
+	vector<ofPoint> poly;
 
 	for (i=0; i<polyline.size(); i++) {
-		poly[i] = polyline.getVertices().at(i);
+		poly.push_back(polyline.getVertices().at(i));
 	}
 
 	vector<ofPoint> intersections;
