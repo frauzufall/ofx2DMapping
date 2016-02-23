@@ -15,7 +15,7 @@ public:
         vector<ofPath::Command> commands;
 
         vector<ofPath::Command>& pathCommands = path.getCommands();
-        for (uint j=0; j<pathCommands.size(); j++) {
+        for (int j=0; j<pathCommands.size(); j++) {
             commands.push_back(pathCommands[j]);
         }
 
@@ -25,7 +25,7 @@ public:
             ofPath tempPath;
             int arcResolution = tempPath.getCircleResolution();
 
-        for(uint i=0; i<commands.size(); i++) {
+        for(int i=0; i<commands.size(); i++) {
             switch(commands[i].type) {
                 case ofPath::Command::moveTo:
                     polyline.addVertex(commands[i].to);
@@ -107,7 +107,7 @@ public:
                 stringstream path_sstr;
                 path_sstr << "m";
                 ofPoint last_p;
-                for(uint k = 0; k < line.size(); k++) {
+                for(int k = 0; k < line.size(); k++) {
                     ofPoint cur_p = ofPoint(line[k].x, line[k].y);
                     if(k == 0)
                         path_sstr << cur_p.x << "," << cur_p.y;

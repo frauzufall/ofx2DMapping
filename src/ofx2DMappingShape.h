@@ -93,7 +93,7 @@ public:
         xml->addTag("polyline");
         xml->pushTag("polyline",0);
 
-            for(uint k = 0; k < polyline.size(); k++) {
+            for(int k = 0; k < polyline.size(); k++) {
                 xml->addTag("point");
                 xml->pushTag("point",k);
                     xml->addValue("x", polyline[k].x);
@@ -113,7 +113,7 @@ public:
         ofFill();
 
         ofBeginShape();
-        for (uint j = 0; j < this->polyline.size(); j++){
+        for (int j = 0; j < this->polyline.size(); j++){
             ofVertex(this->polyline[j].x*w, this->polyline[j].y*h);
         }
 

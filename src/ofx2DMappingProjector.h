@@ -37,7 +37,7 @@ public:
 
     ofPtr<ofx2DMappingObject> getMappingObject(int id);
 
-    uint shapeCount();
+    int shapeCount();
 
     ofPtr<ofx2DMappingObject> getFirstImageShape();
 
@@ -46,7 +46,7 @@ public:
         vector<ofPtr<T>> res;
         res.clear();
         ofPtr<T> mo;
-        for(uint i = 0; i < shapeCount(); i++) {
+        for(int i = 0; i < shapeCount(); i++) {
             mo = dynamic_pointer_cast<T>(getMappingObject(i));
             if(mo) {
                 res.push_back(mo);

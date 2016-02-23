@@ -21,7 +21,7 @@ class ofx2DMappingColorShape : public ofx2DMappingShape {
         ofFill();
         ofSetColor(this->color);
         ofBeginShape();
-            for (uint j = 0; j < this->polyline.size(); j++){
+            for (int j = 0; j < this->polyline.size(); j++){
             ofVertex(this->polyline[j].x*w, this->polyline[j].y*h);
         }
         ofEndShape(true);
