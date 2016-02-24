@@ -60,7 +60,7 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
 	add_button_params.clear();
 	vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
-	for(uint i = 0; i < options.size(); i++) {
+	for(unsigned int i = 0; i < options.size(); i++) {
 		add_button_params.push_back(ofParameter<bool>("add " + options.at(i)->name, true));
 		add_buttons_panel.add(add_button_params.at(i));
 		add_button_params.at(i) = false;
@@ -106,7 +106,7 @@ void ofx2DMappingView::update() {
 
 	mapping_forms.update();
 
-	for(uint i = 0; i < add_button_params.size(); i++) {
+	for(unsigned int i = 0; i < add_button_params.size(); i++) {
 		if(add_button_params.at(i)) {
 			ctrl->getProjector(0)->copyShape(ctrl->getOptions().at(i));
 			mapping_forms.updateForms();
@@ -148,7 +148,7 @@ void ofx2DMappingView::updateObjectList() {
 
 	ofx2DMappingProjector *p = ctrl->getProjector(0);
 
-	for(uint i = 0; i < p->shapeCount(); i++) {
+	for(unsigned int i = 0; i < p->shapeCount(); i++) {
 
 		ofPtr<ofx2DMappingObject> mq = p->getMappingObject(i);
 		if(mq) {
@@ -226,13 +226,13 @@ ofx2DFormMapping *ofx2DMappingView::getFormMapping() {
 }
 
 void ofx2DMappingView::selectAllObjects() {
-	for(uint i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
+	for(unsigned int i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
 		ctrl->getProjector(0)->getMappingObject(i)->editable = true;
 	}
 }
 
 void ofx2DMappingView::deselectAllObjects() {
-	for(uint i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
+	for(unsigned int i = 0; i < ctrl->getProjector(0)->shapeCount(); i++) {
 		ctrl->getProjector(0)->getMappingObject(i)->editable = false;
 	}
 }
