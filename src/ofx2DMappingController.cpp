@@ -131,7 +131,7 @@ ofPtr<ofx2DMappingObject> ofx2DMappingController::createShape(ofx2DMappingProjec
 
 	ofPtr<ofx2DMappingObject> res;
 
-	int i = 0;
+	unsigned int i = 0;
 	for(; i < available_shapes.size(); i++) {
 		if(available_shapes.at(i)->name == name) {
 			res = projector->copyShape(available_shapes.at(i));
@@ -148,7 +148,7 @@ ofPtr<ofx2DMappingObject> ofx2DMappingController::createShape(ofx2DMappingProjec
 
 void ofx2DMappingController::update() {
 
-	for(int i = 0; i < projectors.size(); i++) {
+	for(unsigned int i = 0; i < projectors.size(); i++) {
 		projectors[i].update();
 	}
 
@@ -206,7 +206,7 @@ void ofx2DMappingController::mappedContentToFbo(ofx2DMappingProjector *p) {
 	mapped_content_fbo->begin();
 	ofClear(0, 0, 0, 255);
 
-	for(int i = 0; i < p->shapeCount(); i++) {
+	for(unsigned int i = 0; i < p->shapeCount(); i++) {
 
 		ofPtr<ofx2DMappingObject> q = p->getMappingObject(i);
 		q->draw(p->outputWidth(), p->outputHeight());
@@ -223,7 +223,7 @@ void ofx2DMappingController::mappedAreaToFbo(ofx2DMappingProjector *p) {
 	mapped_area_fbo->begin();
 	ofClear(0, 0, 0, 255);
 
-	for(int i = 0; i < p->shapeCount(); i++) {
+	for(unsigned int i = 0; i < p->shapeCount(); i++) {
 
 		p->getMappingObject(i)->drawArea(p->outputWidth(), p->outputHeight());
 	}
@@ -236,7 +236,7 @@ void ofx2DMappingController::drawCalibration(ofx2DMappingProjector* p) {
 
 	ofEnableAlphaBlending();
 
-	for(int i = 0; i < p->shapeCount(); i++) {
+	for(unsigned int i = 0; i < p->shapeCount(); i++) {
 
 	   ofPtr<ofx2DMappingObject> q = p->getMappingObject(i);
 
@@ -313,7 +313,7 @@ ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint nex
 //    res_norm.x = res.x/output_w;
 //    res_norm.y = res.y/output_h;
 
-//    for(uint i = 0; i < getProjector(0)->shapeCount(); i++) {
+//    for(unsigned int i = 0; i < getProjector(0)->shapeCount(); i++) {
 
 //        MappingShape_ptr shape = std::dynamic_pointer_cast<MappingShape>(getProjector(0)->getShape(i));
 
@@ -360,7 +360,7 @@ ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint nex
 //            }
 //        }
 
-//        for(uint i = 0; i < paintings_last_inside.size(); i++) {
+//        for(unsigned int i = 0; i < paintings_last_inside.size(); i++) {
 
 //            MappingShape_ptr shape = paintings_last_inside.at(i);
 
@@ -388,7 +388,7 @@ ofPoint ofx2DMappingController::getPointInMappedArea(ofPoint last_p, ofPoint nex
 
 //        float dist_res_nextp = 1000000;
 
-//        for(uint i = 0; i < windows_next_inside.size(); i++) {
+//        for(unsigned int i = 0; i < windows_next_inside.size(); i++) {
 
 //            MappingShape_ptr shape = windows_next_inside.at(i);
 
@@ -431,7 +431,7 @@ bool ofx2DMappingController::isOnLine(ofPoint p1, ofPoint p2, ofPoint p_test){
 
 ofPoint ofx2DMappingController::intersectionPointPolyline(ofPoint last_p, ofPoint next_p, ofPolyline polyline) {
 
-	int i, j=polyline.size()-1;
+	unsigned int i, j=polyline.size()-1;
 
 	vector<ofPoint> poly;
 
@@ -458,7 +458,7 @@ ofPoint ofx2DMappingController::intersectionPointPolyline(ofPoint last_p, ofPoin
 
 	ofPoint min_dif_p = next_p;
 	float min_dif = 100000;
-	for(int i = 0; i<intersections.size(); i++) {
+	for(unsigned int i = 0; i<intersections.size(); i++) {
 		float dist = last_p.distance(intersections.at(i));
 		if(dist < min_dif) {
 			min_dif_p = intersections.at(i);
@@ -521,7 +521,7 @@ void ofx2DMappingController::saveMapping(string path, string path_svg, string pa
 				xml->addValue("height", (int)getProjector(0)->outputHeight());
 			xml->popTag();
 
-			for(int j = 0; j < getProjector(0)->shapeCount(); j++) {
+			for(unsigned int j = 0; j < getProjector(0)->shapeCount(); j++) {
 
 				ofPtr<ofx2DMappingObject> mq = getProjector(0)->getMappingObject(j);
 
