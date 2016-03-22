@@ -1,4 +1,5 @@
 ofxGui
+ofxDOM
 ofxTriangle
 ofxSvg
 ofxSortableList

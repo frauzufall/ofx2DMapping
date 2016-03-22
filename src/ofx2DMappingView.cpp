@@ -1,289 +1,219 @@
 #include "ofx2DMappingView.h"
 
-ofx2DMappingView::ofx2DMappingView():ofxGuiPage() {
+ofx2DMappingView::ofx2DMappingView(const ofJson &config):ofxPanel() {
 
-    zoom = 1;
-    zoom_pos = ofPoint(0.5,0.5);
-    direct_edit.set("direct edit", false);
-    setup_done = false;
+	zoom = 1;
+	zoom_pos = ofPoint(0.5,0.5);
+	direct_edit.set("direct edit", false);
+	setup_done = false;
+	mapping_forms = nullptr;
+	list_panel = nullptr;
+	main_panel = nullptr;
+	object_list = nullptr;
+
+	_setConfig(config);
 
 }
 
+ofx2DMappingView::~ofx2DMappingView(){
+	if(setup_done){
+		vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
+		for(uint i = 0; i < options.size(); i++) {
+			options.at(i)->pleaseCopyMe.removeListener(this, &ofx2DMappingView::addedObject);
+		}
+		save.removeListener(ctrl, &ofx2DMappingController::saveMappingDefault);
+		import.removeListener(this, &ofx2DMappingView::importSvg);
+		direct_edit.removeListener(this, &ofx2DMappingView::setEditMode);
+		select_all.removeListener(this, &ofx2DMappingView::selectAllObjects);
+		deselect_all.removeListener(this, &ofx2DMappingView::deselectAllObjects);
+		delete_all.removeListener(this, &ofx2DMappingView::removeAllObjects);
+		ofRemoveListener(object_list->elementRemoved, this, &ofx2DMappingView::removeForm);
+		ofRemoveListener(object_list->elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
+	}
+}
+
 void ofx2DMappingView::setControl(ofx2DMappingController *ctrl) {
-    this->ctrl = ctrl;
+	this->ctrl = ctrl;
 }
 
 void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
-    setup_done = true;
+	setup_done = true;
 
-    //MAPPING RECT PANEL
-    mapping_forms.setup("MAPPING FORMS", ctrl->getProjector(), &object_list, w, h);
-    mapping_forms.setMappingBackground(ctrl->getOutput());
-    mapping_forms.setHeaderBackgroundColor(group_config.headerBackgroundColor);
-    mapping_forms.setShowHeader(group_config.showHeader);
-    mapping_forms.setBorderColor(group_config.borderColor);
-    mapping_forms.setTextColor(group_config.textColor);
+	mapping_forms = this->add<ofx2DFormMapping>();
+	main_panel = this->addPanel("MAPPING");
+	list_panel = this->addGroup("MAPPING OBJECTS");
+	main_panel->setAttribute("float", LayoutFloat::LEFT);
+	list_panel->setAttribute("float", LayoutFloat::LEFT);
+	mapping_forms->setAttribute("float", LayoutFloat::RIGHT);
+	mapping_forms->setConfig(ofJson({{"width", "50%"}}));
 
-    //MAIN OPTIONS PANEL
+	//MAIN OPTIONS PANEL
+	save.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
+	main_panel->add(save.set("save"));
 
-    main_panel.setup("MAPPING", group_config);
+	import.addListener(this, &ofx2DMappingView::importSvg);
+	main_panel->add(import.set("import svg"));
 
-    save_btn.setup("save", toggle_config);
-    save_btn.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
-    main_panel.add(save_btn);
+	direct_edit.addListener(this, &ofx2DMappingView::setEditMode);
+	main_panel->add(direct_edit);
 
-    import_btn.setup("import svg", toggle_config);
-    import_btn.addListener(this, &ofx2DMappingView::importSvg);
-    main_panel.add(import_btn);
+	//CALIBRATION OPTIONS
 
-    edit_mode_btn.setup(direct_edit, toggle_config);
-    edit_mode_btn.addListener(this, &ofx2DMappingView::setEditMode);
-    main_panel.add(edit_mode_btn);
+	calibration_options = main_panel->addGroup("CALIBRATION OPTIONS");
 
-    //CALIBRATION OPTIONS
+	calibration_options->add(ctrl->getCalibrating());
+	calibration_options->add(ctrl->getCalBorder());
+	calibration_options->add(ctrl->getCalGrey());
 
-    calibration_options.setup("CALIBRATION OPTIONS", group_config);
+	//OBJECT LIST PANEL
 
-    calibration_options.add(ctrl->getCalibrating(), toggle_config);
-    calibration_options.add(ctrl->getCalBorder(), slider_config);
-    calibration_options.add(ctrl->getCalGrey(), slider_config);
+	add_buttons_panel = list_panel->addGroup("ADD MAPPING OBJECTS");
 
-    main_panel.add(calibration_options);
+	vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
+	for(uint i = 0; i < options.size(); i++) {
+//		ofxToggle::Config config = toggle_config;
+//		ofColor c = options.at(i)->color;
+//		if(c.getBrightness() < 200){
+//			c.setBrightness(200);
+//		}
+//		config.textColor = c;
+		add_buttons_panel->add(options.at(i)->pleaseCopyMe.set("add " + options.at(i)->name, false));
+		options.at(i)->pleaseCopyMe.addListener(this, &ofx2DMappingView::addedObject);
+	}
 
-    //OBJECT LIST PANEL
 
-    list_panel.setup("MAPPING OBJECTS", group_config);
+	//LIST MANIPULATION OPTIONS
 
-    add_buttons_panel.setup("ADD MAPPING OBJECTS", group_config);
+	list_options = list_panel->addGroup("OBJECT MANIPULATION");
 
-    vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
-    for(uint i = 0; i < options.size(); i++) {
-        ofxToggle::Config config = toggle_config;
-        ofColor c = options.at(i)->color;
-        if(c.getBrightness() < 200){
-            c.setBrightness(200);
-        }
-        config.textColor = c;
-        add_buttons_panel.add(options.at(i)->pleaseCopyMe.set("add " + options.at(i)->name, false), config);
-        options.at(i)->pleaseCopyMe.addListener(this, &ofx2DMappingView::addedObject);
-    }
+	select_all.addListener(this, &ofx2DMappingView::selectAllObjects);
+	list_options->add(select_all.set("select all"));
 
-    list_panel.add(add_buttons_panel);
+	deselect_all.addListener(this, &ofx2DMappingView::deselectAllObjects);
+	list_options->add(deselect_all.set("deselect all"));
 
-    //LIST MANIPULATION OPTIONS
+	delete_all.addListener(this, &ofx2DMappingView::removeAllObjects);
+	list_options->add(delete_all.set("delete all"));
 
-    list_options.setup("OBJECT MANIPULATION", group_config);
+	//OBJECT LIST
 
-    select_all_btn.setup("select all", toggle_config);
-    select_all_btn.addListener(this, &ofx2DMappingView::selectAllObjects);
-    list_options.add(select_all_btn);
+//	ofxGuiGroup::Config object_list_config = group_config;
+//	object_list_config.spacing = 1;
+	object_list = list_panel->add<ofxSortableList>("MAPPING OBJECT LIST");
+	ofAddListener(object_list->elementRemoved, this, &ofx2DMappingView::removeForm);
+	ofAddListener(object_list->elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
 
-    deselect_all_btn.setup("deselect all", toggle_config);
-    deselect_all_btn.addListener(this, &ofx2DMappingView::deselectAllObjects);
-    list_options.add(deselect_all_btn);
+	//MAPPING RECT PANEL
 
-    delete_all_btn.setup("delete all", toggle_config);
-    delete_all_btn.addListener(this, &ofx2DMappingView::removeAllObjects);
-    list_options.add(delete_all_btn);
+	mapping_forms->setup("MAPPING FORMS", ctrl->getProjector(), object_list, w, h);
+	mapping_forms->setMappingBackground(ctrl->getOutput());
 
-    list_panel.add(list_options);
 
-    //OBJECT LIST
+	setName("Mapping");
+	setShowHeader(false);
 
-    ofxGuiGroup::Config object_list_config = group_config;
-    object_list_config.spacing = 1;
-    object_list.setup("MAPPING OBJECT LIST", object_list_config);
-    ofAddListener(object_list.elementRemoved, this, &ofx2DMappingView::removeForm);
-    ofAddListener(object_list.elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
+	setShape(x,y,w,h);
 
-    list_panel.add(object_list);
-
-    ofxGuiGroup::setup("Mapping", group_config);
-    setShowHeader(false);
-    add(main_panel);
-    add(list_panel);
-    add(mapping_forms);
-
-    setShape(x,y,w,h);
-
-    setSubpanelPositions();
-
-    updateObjectList();
+	updateObjectList();
 
 
 }
 
 void ofx2DMappingView::addedObject(bool & clickstart){
-    if(clickstart){
-        ctrl->update();
-        mapping_forms.updateForms();
-        updateObjectList();
-    }
+	if(clickstart){
+		ctrl->update();
+		mapping_forms->updateForms();
+		updateObjectList();
+	}
 }
 
 void ofx2DMappingView::updateObjectList() {
 
-    object_list.clear();
+	object_list->clear();
 
-    ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
+	ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
 
-    for(uint i = 0; i < p->shapeCount(); i++) {
+	for(uint i = 0; i < p->shapeCount(); i++) {
 
-        ofPtr<ofx2DMappingObject> mq = p->getMappingObject(i);
-        if(mq) {
-            //insert toggles at beginning of list
-            mq->editable.setName(mq->name);
-            ofColor c = mq->color;
-            if(c.getBrightness() < 200){
-                c.setBrightness(200);
-            }
-            ofxToggle::Config config = toggle_config;
-            config.textColor = c;
-            object_list.add(mq->editable, config, false);
-        }
-    }
+		ofPtr<ofx2DMappingObject> mq = p->getMappingObject(i);
+		if(mq) {
+			//insert toggles at beginning of list
+			mq->editable.setName(mq->name);
+			ofColor c = mq->color;
+			if(c.getBrightness() < 200){
+				c.setBrightness(200);
+			}
+//			ofxToggle::Config config = toggle_config;
+//			config.textColor = c;
+			object_list->add(mq->editable);
+		}
+	}
 }
 
 void ofx2DMappingView::importSvg() {
-    ctrl->importSvg();
-    mapping_forms.updateForms();
-    object_list.clear();
-    updateObjectList();
+	ctrl->importSvg();
+	mapping_forms->updateForms();
+	object_list->clear();
+	updateObjectList();
 }
 
 void ofx2DMappingView::removeForm(RemovedElementData &data) {
 
-    ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
-    int index = p->shapeCount()-1-data.index;
-    if(p->removeShape(index)) {
-        p->updateOutlines();
-        mapping_forms.updateForms();
-    }
+	ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
+	int index = p->shapeCount()-1-data.index;
+	if(p->removeShape(index)) {
+		p->updateOutlines();
+		mapping_forms->updateForms();
+	}
 
 }
 
 void ofx2DMappingView::reorderForm(MovingElementData &data) {
 
-    ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
+	ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
 
-    int index1 = p->shapeCount()-1-data.old_index;
-    int index2 = p->shapeCount()-1-data.new_index;
+	int index1 = p->shapeCount()-1-data.old_index;
+	int index2 = p->shapeCount()-1-data.new_index;
 
-    bool swapped = p->swapShapes(index1,index2);
-    if(swapped) {
-        mapping_forms.updateForms();
-    }
+	bool swapped = p->swapShapes(index1,index2);
+	if(swapped) {
+		mapping_forms->updateForms();
+	}
 
-}
-
-void ofx2DMappingView::setSubpanelPositions() {
-    float margin = 10;
-    ofPoint pos = this->getPosition();
-    pos.y += spacing;
-    if(bShowHeader){
-        pos.y += header += spacingFirstElement;
-    }
-    main_panel.sizeChangedE.disable();
-    list_panel.sizeChangedE.disable();
-    mapping_forms.sizeChangedE.disable();
-    main_panel.setPosition(
-                pos.x+margin,
-                pos.y+margin);
-    list_panel.setPosition(
-                pos.x+margin,
-                pos.y+margin+main_panel.getHeight()+margin);
-    mapping_forms.setPosition(
-                main_panel.getPosition().x + main_panel.getWidth()+margin,
-                pos.y+margin);
-    main_panel.sizeChangedE.enable();
-    list_panel.sizeChangedE.enable();
-    mapping_forms.sizeChangedE.enable();
 }
 
 void ofx2DMappingView::setMappingBackground(ofFbo_ptr fbo) {
-    mapping_forms.setMappingBackground(fbo);
+	mapping_forms->setMappingBackground(fbo);
 }
 
 void ofx2DMappingView::showSource(bool show) {
-    mapping_forms.getShowSource().set(show);
+	mapping_forms->getShowSource().set(show);
 }
 
 void ofx2DMappingView::setEditMode(bool &) {
-    mapping_forms.setEditMode(direct_edit);
-    setSubpanelPositions();
-    //TODO trigger button
+	mapping_forms->setEditMode(direct_edit);
 }
 
 ofx2DFormMapping *ofx2DMappingView::getFormMapping() {
-    return &mapping_forms;
+	return mapping_forms;
 }
 
 void ofx2DMappingView::selectAllObjects() {
-    for(uint i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
-        ctrl->getProjector()->getMappingObject(i)->editable = true;
-    }
+	for(uint i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
+		ctrl->getProjector()->getMappingObject(i)->editable = true;
+	}
 }
 
 void ofx2DMappingView::deselectAllObjects() {
-    for(uint i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
-        ctrl->getProjector()->getMappingObject(i)->editable = false;
-    }
+	for(uint i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
+		ctrl->getProjector()->getMappingObject(i)->editable = false;
+	}
 }
 
 void ofx2DMappingView::removeAllObjects() {
-    ctrl->getProjector()->removeAllShapes();
-    ctrl->getProjector()->updateOutlines();
-    mapping_forms.updateForms();
-    updateObjectList();
-}
-
-void ofx2DMappingView::setSize(float width, float height) {
-    setShape(this->getPosition().x, this->getPosition().y, width, height);
-}
-
-void ofx2DMappingView::setShape(ofRectangle shape) {
-    setShape(shape.x, shape.y, shape.width, shape.height);
-}
-
-void ofx2DMappingView::setShape(float x, float y, float width, float height) {
-    int margin = 10;
-    mapping_forms.sizeChangedE.disable();
-    mapping_forms.setSize(width-object_list.getWidth()-margin*3, height-margin*3);
-    mapping_forms.sizeChangedE.enable();
-    setSubpanelPositions();
-    ofxGuiPage::setShape(x,y,width,height);
-}
-
-void ofx2DMappingView::setGroupConfig(const ofxGuiGroup::Config &config){
-    if(!setup_done){
-        group_config = config;
-    }else{
-        ofLogError("ofx2DMappingView: setGroupConfig()", "config must be set before ofx2DMappingView::setup()");
-    }
-
-}
-
-void ofx2DMappingView::setSliderConfig(const ofxFloatSlider::Config &config){
-    if(!setup_done){
-        slider_config = config;
-    }else{
-        ofLogError("ofx2DMappingView: setSliderConfig()", "config must be set before ofx2DMappingView::setup()");
-    }
-}
-
-void ofx2DMappingView::setToggleConfig(const ofxToggle::Config &config){
-    if(!setup_done){
-        toggle_config = config;
-    }else{
-        ofLogError("ofx2DMappingView: setToggleConfig()", "config must be set before ofx2DMappingView::setup()");
-    }
-}
-
-void ofx2DMappingView::setLabelConfig(const ofxLabel::Config &config){
-    if(!setup_done){
-        label_config = config;
-    }else{
-        ofLogError("ofx2DMappingView: setLabelConfig()", "config must be set before ofx2DMappingView::setup()");
-    }
+	ctrl->getProjector()->removeAllShapes();
+	ctrl->getProjector()->updateOutlines();
+	mapping_forms->updateForms();
+	updateObjectList();
 }

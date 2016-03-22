@@ -1,54 +1,59 @@
 #include "ofx2DMapping.h"
 
 ofx2DMapping::ofx2DMapping() {
-    show_controls = true;
 }
 
 void ofx2DMapping::setup() {
-    setup("mapping/mapping.xml");
+	setup("mapping/mapping.xml");
 
 }
 
-void ofx2DMapping::setup(string mapping_path, bool setup_view) {
-    ctrl.setup(mapping_path);
-    view.setControl(&ctrl);
-    if(setup_view){
-        view.setup(0,0,800,600);
-    }
+void ofx2DMapping::setup(string mapping_path) {
+	ctrl.setup(mapping_path);
 }
 
 void ofx2DMapping::update() {
-    ctrl.update();
+	ctrl.update();
 }
 
 ofx2DMappingController* ofx2DMapping::getControl() {
-    return &ctrl;
+	return &ctrl;
 }
 
 ofx2DMappingView* ofx2DMapping::getControlView() {
-    return &view;
+	return view;
+}
+
+ofx2DMappingView* ofx2DMapping::addControlViewTo(ofx::DOM::Element* parent) {
+	view = parent->add<ofx2DMappingView>();
+	view->setControl(&ctrl);
+	view->setup(0,0,800,600);
+	return view;
+}
+
+ofx2DMappingView* ofx2DMapping::addControlViewTo(ofx::DOM::Element& parent) {
+	return addControlViewTo(&parent);
+}
+
+ofx2DMappingView* ofx2DMapping::addControlViewTo(ofxGui& parent) {
+	return addControlViewTo(parent.getRoot());
 }
 
 void ofx2DMapping::draw() {
-    ctrl.getOutput()->draw(ctrl.getOutputShape());
-
-    if(show_controls) {
-        //draw the control panel
-        view.draw();
-    }
+	ctrl.getOutput()->draw(ctrl.getOutputShape());
 }
 
 void ofx2DMapping::setOutputShape(float x, float y, float width, float height) {
-    ctrl.setOutputShape(ofRectangle(x,y,width,height));
-    view.getFormMapping()->setOutputForm(x,y,width,height);
+	ctrl.setOutputShape(ofRectangle(x,y,width,height));
+	view->getFormMapping()->setOutputForm(x,y,width,height);
 }
 
 void ofx2DMapping::setControlShape(float x, float y, float width, float height) {
-    view.setShape(ofRectangle(x,y,width,height));
+	view->setShape(ofRectangle(x,y,width,height));
 }
 
 void ofx2DMapping::showControls(bool show) {
-    show_controls = show;
+	view->setHidden(!show);
 }
 
 //void ofx2DMapping::setDirectEditMode(bool direct) {
@@ -56,22 +61,22 @@ void ofx2DMapping::showControls(bool show) {
 //}
 
 ofPtr<ofx2DMappingImage> ofx2DMapping::addImageTemplate(string name, string path) {
-    ofPtr<ofx2DMappingImage> image = addTemplate<ofx2DMappingImage>(name);
-    image->loadImage(path);
-    image->setColor(ofColor(0,200,255));
-    return image;
+	ofPtr<ofx2DMappingImage> image = addTemplate<ofx2DMappingImage>(name);
+	image->loadImage(path);
+	image->setColor(ofColor(0,200,255));
+	return image;
 }
 
 ofPtr<ofx2DMappingFbo> ofx2DMapping::addFboTemplate(string name, ofPtr<ofFbo> fbo) {
-    ofPtr<ofx2DMappingFbo> content = addTemplate<ofx2DMappingFbo>(name);
-    content->setFbo(fbo);
-    return content;
+	ofPtr<ofx2DMappingFbo> content = addTemplate<ofx2DMappingFbo>(name);
+	content->setFbo(fbo);
+	return content;
 }
 
 ofPtr<ofx2DMappingColorShape> ofx2DMapping::addColorTemplate(string name, ofColor color) {
-    ofPtr<ofx2DMappingColorShape> shape = addTemplate<ofx2DMappingColorShape>(name);
-    shape->setColor(color);
-    return shape;
+	ofPtr<ofx2DMappingColorShape> shape = addTemplate<ofx2DMappingColorShape>(name);
+	shape->setColor(color);
+	return shape;
 }
 
 ofx2DMapping::~ofx2DMapping() {

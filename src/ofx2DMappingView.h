@@ -4,67 +4,55 @@
 #include "ofxSortableList.h"
 #include "ofx2DFormMapping.h"
 
-class ofx2DMappingView : public ofxGuiPage {
+class ofx2DMappingView : public ofxPanel {
 
 public:
-    ofx2DMappingView();
-    void setup(float x, float y, float w, float h);
-    void setMappingBackground(ofFbo_ptr fbo);
-    void showSource(bool show);
-    void setEditMode(bool &);
+	ofx2DMappingView(const ofJson& config = ofJson());
+	~ofx2DMappingView();
+	void setup(float x, float y, float w, float h);
+	void setMappingBackground(ofFbo_ptr fbo);
+	void showSource(bool show);
+	void setEditMode(bool &);
 
-    void setControl(ofx2DMappingController* ctrl);
+	void setControl(ofx2DMappingController* ctrl);
 
-    void importSvg();
+	void importSvg();
 
-    ofx2DFormMapping* getFormMapping();
+	ofx2DFormMapping* getFormMapping();
 
-    virtual void setSize(float width, float height);
-    virtual void setShape(ofRectangle shape);
-    virtual void setShape(float x, float y, float width, float height);
-
-    void setGroupConfig(const ofxGuiGroup::Config & config);
-    void setSliderConfig(const ofxFloatSlider::Config & config);
-    void setLabelConfig(const ofxLabel::Config & config);
-    void setToggleConfig(const ofxToggle::Config & config);
 
 protected:
 
-    bool setup_done;
-    ofxFloatSlider::Config slider_config;
-    ofxToggle::Config toggle_config;
-    ofxToggle::Config toggle_auto_width_config;
-    ofxLabel::Config label_config;
-    ofxGuiGroup::Config group_config;
+	bool setup_done;
 
-    ofx2DMappingController* ctrl;
+	ofx2DMappingController* ctrl;
 
-    void setSubpanelPositions();
-    void updateObjectList();
-    void selectAllObjects();
-    void deselectAllObjects();
-    void removeAllObjects();
+	void updateObjectList();
+	void selectAllObjects();
+	void deselectAllObjects();
+	void removeAllObjects();
 
-    void addedObject(bool&clickstart);
+	void addedObject(bool&clickstart);
 
-    ofParameter<bool> direct_edit;
+	ofParameter<bool> direct_edit;
 
-    ofxSortableList object_list;
+//	ofxSortableList *object_list;
+	ofxSortableList *object_list;
 
-    ofPoint pos_main_options, pos_calibration_options, pos_add_buttons, pos_shape_list;
+	ofPoint pos_main_options, pos_calibration_options, pos_add_buttons, pos_shape_list;
 
-    ofxGuiGroup add_buttons_panel;
-    ofx2DFormMapping mapping_forms;
-    ofxGuiGroup main_panel, list_panel;
-    ofxGuiGroup calibration_options, list_options;
+	ofxGuiGroup *add_buttons_panel;
+	ofx2DFormMapping *mapping_forms;
+	ofxGuiGroup *main_panel, *list_panel;
+	ofxGuiGroup *calibration_options, *list_options;
 
-    void removeForm(RemovedElementData& data);
-    void reorderForm(MovingElementData& data);
+	void removeForm(RemovedElementData& data);
+	void reorderForm(MovingElementData& data);
 
-    ofxButton save_btn, import_btn, select_all_btn, deselect_all_btn, delete_all_btn;
-    ofxToggle edit_mode_btn;
+	//ofxButton save_btn, import_btn, select_all_btn, deselect_all_btn, delete_all_btn;
+	ofParameter<void> save, import, select_all, deselect_all, delete_all;
 
-    float zoom;
-    ofPoint zoom_pos;
+	float zoom;
+	ofPoint zoom_pos;
 
 };
