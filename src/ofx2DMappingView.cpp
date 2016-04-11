@@ -1,6 +1,6 @@
 #include "ofx2DMappingView.h"
 
-ofx2DMappingView::ofx2DMappingView(const ofJson &config):ofxPanel() {
+ofx2DMappingView::ofx2DMappingView(const string &name, const ofJson &config):ofxPanel(name) {
 
 	zoom = 1;
 	zoom_pos = ofPoint(0.5,0.5);
@@ -42,11 +42,15 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
 	mapping_forms = this->add<ofx2DFormMapping>();
 	main_panel = this->addPanel("MAPPING");
+	main_panel->setPercentalWidth(false);
+	main_panel->setWidth(200);
 	list_panel = this->addGroup("MAPPING OBJECTS");
+	list_panel->setPercentalWidth(false);
+	list_panel->setWidth(200);
 	main_panel->setAttribute("float", LayoutFloat::LEFT);
 	list_panel->setAttribute("float", LayoutFloat::LEFT);
 	mapping_forms->setAttribute("float", LayoutFloat::RIGHT);
-	mapping_forms->setConfig(ofJson({{"width", "50%"}}));
+	mapping_forms->setPercentalWidth(true, 0.5);
 
 	//MAIN OPTIONS PANEL
 	save.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);

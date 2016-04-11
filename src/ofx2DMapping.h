@@ -22,7 +22,9 @@ public:
 	ofx2DMappingView* addControlViewTo(ofxGui& parent);
 	ofx2DMappingView* getControlView();
 
+	void setOutputShape(ofRectangle shape);
 	void setOutputShape(float x, float y, float width, float height);
+	void setControlShape(ofRectangle shape);
 	void setControlShape(float x, float y, float width, float height);
 
 	//void setDirectEditMode(bool direct);

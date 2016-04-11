@@ -7,7 +7,7 @@
 class ofx2DMappingView : public ofxPanel {
 
 public:
-	ofx2DMappingView(const ofJson& config = ofJson());
+	ofx2DMappingView(const std::string& name, const ofJson& config = ofJson());
 	~ofx2DMappingView();
 	void setup(float x, float y, float w, float h);
 	void setMappingBackground(ofFbo_ptr fbo);
