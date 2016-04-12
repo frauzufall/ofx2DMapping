@@ -18,7 +18,7 @@ ofx2DMappingView::ofx2DMappingView(const string &name, const ofJson &config):ofx
 ofx2DMappingView::~ofx2DMappingView(){
 	if(setup_done){
 		vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
-		for(uint i = 0; i < options.size(); i++) {
+		for(unsigned int i = 0; i < options.size(); i++) {
 			options.at(i)->pleaseCopyMe.removeListener(this, &ofx2DMappingView::addedObject);
 		}
 		save.removeListener(ctrl, &ofx2DMappingController::saveMappingDefault);
@@ -75,7 +75,7 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 	add_buttons_panel = list_panel->addGroup("ADD MAPPING OBJECTS");
 
 	vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
-	for(uint i = 0; i < options.size(); i++) {
+	for(unsigned int i = 0; i < options.size(); i++) {
 //		ofxToggle::Config config = toggle_config;
 //		ofColor c = options.at(i)->color;
 //		if(c.getBrightness() < 200){
@@ -203,13 +203,13 @@ ofx2DFormMapping *ofx2DMappingView::getFormMapping() {
 }
 
 void ofx2DMappingView::selectAllObjects() {
-	for(uint i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
+	for(unsigned int i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
 		ctrl->getProjector()->getMappingObject(i)->editable = true;
 	}
 }
 
 void ofx2DMappingView::deselectAllObjects() {
-	for(uint i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
+	for(unsigned int i = 0; i < ctrl->getProjector()->shapeCount(); i++) {
 		ctrl->getProjector()->getMappingObject(i)->editable = false;
 	}
 }

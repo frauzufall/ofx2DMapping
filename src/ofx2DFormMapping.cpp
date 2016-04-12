@@ -99,7 +99,7 @@ void ofx2DFormMapping::updateForms() {
 
 		shapes.clear();
 
-		for (uint i = 0; i < parent_projector->shapeCount(); i++) {
+		for (unsigned int i = 0; i < parent_projector->shapeCount(); i++) {
 
 			ofPtr<ofx2DMappingObject> obj = parent_projector->getMappingObject(i);
 
@@ -112,7 +112,7 @@ void ofx2DFormMapping::updateForms() {
 				ms.src.clear();
 				ofPolyline line = shape->polyline;
 
-				for(uint j = 0; j < line.size(); j++) {
+				for(unsigned int j = 0; j < line.size(); j++) {
 					ms.polyline.push_back(draggableVertex());
 					ms.polyline[j].x = line[j].x*mapping_rect_dst.width+mapping_rect_dst.x;
 					ms.polyline[j].y = line[j].y*mapping_rect_dst.height+mapping_rect_dst.y;
@@ -212,7 +212,7 @@ void ofx2DFormMapping::generateDraw(){
 			translation_dst.y = -addZoom(mapping_rect_dst.getHeight())+mapping_rect_dst.getHeight();
 	}
 
-	for (uint i = 0; i < shapes.size(); i++) {
+	for (unsigned int i = 0; i < shapes.size(); i++) {
 
 		if(shapes[i].polyline.size() > 0){
 
@@ -233,7 +233,7 @@ void ofx2DFormMapping::generateDraw(){
 			shapes[i].dst_drag_unset.clear();
 			shapes[i].dst_drag_set.clear();
 
-			for(uint j = 0; j < shapes[i].polyline.size(); j++) {
+			for(unsigned int j = 0; j < shapes[i].polyline.size(); j++) {
 				ofPoint p(addZoom(shapes[i].polyline[j]-mapping_rect_dst.getPosition())+mapping_rect_dst.getPosition());
 				if(j == 0){
 					shapes[i].dst_border.moveTo(p);
@@ -264,7 +264,7 @@ void ofx2DFormMapping::generateDraw(){
 			shapes[i].src_drag_unset.clear();
 			shapes[i].src_drag_set.clear();
 
-			for(uint j = 0; j < shapes[i].src.size(); j++) {
+			for(unsigned int j = 0; j < shapes[i].src.size(); j++) {
 				ofPoint p(shapes[i].src[j]);
 				if(j == 0){
 					shapes[i].src_border.moveTo(p);
@@ -322,7 +322,7 @@ void ofx2DFormMapping::render() {
 
 	ofSetColor(255);
 
-	for (uint i = 0; i < shapes.size(); i++) {
+	for (unsigned int i = 0; i < shapes.size(); i++) {
 
 //        //draw dst rectangles
 
@@ -330,7 +330,7 @@ void ofx2DFormMapping::render() {
 //        ofSetColor(80,130,150);
 
 //        ofBeginShape();
-//        for(uint j = 0; j < shapes[i].dst.size(); j++) {
+//        for(unsigned int j = 0; j < shapes[i].dst.size(); j++) {
 //            ofVertex(shapes[i].dst[j]);
 //        }
 //        ofEndShape(true);
@@ -365,7 +365,7 @@ void ofx2DFormMapping::render() {
 						mapping_rect_src.width,
 						mapping_rect_src.height);
 		}
-		for (uint i = 0; i < shapes.size(); i++) {
+		for (unsigned int i = 0; i < shapes.size(); i++) {
 
 			shapes[i].src_border.draw();
 
@@ -385,8 +385,8 @@ bool ofx2DFormMapping::mouseMoved(ofMouseEventArgs& args) {
 
 	mouse = screenToLocal(mouse);
 
-	for (uint i = 0; i < shapes.size(); i++){
-		for (uint j = 0; j < shapes[i].polyline.size(); j++){
+	for (unsigned int i = 0; i < shapes.size(); i++){
+		for (unsigned int j = 0; j < shapes[i].polyline.size(); j++){
 			ofPoint zoomed_p = addZoomRelativeOfDstRect(shapes[i].polyline[j]);
 			float diffx = mouse.x - zoomed_p.x;
 			float diffy = mouse.y - zoomed_p.y;
@@ -403,7 +403,7 @@ bool ofx2DFormMapping::mouseMoved(ofMouseEventArgs& args) {
 				}
 			}
 		}
-		for (uint j = 0; j < shapes[i].src.size(); j++){
+		for (unsigned int j = 0; j < shapes[i].src.size(); j++){
 			float diffx = mouse.x - shapes[i].src[j].x;
 			float diffy = mouse.y - shapes[i].src[j].y;
 			float dist = sqrt(diffx*diffx + diffy*diffy);
@@ -431,11 +431,11 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
 
 	mouse = screenToLocal(mouse);
 
-	for (uint i = 0; i < shapes.size(); i++) {
+	for (unsigned int i = 0; i < shapes.size(); i++) {
 
 		ofPtr<ofx2DMappingObject> obj = parent_projector->getMappingObject(i);
 
-		for (uint j = 0; j < shapes[i].polyline.size(); j++) {
+		for (unsigned int j = 0; j < shapes[i].polyline.size(); j++) {
 
 			if (shapes[i].polyline[j].bBeingDragged == true){
 
@@ -509,7 +509,7 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
 
 		if(ofPtr<ofx2DMappingContentShape> cshape = std::dynamic_pointer_cast<ofx2DMappingContentShape>(obj)) {
 
-			for (uint j = 0; j < shapes[i].src.size(); j++){
+			for (unsigned int j = 0; j < shapes[i].src.size(); j++){
 				if (shapes[i].src[j].bBeingDragged == true){
 					if(mouse.x < mapping_rect_src.x+mapping_rect_src.width) {
 						if(mouse.x > mapping_rect_src.x)
@@ -591,9 +591,9 @@ bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
 
 	bool on_element = false;
 
-	for (uint i = 0; i < shapes.size(); i++){
+	for (unsigned int i = 0; i < shapes.size(); i++){
 		bool editable = parent_projector->getMappingObject(i)->editable;
-		for (uint j = 0; j < shapes[i].polyline.size(); j++){
+		for (unsigned int j = 0; j < shapes[i].polyline.size(); j++){
 			ofPoint zoomed_p = addZoomRelativeOfDstRect(shapes[i].polyline[j]);
 			float diffx = mouse.x - zoomed_p.x;
 			float diffy = mouse.y - zoomed_p.y;
@@ -608,7 +608,7 @@ bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
 				shapes[i].polyline[j].bBeingDragged = false;
 			}
 		}
-		for (uint j = 0; j < shapes[i].src.size(); j++){
+		for (unsigned int j = 0; j < shapes[i].src.size(); j++){
 			float diffx = mouse.x - shapes[i].src[j].x;
 			float diffy = mouse.y - shapes[i].src[j].y;
 			float dist = sqrt(diffx*diffx + diffy*diffy);
@@ -633,13 +633,13 @@ bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
 
 bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
 
-	for (uint i = 0; i < shapes.size(); i++){
-		for (uint j = 0; j < shapes[i].polyline.size(); j++){
+	for (unsigned int i = 0; i < shapes.size(); i++){
+		for (unsigned int j = 0; j < shapes[i].polyline.size(); j++){
 			shapes[i].polyline[j].bBeingDragged = false;
 			if(shapes.size()-1-i < parent_list->getNumControls() && parent_list->getNumControls() > 0 && shapes.size() == parent_list->getNumControls())
 				parent_list->getControl(shapes.size()-1-i)->setBackgroundColor(ofColor(0,0,0,0));
 		}
-		for (uint j = 0; j < shapes[i].src.size(); j++){
+		for (unsigned int j = 0; j < shapes[i].src.size(); j++){
 			shapes[i].src[j].bBeingDragged = false;
 		}
 	}
