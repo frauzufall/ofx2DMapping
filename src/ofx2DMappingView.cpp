@@ -138,7 +138,7 @@ void ofx2DMappingView::updateObjectList() {
 
 	ofPtr<ofx2DMappingProjector> p = ctrl->getProjector();
 
-	for(uint i = 0; i < p->shapeCount(); i++) {
+	for(int i = p->shapeCount()-1; i >= 0; i--) {
 
 		ofPtr<ofx2DMappingObject> mq = p->getMappingObject(i);
 		if(mq) {
@@ -148,9 +148,8 @@ void ofx2DMappingView::updateObjectList() {
 			if(c.getBrightness() < 200){
 				c.setBrightness(200);
 			}
-//			ofxToggle::Config config = toggle_config;
-//			config.textColor = c;
-			object_list->add(mq->editable);
+			ofxBaseGui* toggle = object_list->add(mq->editable);
+			toggle->setTextColor(c);
 		}
 	}
 }

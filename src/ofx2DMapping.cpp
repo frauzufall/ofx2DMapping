@@ -53,6 +53,7 @@ void ofx2DMapping::setOutputShape(float x, float y, float width, float height) {
 }
 
 void ofx2DMapping::setControlShape(ofRectangle shape) {
+	view->setPercentalWidth(false);
 	view->setShape(shape);
 }
 
