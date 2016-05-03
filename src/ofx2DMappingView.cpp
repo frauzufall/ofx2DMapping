@@ -1,14 +1,12 @@
 #include "ofx2DMappingView.h"
 
-ofx2DMappingView::ofx2DMappingView(const string &name, const ofJson &config):ofxPanel(name) {
+ofx2DMappingView::ofx2DMappingView(const string &name, const ofJson &config):ofxGuiPanel(name) {
 
 	zoom = 1;
 	zoom_pos = ofPoint(0.5,0.5);
 	direct_edit.set("direct edit", false);
 	setup_done = false;
 	mapping_forms = nullptr;
-	list_panel = nullptr;
-	main_panel = nullptr;
 	object_list = nullptr;
 
 	_setConfig(config);
@@ -40,17 +38,15 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
 	setup_done = true;
 
+	setConfig(ofJson({
+						 {"align-items", "stretch"},
+						 {"flex-direction", "row"}
+					 }));
+
+	ofxGuiGroup* main_panel = this->addPanel("MAPPING", ofJson({{"flex-direction", "column"}, {"width", 200}}));
+	ofxGuiGroup* list_panel = this->addGroup("MAPPING OBJECTS", ofJson({{"flex-direction", "column"}, {"width", 200}}));
 	mapping_forms = this->add<ofx2DFormMapping>();
-	main_panel = this->addPanel("MAPPING");
-	main_panel->setPercentalWidth(false);
-	main_panel->setWidth(200);
-	list_panel = this->addGroup("MAPPING OBJECTS");
-	list_panel->setPercentalWidth(false);
-	list_panel->setWidth(200);
-	main_panel->setAttribute("float", LayoutFloat::LEFT);
-	list_panel->setAttribute("float", LayoutFloat::LEFT);
-	mapping_forms->setAttribute("float", LayoutFloat::RIGHT);
-	mapping_forms->setPercentalWidth(true, 0.5);
+	mapping_forms->setConfig(ofJson({{"flex-direction", "column"}, {"flex", 1}}));
 
 	//MAIN OPTIONS PANEL
 	save.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
@@ -64,7 +60,7 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
 	//CALIBRATION OPTIONS
 
-	calibration_options = main_panel->addGroup("CALIBRATION OPTIONS");
+	ofxGuiGroup* calibration_options = main_panel->addGroup("CALIBRATION OPTIONS", ofJson({{"flex-direction", "column"}}));
 
 	calibration_options->add(ctrl->getCalibrating());
 	calibration_options->add(ctrl->getCalBorder());
@@ -72,24 +68,23 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
 	//OBJECT LIST PANEL
 
-	add_buttons_panel = list_panel->addGroup("ADD MAPPING OBJECTS");
+	ofxGuiGroup* add_buttons_panel = list_panel->addGroup("ADD MAPPING OBJECTS", ofJson({{"flex-direction", "column"}}));
 
 	vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
 	for(unsigned int i = 0; i < options.size(); i++) {
-//		ofxToggle::Config config = toggle_config;
-//		ofColor c = options.at(i)->color;
-//		if(c.getBrightness() < 200){
-//			c.setBrightness(200);
-//		}
-//		config.textColor = c;
-		add_buttons_panel->add(options.at(i)->pleaseCopyMe.set("add " + options.at(i)->name, false));
+		ofColor c = options.at(i)->color;
+		if(c.getBrightness() < 200){
+			c.setBrightness(200);
+		}
+		ofxGuiElement* element = add_buttons_panel->add(options.at(i)->pleaseCopyMe.set("add " + options.at(i)->name, false));
+		element->setTextColor(c);
 		options.at(i)->pleaseCopyMe.addListener(this, &ofx2DMappingView::addedObject);
 	}
 
 
 	//LIST MANIPULATION OPTIONS
 
-	list_options = list_panel->addGroup("OBJECT MANIPULATION");
+	ofxGuiGroup* list_options = list_panel->addGroup("OBJECT MANIPULATION", ofJson({{"flex-direction", "column"}}));
 
 	select_all.addListener(this, &ofx2DMappingView::selectAllObjects);
 	list_options->add(select_all.set("select all"));
@@ -104,7 +99,7 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
 //	ofxGuiGroup::Config object_list_config = group_config;
 //	object_list_config.spacing = 1;
-	object_list = list_panel->add<ofxSortableList>("MAPPING OBJECT LIST");
+	object_list = list_panel->add<ofxSortableList>("MAPPING OBJECT LIST", ofJson({{"flex-direction", "column"}}));
 	ofAddListener(object_list->elementRemoved, this, &ofx2DMappingView::removeForm);
 	ofAddListener(object_list->elementMovedStepByStep, this, &ofx2DMappingView::reorderForm);
 
@@ -148,7 +143,7 @@ void ofx2DMappingView::updateObjectList() {
 			if(c.getBrightness() < 200){
 				c.setBrightness(200);
 			}
-			ofxBaseGui* toggle = object_list->add(mq->editable);
+			ofxGuiElement* toggle = object_list->add(mq->editable);
 			toggle->setTextColor(c);
 		}
 	}

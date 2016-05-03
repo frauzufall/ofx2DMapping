@@ -24,19 +24,19 @@ ofx2DMappingView* ofx2DMapping::getControlView() {
 	return view;
 }
 
-ofx2DMappingView* ofx2DMapping::addControlViewTo(ofx::DOM::Element* parent) {
+ofx2DMappingView* ofx2DMapping::addControlViewTo(DOM::Element* parent) {
 	view = parent->add<ofx2DMappingView>("Mapping");
 	view->setControl(&ctrl);
 	view->setup(0,0,800,600);
 	return view;
 }
 
-ofx2DMappingView* ofx2DMapping::addControlViewTo(ofx::DOM::Element& parent) {
+ofx2DMappingView* ofx2DMapping::addControlViewTo(DOM::Element& parent) {
 	return addControlViewTo(&parent);
 }
 
 ofx2DMappingView* ofx2DMapping::addControlViewTo(ofxGui& parent) {
-	return addControlViewTo(parent.getRoot());
+	return addControlViewTo(parent.getDocument());
 }
 
 void ofx2DMapping::draw() {
@@ -53,7 +53,6 @@ void ofx2DMapping::setOutputShape(float x, float y, float width, float height) {
 }
 
 void ofx2DMapping::setControlShape(ofRectangle shape) {
-	view->setPercentalWidth(false);
 	view->setShape(shape);
 }
 

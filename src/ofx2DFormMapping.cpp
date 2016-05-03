@@ -1,6 +1,6 @@
 #include "ofx2DFormMapping.h"
 
-ofx2DFormMapping::ofx2DFormMapping(): ofxBaseGui() {
+ofx2DFormMapping::ofx2DFormMapping(): ofxGuiElement() {
 
 	shapes.clear();
 	resizing = false;
@@ -20,18 +20,7 @@ ofx2DFormMapping::ofx2DFormMapping(): ofxBaseGui() {
 }
 
 void ofx2DFormMapping::setup(string title, ofPtr<ofx2DMappingProjector> parent_projector, ofxSortableList *parent_list, float w, float h) {
-//	setSize(w,h);
-//    spacing = Config().spacing;
-//    spacingNextElement = Config().spacingNextElement;
-//    spacingFirstElement = Config().spacingFirstElement;
-//    header = Config().header;
-//    minimized = Config().minimized;
-//    bShowHeader = Config().showHeader;
-//    b.width = defaultWidth;
-//    layout = Config().layout;
 	clear();
-//    filename = Config().filename;
-//    guiActive = false;
 	setName(title);
 
 	registerMouseEvents(-2);
@@ -61,9 +50,10 @@ void ofx2DFormMapping::setMappingRects() {
 				mapping_rect_src.width = this->getWidth()-2*margin;
 				mapping_rect_src.height = mapping_rect_src.width*output_ratio_inv;
 
-				setHeight(mapping_rect_src.getHeight() + 2*margin);
-
-	//            ofxGuiGroup::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
+				if(mapping_rect_src.getHeight() + 2*margin > getHeight()){
+					mapping_rect_src.height = getHeight() - 2*margin;
+					mapping_rect_src.width = mapping_rect_src.height * parent_projector->outputWidth()/parent_projector->outputHeight();
+				}
 			}
 			else {
 
@@ -78,14 +68,18 @@ void ofx2DFormMapping::setMappingRects() {
 				mapping_rect_src.setSize(mapping_rect_dst.width,mapping_rect_dst.height);
 				mapping_rect_src.setPosition(mapping_rect_dst.getPosition()+ofPoint(0,mapping_rect_dst.height+margin));
 
-	//            ofxGuiGroup::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
+				if(mapping_rect_src.getBottom() - mapping_rect_dst.getTop() + 3*margin > getHeight()){
+					mapping_rect_dst.height = (getHeight() - margin)/2 - margin;
+					mapping_rect_dst.width= mapping_rect_dst.height*parent_projector->outputWidth()/parent_projector->outputHeight();
+
+					mapping_rect_src.setSize(mapping_rect_dst.width,mapping_rect_dst.height);
+					mapping_rect_src.setPosition(mapping_rect_dst.getPosition()+ofPoint(0,mapping_rect_dst.height+margin));
+				}
 
 				mapping_front.clear();
 				if(mapping_rect_dst.width > 0 && mapping_rect_dst.height > 0){
 					mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
 				}
-
-				setHeight(mapping_rect_src.getBottom() - mapping_rect_dst.getTop() + 3*margin);
 			}
 		}
 
@@ -193,7 +187,7 @@ void ofx2DFormMapping::rebuild() {
 
 void ofx2DFormMapping::generateDraw(){
 
-	ofxBaseGui::generateDraw();
+	ofxGuiElement::generateDraw();
 
 	updateSourceBackground();
 	source_empty_bg.clear();
@@ -294,7 +288,7 @@ void ofx2DFormMapping::generateDraw(){
 
 void ofx2DFormMapping::render() {
 
-	ofxBaseGui::render();
+	ofxGuiElement::render();
 
 	ofEnableAlphaBlending();
 
@@ -421,7 +415,7 @@ bool ofx2DFormMapping::mouseMoved(ofMouseEventArgs& args) {
 		}
 	}
 
-	return ofxBaseGui::mouseMoved(args);
+	return ofxGuiElement::mouseMoved(args);
 }
 
 
@@ -580,7 +574,7 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
 		setNeedsRedraw();
 	}
 
-	return ofxBaseGui::mouseDragged(args);
+	return ofxGuiElement::mouseDragged(args);
 }
 
 bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
@@ -628,7 +622,7 @@ bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
 		last_mouse = mouse;
 	}
 
-	return ofxBaseGui::mousePressed(args);
+	return ofxGuiElement::mousePressed(args);
 }
 
 bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
@@ -646,7 +640,7 @@ bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
 
 	dragging_dst = false;
 
-	return ofxBaseGui::mouseReleased(args);
+	return ofxGuiElement::mouseReleased(args);
 }
 
 bool ofx2DFormMapping::mouseScrolled(ofMouseEventArgs &args) {
@@ -656,7 +650,7 @@ bool ofx2DFormMapping::mouseScrolled(ofMouseEventArgs &args) {
 		setNeedsRedraw();
 	}
 
-	return ofxBaseGui::mouseScrolled(args);
+	return ofxGuiElement::mouseScrolled(args);
 }
 
 void ofx2DFormMapping::setMappingBackground(ofFbo_ptr &fbo) {
@@ -734,11 +728,11 @@ ofPoint ofx2DFormMapping::removeZoom(ofPoint p) {
 	return p/(1+zoom_factor*zoom_speed);
 }
 
-void ofx2DFormMapping::onResized(ResizeEventArgs&){
+void ofx2DFormMapping::onResized(DOM::ResizeEventArgs&){
 	rebuild();
 }
 
-void ofx2DFormMapping::onMoved(MoveEventArgs&){
+void ofx2DFormMapping::onMoved(DOM::MoveEventArgs&){
 	rebuild();
 }
 

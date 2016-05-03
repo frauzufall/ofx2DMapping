@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxPanel.h"
+#include "ofxGuiPanel.h"
 #include "ofx2DMappingProjector.h"
 #include "ofxSortableList.h"
 
@@ -45,7 +45,7 @@ struct mappableShape {
 };
 
 
-class ofx2DFormMapping : public ofxBaseGui {
+class ofx2DFormMapping : public ofxGuiElement {
 
 public:
 	ofx2DFormMapping();
@@ -74,10 +74,10 @@ public:
 	ofParameter<bool>& getShowSource();
 
 	/// \brief A callback to notify of Elements size changes
-	void onResized(ResizeEventArgs&);
+	void onResized(DOM::ResizeEventArgs&);
 
 	/// \brief A callback to notify of Elements moves
-	void onMoved(MoveEventArgs&);
+	void onMoved(DOM::MoveEventArgs&);
 
 private:
 

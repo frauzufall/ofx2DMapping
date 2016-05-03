@@ -4,7 +4,7 @@
 #include "ofxSortableList.h"
 #include "ofx2DFormMapping.h"
 
-class ofx2DMappingView : public ofxPanel {
+class ofx2DMappingView : public ofxGuiPanel {
 
 public:
 	ofx2DMappingView(const std::string& name, const ofJson& config = ofJson());
@@ -41,10 +41,7 @@ protected:
 
 	ofPoint pos_main_options, pos_calibration_options, pos_add_buttons, pos_shape_list;
 
-	ofxGuiGroup *add_buttons_panel;
 	ofx2DFormMapping *mapping_forms;
-	ofxGuiGroup *main_panel, *list_panel;
-	ofxGuiGroup *calibration_options, *list_options;
 
 	void removeForm(RemovedElementData& data);
 	void reorderForm(MovingElementData& data);

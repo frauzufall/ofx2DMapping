@@ -17,8 +17,8 @@ public:
 	void showControls(bool show);
 
 	ofx2DMappingController* getControl();
-	ofx2DMappingView* addControlViewTo(ofx::DOM::Element* parent);
-	ofx2DMappingView* addControlViewTo(ofx::DOM::Element& parent);
+	ofx2DMappingView* addControlViewTo(DOM::Element* parent);
+	ofx2DMappingView* addControlViewTo(DOM::Element& parent);
 	ofx2DMappingView* addControlViewTo(ofxGui& parent);
 	ofx2DMappingView* getControlView();
 
