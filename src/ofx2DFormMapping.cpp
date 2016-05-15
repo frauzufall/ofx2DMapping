@@ -1,6 +1,6 @@
 #include "ofx2DFormMapping.h"
 
-ofx2DFormMapping::ofx2DFormMapping(): ofxPanel() {
+ofx2DFormMapping::ofx2DFormMapping(): ofxGuiPanel() {
 
 	shapes.clear();
 	zoom_factor = 0;
@@ -11,8 +11,8 @@ ofx2DFormMapping::ofx2DFormMapping(): ofxPanel() {
 }
 
 void ofx2DFormMapping::setup(string title, ofx2DMappingProjector *parent_projector, ofxSortableList *parent_list, float w, float h) {
-	ofxPanel::setup(title);
-	ofxPanel::setSize(w, h);
+	ofxGuiPanel::setup(title);
+	ofxGuiPanel::setSize(w, h);
 	control_rect = this->getShape();
 	control_rect_backup = control_rect;
 	this->parent_projector = parent_projector;
@@ -37,7 +37,7 @@ void ofx2DFormMapping::setMappingRects() {
 			mapping_rect_src.height = mapping_rect_src.width*output_ratio_inv;
 		}
 
-		ofxPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
+		ofxGuiPanel::setSize(mapping_rect_src.width+2*margin, header+mapping_rect_src.height+2*margin);
 	}
 	else {
 		mapping_rect_dst.x = control_rect.x+margin;
@@ -67,7 +67,7 @@ void ofx2DFormMapping::setMappingRects() {
 		mapping_rect_dst.width = fmax(1, mapping_rect_dst.width);
 		mapping_rect_dst.height = fmax(1, mapping_rect_dst.height);
 
-		ofxPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
+		ofxGuiPanel::setSize(mapping_rect_dst.width+2*margin, mapping_rect_dst.height+header+mapping_rect_src.height+3*margin);
 
 		mapping_front.clear();
 		mapping_front.allocate(mapping_rect_dst.width+2*mapping_margin, mapping_rect_dst.height+2*mapping_margin, GL_RGBA);
@@ -187,7 +187,7 @@ void ofx2DFormMapping::draw(bool show_source) {
 	ofFill();
 	ofDrawRectangle(this->getPosition().x, this->getPosition().y, this->getWidth(), this->getHeight()-2);
 
-	ofxPanel::draw();
+	ofxGuiPanel::draw();
 
 	if(show_source) {
 		//ofDrawRectangle(mapping_rect_src);
@@ -355,7 +355,7 @@ bool ofx2DFormMapping::mouseMoved(ofMouseEventArgs& args) {
 		}
 	}
 
-	return ofxPanel::mouseMoved(args);
+	return ofxGuiPanel::mouseMoved(args);
 }
 
 
@@ -508,7 +508,7 @@ bool ofx2DFormMapping::mouseDragged(ofMouseEventArgs &args) {
 		last_mouse = mouse;
 	}
 
-	return ofxPanel::mouseDragged(args);
+	return ofxGuiPanel::mouseDragged(args);
 }
 
 bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
@@ -552,7 +552,7 @@ bool ofx2DFormMapping::mousePressed(ofMouseEventArgs& args) {
 		last_mouse = mouse;
 	}
 
-	return ofxPanel::mousePressed(args);
+	return ofxGuiPanel::mousePressed(args);
 }
 
 bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
@@ -570,7 +570,7 @@ bool ofx2DFormMapping::mouseReleased(ofMouseEventArgs &args) {
 
 	dragging_dst = false;
 
-	return ofxPanel::mouseReleased(args);
+	return ofxGuiPanel::mouseReleased(args);
 }
 
 bool ofx2DFormMapping::mouseScrolled(ofMouseEventArgs &args) {
@@ -579,7 +579,7 @@ bool ofx2DFormMapping::mouseScrolled(ofMouseEventArgs &args) {
 		setZoomFactor(args.y);
 	}
 
-	return ofxPanel::mouseScrolled(args);
+	return ofxGuiPanel::mouseScrolled(args);
 }
 
 void ofx2DFormMapping::setMappingBackground(ofFbo_ptr &fbo) {
@@ -662,7 +662,7 @@ ofPoint ofx2DFormMapping::removeZoom(ofPoint p) {
 }
 
 void ofx2DFormMapping::setSize(float w, float h) {
-	ofxPanel::setSize(w,h);
+	ofxGuiPanel::setSize(w,h);
 	control_rect = this->getShape();
 	control_rect.width = w;
 	control_rect.height = h;

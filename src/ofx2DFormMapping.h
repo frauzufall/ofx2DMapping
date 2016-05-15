@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxPanel.h"
 #include "ofx2DMappingProjector.h"
 #include "ofxSortableList.h"
 
@@ -22,7 +21,7 @@ struct mappableShape {
 };
 
 
-class ofx2DFormMapping : public ofxPanel {
+class ofx2DFormMapping : public ofxGuiPanel {
 
 public:
     ofx2DFormMapping();

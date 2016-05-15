@@ -45,14 +45,14 @@ private:
 
     ofxGuiGroup add_buttons_panel;
     ofx2DFormMapping mapping_forms;
-    ofxPanel main_panel, list_panel;
+    ofxGuiPanel main_panel, list_panel;
     ofxGuiGroup calibration_options, list_options;
 
     void removeForm(RemovedElementData& data);
     void reorderForm(MovingElementData& data);
 
-    ofxButton save_btn, import_btn, select_all_btn, deselect_all_btn, delete_all_btn;
-    ofxToggle edit_mode_btn;
+    ofxGuiButton save_btn, import_btn, select_all_btn, deselect_all_btn, delete_all_btn;
+    ofxGuiToggle edit_mode_btn;
     vector<ofParameter<bool>> add_button_params;
 
     float zoom;
