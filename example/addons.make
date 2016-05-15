@@ -1,4 +1,4 @@
-ofxGui
+ofxGuiExtended
 ofxTriangle
 ofxSvg
 ofxSortableList

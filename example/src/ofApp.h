@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxGui.h"
+#include "ofxGuiExtended.h"
 #include "ofx2DMapping.h"
 
 #include "SomeScene.h"
