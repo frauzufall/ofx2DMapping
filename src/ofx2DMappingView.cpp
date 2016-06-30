@@ -5,6 +5,11 @@ ofx2DMappingView::ofx2DMappingView(const string &name, const ofJson &config):ofx
 	zoom = 1;
 	zoom_pos = ofPoint(0.5,0.5);
 	direct_edit.set("direct edit", false);
+	save.set("save");
+	import.set("import svg");
+	select_all.set("select all");
+	deselect_all.set("deselect all");
+	delete_all.set("delete all");
 	setup_done = false;
 	mapping_forms = nullptr;
 	object_list = nullptr;
@@ -50,10 +55,10 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
 	//MAIN OPTIONS PANEL
 	save.addListener(ctrl, &ofx2DMappingController::saveMappingDefault);
-	main_panel->add(save.set("save"));
+	main_panel->add(save);
 
 	import.addListener(this, &ofx2DMappingView::importSvg);
-	main_panel->add(import.set("import svg"));
+	main_panel->add(import);
 
 	direct_edit.addListener(this, &ofx2DMappingView::setEditMode);
 	main_panel->add(direct_edit);
@@ -73,11 +78,10 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 	vector<ofPtr<ofx2DMappingObject>> options = ctrl->getOptions();
 	for(unsigned int i = 0; i < options.size(); i++) {
 		ofColor c = options.at(i)->color;
-		if(c.getBrightness() < 200){
-			c.setBrightness(200);
-		}
 		ofxGuiElement* element = add_buttons_panel->add(options.at(i)->pleaseCopyMe.set("add " + options.at(i)->name, false));
-		element->setTextColor(c);
+		if(c.getSaturation() > 0){
+			element->setTextColor(c);
+		}
 		options.at(i)->pleaseCopyMe.addListener(this, &ofx2DMappingView::addedObject);
 	}
 
@@ -87,13 +91,13 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 	ofxGuiGroup* list_options = list_panel->addGroup("OBJECT MANIPULATION", ofJson({{"flex-direction", "column"}}));
 
 	select_all.addListener(this, &ofx2DMappingView::selectAllObjects);
-	list_options->add(select_all.set("select all"));
+	list_options->add(select_all);
 
 	deselect_all.addListener(this, &ofx2DMappingView::deselectAllObjects);
-	list_options->add(deselect_all.set("deselect all"));
+	list_options->add(deselect_all);
 
 	delete_all.addListener(this, &ofx2DMappingView::removeAllObjects);
-	list_options->add(delete_all.set("delete all"));
+	list_options->add(delete_all);
 
 	//OBJECT LIST
 
@@ -140,11 +144,10 @@ void ofx2DMappingView::updateObjectList() {
 			//insert toggles at beginning of list
 			mq->editable.setName(mq->name);
 			ofColor c = mq->color;
-			if(c.getBrightness() < 200){
-				c.setBrightness(200);
-			}
 			ofxGuiElement* toggle = object_list->add(mq->editable);
-			toggle->setTextColor(c);
+			if(c.getSaturation() > 0){
+				toggle->setTextColor(c);
+			}
 		}
 	}
 }

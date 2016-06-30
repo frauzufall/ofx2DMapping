@@ -36,6 +36,7 @@ public:
 
 	ofPtr<ofx2DMappingImage> addImageTemplate(string name, string path);
 	ofPtr<ofx2DMappingFbo> addFboTemplate(string name, ofPtr<ofFbo> fbo);
+	ofPtr<ofx2DMappingContentShape> addTextureTemplate(string name, ofTexture* texture);
 	ofPtr<ofx2DMappingColorShape> addColorTemplate(string name, ofColor color);
 
 private:
