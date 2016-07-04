@@ -40,7 +40,9 @@ void ofx2DMappingView::setup(float x, float y, float w, float h) {
 
 	setConfig(ofJson({
 						 {"align-items", "stretch"},
-						 {"flex-direction", "row"}
+						 {"flex-direction", "row"},
+						 {"flex", 1},
+						 {"align-self", "stretch"}
 					 }));
 
 	ofxGuiGroup* main_panel = this->addPanel("MAPPING", ofJson({{"flex-direction", "column"}, {"width", 200}}));
