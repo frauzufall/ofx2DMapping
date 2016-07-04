@@ -81,6 +81,12 @@ ofPtr<ofx2DMappingFbo> ofx2DMapping::addFboTemplate(string name, ofPtr<ofFbo> fb
 	return content;
 }
 
+ofPtr<ofx2DMappingContentShape> ofx2DMapping::addTextureTemplate(string name, ofTexture* texture) {
+	ofPtr<ofx2DMappingContentShape> content = addTemplate<ofx2DMappingContentShape>(name);
+	content->setTexture(texture);
+	return content;
+}
+
 ofPtr<ofx2DMappingColorShape> ofx2DMapping::addColorTemplate(string name, ofColor color) {
 	ofPtr<ofx2DMappingColorShape> shape = addTemplate<ofx2DMappingColorShape>(name);
 	shape->setColor(color);
