@@ -237,7 +237,7 @@ void ofx2DMappingController::mappedContentToFbo(ofPtr<ofx2DMappingProjector> p) 
 	glHint(GL_LINE_SMOOTH, GL_NICEST);
 
 	mapped_content_fbo->begin();
-	ofClear(0, 0, 0, 255);
+	ofClear(0, 0, 0, 0);
 
 	for(unsigned int i = 0; i < p->shapeCount(); i++) {
 
@@ -254,7 +254,7 @@ void ofx2DMappingController::mappedContentToFbo(ofPtr<ofx2DMappingProjector> p) 
 void ofx2DMappingController::mappedAreaToFbo(ofPtr<ofx2DMappingProjector> p) {
 
 	mapped_area_fbo->begin();
-	ofClear(0, 0, 0, 255);
+	ofClear(0, 0, 0, 0);
 
 	for(unsigned int i = 0; i < p->shapeCount(); i++) {
 

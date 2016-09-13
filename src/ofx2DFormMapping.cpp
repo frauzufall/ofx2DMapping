@@ -294,7 +294,7 @@ void ofx2DFormMapping::render() {
 
 	//draw dst
 
-	if(!direct_edit) {
+	if(!direct_edit && mapping_front.isAllocated()) {
 		mapping_front.begin();
 		ofClear(0,0,0,0);
 		ofTranslate(mapping_margin, mapping_margin);
@@ -312,39 +312,44 @@ void ofx2DFormMapping::render() {
 					addZoom(mapping_rect_dst.width),
 					addZoom(mapping_rect_dst.height));
 
-	}
+		ofSetColor(255);
 
-	ofSetColor(255);
+		for (unsigned int i = 0; i < shapes.size(); i++) {
 
-	for (unsigned int i = 0; i < shapes.size(); i++) {
+			//draw shape lines and fillings
 
-//        //draw dst rectangles
+			shapes[i].dst_bg.draw();
+			shapes[i].dst_border.draw();
 
-//        ofNoFill();
-//        ofSetColor(80,130,150);
+			if(parent_projector->getMappingObject(i)->editable) {
+				shapes[i].dst_drag_unset.draw();
+				shapes[i].dst_drag_set.draw();
+			}
 
-//        ofBeginShape();
-//        for(unsigned int j = 0; j < shapes[i].dst.size(); j++) {
-//            ofVertex(shapes[i].dst[j]);
-//        }
-//        ofEndShape(true);
-
-		//draw shape lines and fillings
-
-		shapes[i].dst_bg.draw();
-		shapes[i].dst_border.draw();
-
-		if(parent_projector->getMappingObject(i)->editable) {
-			shapes[i].dst_drag_unset.draw();
-			shapes[i].dst_drag_set.draw();
 		}
 
-	}
-
-	if(!direct_edit) {
 		ofPopMatrix();
 		mapping_front.end();
+
 		mapping_front.draw(mapping_rect_dst.getPosition()-ofPoint(mapping_margin, mapping_margin), mapping_front.getWidth(), mapping_front.getHeight());
+
+	}else{
+		ofSetColor(255);
+
+		for (unsigned int i = 0; i < shapes.size(); i++) {
+
+			//draw shape lines and fillings
+
+			shapes[i].dst_bg.draw();
+			shapes[i].dst_border.draw();
+
+			if(parent_projector->getMappingObject(i)->editable) {
+				shapes[i].dst_drag_unset.draw();
+				shapes[i].dst_drag_set.draw();
+			}
+
+		}
+
 	}
 
 	//draw src
