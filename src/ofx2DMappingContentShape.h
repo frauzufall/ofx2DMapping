@@ -111,24 +111,24 @@ class ofx2DMappingContentShape : public ofx2DMappingShape {
 						glBegin(GL_TRIANGLES);
 						for (int i = 0; i < this->triangle.nTriangles; i++){
 
-							float cx = (((this->triangle.triangles[i].a.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
-							float cy = (((this->triangle.triangles[i].a.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
-							float ox = (this->triangle.triangles[i].a.x - this->dst[0].x) / (float)(this->dst[1].x-this->dst[0].x) * w;
-							float oy = (this->triangle.triangles[i].a.y - this->dst[0].y) / (float)(this->dst[2].y-this->dst[0].y) * h;
+							float cx = (((this->triangle.triangles[i].pts[0].x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
+							float cy = (((this->triangle.triangles[i].pts[0].y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
+							float ox = (this->triangle.triangles[i].pts[0].x - this->dst[0].x) / (float)(this->dst[1].x-this->dst[0].x) * w;
+							float oy = (this->triangle.triangles[i].pts[0].y - this->dst[0].y) / (float)(this->dst[2].y-this->dst[0].y) * h;
 							glTexCoord2f(cx, cy);
 							glVertex2f(ox, oy);
 
-							cx = (((this->triangle.triangles[i].b.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
-							cy = (((this->triangle.triangles[i].b.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
-							ox = (this->triangle.triangles[i].b.x - this->dst[0].x)/(float)(this->dst[1].x-this->dst[0].x)*w;
-							oy = (this->triangle.triangles[i].b.y - this->dst[0].y)/(float)(this->dst[2].y-this->dst[0].y)*h;
+							cx = (((this->triangle.triangles[i].pts[1].x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
+							cy = (((this->triangle.triangles[i].pts[1].y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
+							ox = (this->triangle.triangles[i].pts[1].x - this->dst[0].x)/(float)(this->dst[1].x-this->dst[0].x)*w;
+							oy = (this->triangle.triangles[i].pts[1].y - this->dst[0].y)/(float)(this->dst[2].y-this->dst[0].y)*h;
 							glTexCoord2f(cx, cy);
 							glVertex2f(ox, oy);
 
-							cx = (((this->triangle.triangles[i].c.x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
-							cy = (((this->triangle.triangles[i].c.y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
-							ox = (this->triangle.triangles[i].c.x - this->dst[0].x)/(float)(this->dst[1].x-this->dst[0].x)*w;
-							oy = (this->triangle.triangles[i].c.y - this->dst[0].y)/(float)(this->dst[2].y-this->dst[0].y)*h;
+							cx = (((this->triangle.triangles[i].pts[2].x - this->dst[0].x) / (this->dst[1].x-this->dst[0].x) * (this->src[1].x-this->src[0].x))+ this->src[0].x)* src_width;
+							cy = (((this->triangle.triangles[i].pts[2].y - this->dst[0].y) / (this->dst[2].y-this->dst[0].y) * (this->src[2].y-this->src[0].y))+ this->src[0].y) * src_height;
+							ox = (this->triangle.triangles[i].pts[2].x - this->dst[0].x)/(float)(this->dst[1].x-this->dst[0].x)*w;
+							oy = (this->triangle.triangles[i].pts[2].y - this->dst[0].y)/(float)(this->dst[2].y-this->dst[0].y)*h;
 							glTexCoord2f(cx, cy);
 							glVertex2f(ox, oy);
 

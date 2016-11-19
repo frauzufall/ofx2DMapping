@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "ofx2DMappingObjectFactory.h"
-#include "ofxTriangle.h"
+#include "ofxTriangleMesh.h"
 #include "ofxXmlSettings.h"
 #include "ofx2DMappingHelper.h"
 #include "IDGenerator.h"

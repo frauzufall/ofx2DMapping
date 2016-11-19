@@ -9,7 +9,7 @@ public:
     ofPoint     dst[4];
     ofMatrix4x4 matrix_dst_norm;
 	ofMatrix4x4 matrix_norm_dst;
-    ofxTriangle triangle;
+    ofxTriangleMesh triangle;
     ofPolyline  polyline;
     ofPoint     plane[4];
 

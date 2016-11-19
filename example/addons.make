@@ -1,6 +1,7 @@
-ofxGuiExtended
-ofxTriangle
-ofxSvg
-ofxSortableList
-ofxXmlSettings
 ofx2DMapping
+ofxGuiExtended
+ofxPoco
+ofxSortableList
+ofxSvg
+ofxTriangleMesh
+ofxXmlSettings
