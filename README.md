@@ -23,4 +23,9 @@ See example for usage details and watch this video: https://vimeo.com/132085632
 
 ##Installation
 Please use the lastest git version of openFrameworks until v0.9 is published. Otherwise the addon will crash. 
-Additionally to this addon, you need **ofxSortableList** (https://github.com/frauzufall/ofxSortableList).
+
+##Dependencies
+	-**ofxSortableList** (https://github.com/frauzufall/ofxSortableList)
+	-**ofxGuiExtended** (https://github.com/frauzufall/ofxGuiExtended)
+	-**ofxTriangleMesh, branch "updated-of"** (https://github.com/frauzufall/ofxTriangleMesh/tree/updated-of)
+
